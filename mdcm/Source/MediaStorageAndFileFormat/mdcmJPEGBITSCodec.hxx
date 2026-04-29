@@ -27,7 +27,7 @@
 #include "mdcmImageHelper.h"
 #include <csetjmp>
 
-#if 0
+#if 1
 #ifndef _WIN32
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -197,6 +197,7 @@ typedef my_destination_mgr * my_dest_ptr;
 
 #define OUTPUT_BUF_SIZE 4096
 
+// cppcheck-suppress unknownMacro
 METHODDEF(void) init_destination(j_compress_ptr cinfo)
 {
   my_dest_ptr dest = (my_dest_ptr)cinfo->dest;
@@ -206,6 +207,7 @@ METHODDEF(void) init_destination(j_compress_ptr cinfo)
   dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
 }
 
+// cppcheck-suppress unknownMacro
 METHODDEF(boolean) empty_output_buffer(j_compress_ptr cinfo)
 {
   my_dest_ptr  dest = (my_dest_ptr)cinfo->dest;
@@ -219,6 +221,7 @@ METHODDEF(boolean) empty_output_buffer(j_compress_ptr cinfo)
   return TRUE;
 }
 
+// cppcheck-suppress unknownMacro
 METHODDEF(void) term_destination(j_compress_ptr cinfo)
 {
   my_dest_ptr  dest = (my_dest_ptr)cinfo->dest;
@@ -235,6 +238,7 @@ METHODDEF(void) term_destination(j_compress_ptr cinfo)
     ERREXIT(cinfo, JERR_FILE_WRITE);
 }
 
+// cppcheck-suppress unknownMacro
 GLOBAL(void) jpeg_stdio_dest(j_compress_ptr cinfo, std::ostream * outfile)
 {
   my_dest_ptr dest;
@@ -313,11 +317,17 @@ JPEGBITSCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
     jpeg_create_decompress(&cinfo);
     int workaround = 0;
     if (ImageHelper::GetWorkaroundPredictorBug())
+    {
       workaround |= WORKAROUND_PREDICTOR6OVERFLOW;
+    }
     if (ImageHelper::GetWorkaroundCornellBug())
+    {
       workaround |= WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER;
+    }
     if (workaround != 0)
+    {
       cinfo.workaround_options = workaround;
+    }
     jpeg_stdio_src(&cinfo, is, true);
   }
   else
@@ -546,13 +556,9 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         // PHILIPS_Gyroscan-12-Jpeg_Extended_Process_2_4.dcm
         // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
         // MARCONI_MxTWin-12-MONO2-JpegLossless-ZeroLengthSQ.dcm
-        // LJPEG_BuginMDCM12.dcm
-        mdcmAlwaysWarnMacro("jerr.pub.msg_code: JWRN_MUST_DOWNSCALE\n"
-                            "    cinfo.data_precision="
-                            << cinfo.data_precision
-                            << "\n"
-                               "    this->BitSample="
-                            << this->BitSample);
+        // LJPEG_BuginGDCM12.dcm
+        mdcmAlwaysWarnMacro("jerr.pub.msg_code: JWRN_MUST_DOWNSCALE\n    cinfo.data_precision="
+                            << cinfo.data_precision << "\n    this->BitSample=" << this->BitSample);
         this->BitSample = jerr.pub.msg_parm.i[0];
         assert(cinfo.data_precision == this->BitSample);
         jpeg_destroy_decompress(&cinfo);
@@ -563,8 +569,8 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
     const volatile unsigned int * dims = this->GetDimensions();
     if (cinfo.image_width != dims[0] || cinfo.image_height != dims[1])
     {
-      mdcmAlwaysWarnMacro("JPEG is " << cinfo.image_width << "x" << cinfo.image_height << ", DICOM " << dims[0] << "x"
-                                     << dims[1]);
+      mdcmAlwaysWarnMacro("JPEG is " << cinfo.image_width << "x" << cinfo.image_height << ", DICOM "
+                           << dims[0] << "x" << dims[1]);
     }
 #if (defined JPEGBITS_PRINT_COLORSPACES && JPEGBITS_PRINT_COLORSPACES == 1)
     std::cout << "cinfo.jpeg_color_space = ";
@@ -625,8 +631,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
             (GetPhotometricInterpretation() != PhotometricInterpretation::MONOCHROME2))
         {
           mdcmAlwaysWarnMacro("JPEG: PhotometricInterpretation " << GetPhotometricInterpretation()
-                                                                 << ", but jpeg_color_space is "
-                                                                 << (int)cinfo.jpeg_color_space);
+                              << ", but jpeg_color_space is JCS_GRAYSCALE");
           this->PI = PhotometricInterpretation::MONOCHROME2;
         }
         break;
@@ -640,11 +645,13 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 #endif
             ))
         {
+          // The 'JCS UNKNOWN' color space sets the requirement for image post-processing (YBR to RGB conversion),
+          // except rare cases where the YBR color space is desired.
           cinfo.jpeg_color_space = JCS_UNKNOWN;
           cinfo.out_color_space = JCS_UNKNOWN;
         }
-        // Probably should not happed, but lossy JPEG with photo-metric "RGB" and
-        // cinfo.jpeg_color_space JCS_YCbCr exist. Required to open correctly.
+        // Probably should not happed, but lossy JPEG with photo-metric 'RGB' and
+        // cinfo.jpeg_color_space 'JCS_YCbCr' exist.
         if (GetPhotometricInterpretation() == PhotometricInterpretation::RGB)
         {
           cinfo.jpeg_color_space = JCS_UNKNOWN;
@@ -753,7 +760,7 @@ JPEGBITSCodec::InternalCode(const char * input, size_t len, std::ostream & os)
       break;
     case PhotometricInterpretation::YBR_FULL:
     case PhotometricInterpretation::YBR_FULL_422:
-    case PhotometricInterpretation::YBR_PARTIAL_420: // MPEG
+    case PhotometricInterpretation::YBR_PARTIAL_420: // Unused, MPEG only
     case PhotometricInterpretation::YBR_PARTIAL_422: // Retired
       cinfo.input_components = 3;
       cinfo.in_color_space = JCS_YCbCr;
@@ -763,6 +770,7 @@ JPEGBITSCodec::InternalCode(const char * input, size_t len, std::ostream & os)
     case PhotometricInterpretation::CMYK:
     case PhotometricInterpretation::UNKNOWN:
     case PhotometricInterpretation::PI_END:
+    default:
       return false;
   }
   jpeg_set_defaults(&cinfo);
@@ -865,8 +873,8 @@ JPEGBITSCodec::EncodeBuffer(std::ostream & os, const char * data, size_t datalen
         break;
       case PhotometricInterpretation::YBR_FULL:
       case PhotometricInterpretation::YBR_FULL_422:
-      case PhotometricInterpretation::YBR_PARTIAL_420:
-      case PhotometricInterpretation::YBR_PARTIAL_422:
+      case PhotometricInterpretation::YBR_PARTIAL_420: // Unused, MPEG only
+      case PhotometricInterpretation::YBR_PARTIAL_422: // Retired
         cinfo.input_components = 3;
         cinfo.in_color_space = JCS_YCbCr;
         break;
@@ -875,6 +883,7 @@ JPEGBITSCodec::EncodeBuffer(std::ostream & os, const char * data, size_t datalen
       case PhotometricInterpretation::CMYK:
       case PhotometricInterpretation::UNKNOWN:
       case PhotometricInterpretation::PI_END:
+      default:
         return false;
     }
   }
@@ -946,7 +955,7 @@ JPEGBITSCodec::IsStateSuspension() const
 
 } // end namespace mdcm
 
-#if 0
+#if 1
 #ifndef _WIN32
 #  pragma GCC diagnostic pop
 #endif
