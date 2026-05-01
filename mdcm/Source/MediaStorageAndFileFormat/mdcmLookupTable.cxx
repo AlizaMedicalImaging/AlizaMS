@@ -351,8 +351,10 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
       }
       for (unsigned int i = 0; i < Internal.Length[type]; ++i)
       {
-        assert(i * mult + offset < length);
-        assert(3 * i + type < Internal.RGB.size());
+        if (!(i * mult + offset < length) || !(3 * i + type < Internal.RGB.size()))
+        {
+          return;
+        }
         Internal.RGB[3 * i + type] = array[i * mult + offset];
       }
     }
@@ -362,8 +364,10 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
       assert(mult2 == 2);
       for (unsigned int i = 0; i < Internal.Length[type]; ++i)
       {
-        assert(i * mult2 + offset < length);
-        assert(3 * i + type < Internal.RGB.size());
+        if (!(i * mult2 + offset < length) || !(3 * i + type < Internal.RGB.size()))
+        {
+          return;
+        }
         Internal.RGB[3 * i + type] = array[i * mult2 + offset];
       }
     }
@@ -381,8 +385,10 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
     const uint16_t * array16 = static_cast<const uint16_t *>(varray);
     for (unsigned int i = 0; i < Internal.Length[type]; ++i)
     {
-      assert(2 * i < length);
-      assert(2 * (3 * i + type) < Internal.RGB.size());
+      if (!(2 * i < length) || !(2 * (3 * i + type) < Internal.RGB.size()))
+      {
+        return;
+      }
       uchar16[3 * i + type] = array16[i];
     }
   }
@@ -472,8 +478,10 @@ LookupTable::GetLUT(LookupTableType type, unsigned char * array, unsigned int & 
     }
     for (unsigned int i = 0; i < Internal.Length[type]; ++i)
     {
-      assert(i * mult + offset < length);
-      assert(3 * i + type < Internal.RGB.size());
+      if (!(i * mult + offset < length) || !(3 * i + type < Internal.RGB.size()))
+      {
+        return;
+      }
       array[i * mult + offset] = Internal.RGB[3 * i + type];
     }
   }
@@ -486,8 +494,10 @@ LookupTable::GetLUT(LookupTableType type, unsigned char * array, unsigned int & 
     uint16_t *       array16 = static_cast<uint16_t *>(varray);
     for (unsigned int i = 0; i < Internal.Length[type]; ++i)
     {
-      assert(2 * i < length);
-      assert(2 * (3 * i + type) < Internal.RGB.size());
+      if (!(2 * i < length) || !(2 * (3 * i + type) < Internal.RGB.size()))
+      {
+        return;
+      }
       array16[i] = uchar16[3 * i + type];
     }
   }
