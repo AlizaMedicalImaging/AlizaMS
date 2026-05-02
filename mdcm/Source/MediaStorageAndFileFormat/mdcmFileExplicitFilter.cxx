@@ -31,7 +31,7 @@
 #include "mdcmVM.h"
 #include "mdcmDataSetHelper.h"
 
-/**
+/*
  * FileExplicitFilter class
  *
  * Changing an implicit dataset to an explicit dataset is NOT a
@@ -101,20 +101,23 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
     mdcmWarningMacro("Not implemented");
     return false;
   }
-  DataSet::Iterator it = ds.Begin();
-  for (; it != ds.End();)
+  unsigned long long c{};
+  mdcm::Tag tmp_t;
+  for (DataSet::Iterator it = ds.Begin(); it != ds.End();)
   {
     DataElement  de = *it;
     std::string  strowner;
-    const char * owner = nullptr;
     const Tag &  t = de.GetTag();
-    if (t.IsPrivate() &&
-        !ChangePrivateTags
-        // As a special exception we convert to proper VR:
-        // - Private Group Length
-        // - Private Creator
-        // This makes the output more readable (and this should be relative safe)
-        && !t.IsGroupLength() && !t.IsPrivateCreator())
+    if (c > 0 && tmp_t == t)
+    {
+#if 1
+      std::cout << "FileExplicitFilter: failed, duplicated Tag " << tmp_t << std::endl;
+#endif
+      return false;
+    }
+    tmp_t = t;
+    ++c;
+    if (t.IsPrivate() && !ChangePrivateTags && !t.IsGroupLength() && !t.IsPrivateCreator())
     {
       ++it;
       continue;
@@ -122,9 +125,8 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
     if (t.IsPrivate() && !t.IsPrivateCreator())
     {
       strowner = ds.GetPrivateCreator(t);
-      owner = strowner.c_str();
     }
-    const DictEntry & entry = dicts.GetDictEntry(t, owner);
+    const DictEntry & entry = dicts.GetDictEntry(t, strowner.c_str());
     const VR &        vr = entry.GetVR();
     VR                cvr = DataSetHelper::ComputeVR(*F, ds, t);
     VR                oldvr = de.GetVR();
@@ -147,8 +149,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
       {
         if (cvr & VR::VRASCII)
         {
-          // mdcm-JPEG-Extended.dcm has a couple of VR::OB private field
-          // MM: Is this a good idea to change them to an ASCII when we know this might not work?
+          // gdcm-JPEG-Extended.dcm
           if (!(oldvr & VR::VRASCII || oldvr == VR::INVALID || oldvr == VR::UN || oldvr == VR::OB))
           {
             mdcmErrorMacro("Cannot convert VR for tag: " << t << " " << oldvr << " is incompatible with " << cvr
@@ -170,8 +171,8 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
         {
           assert(0);
         }
-        // one more check we are going to make this attribute explicit VR, there is
-        // still a special case, when VL is > uint16_max then we must give up:
+        // MM: one more check we are going to make this attribute explicit VR, there is
+        // still a special case, when VL is > uint16_max then we must give up
         if (!(cvr & VR::VL32) && de.GetVL() > UINT16_MAX)
         {
           cvr = VR::UN;
@@ -190,13 +191,15 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
       de.SetVLToUndefined();
       assert(sqi->GetLength().IsUndefined());
       // recursive
-      SequenceOfItems::ItemVector::iterator sit = sqi->Items.begin();
-      for (; sit != sqi->Items.end(); ++sit)
+      for (SequenceOfItems::ItemVector::iterator sit = sqi->Items.begin(); sit != sqi->Items.end(); ++sit)
       {
         Item & item = *sit;
         item.SetVLToUndefined();
         DataSet & nds = item.GetNestedDataSet();
-        ProcessDataSet(nds, dicts);
+        if (!ProcessDataSet(nds, dicts))
+        {
+          return false;
+        }
         item.SetVL(item.GetLength<ExplicitDataElement>());
       }
     }
@@ -206,7 +209,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
     }
     else
     {
-      // Ok length is 0, it can be a 0 length explicit SQ (implicit) or a ByteValue...
+      // MM: Ok length is 0, it can be a 0 length explicit SQ (implicit) or a ByteValue,
       // we cannot make any error here, simply change the VR
       de.SetVR(cvr);
     }

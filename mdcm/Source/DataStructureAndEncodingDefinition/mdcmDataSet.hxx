@@ -485,18 +485,33 @@ DataSet::ReadWithLength(std::istream & is, VL & length)
   return is;
 }
 
+#define MDCM_WARN_DUPLICATED
 template <typename TDE, typename TSwap>
 const std::ostream &
 DataSet::Write(std::ostream & os) const
 {
-  typename DataSet::ConstIterator it = DES.begin();
-  for (; it != DES.end(); ++it)
+#ifdef MDCM_WARN_DUPLICATED
+  unsigned long long c{};
+  mdcm::Tag t;
+#endif
+  for (typename DataSet::ConstIterator it = DES.begin(); it != DES.end(); ++it)
   {
     const DataElement & de = *it;
+#ifdef MDCM_WARN_DUPLICATED
+    if (c > 0 && t == de.GetTag())
+    {
+      mdcmAlwaysWarnMacro("DataSet::Write: duplicated Tag " << t);
+    }
+    t = de.GetTag();
+    ++c;
+#endif
     de.Write<TDE, TSwap>(os);
   }
   return os;
 }
+#ifdef MDCM_WARN_DUPLICATED
+#undef MDCM_WARN_DUPLICATED
+#endif
 
 } // end namespace mdcm
 
