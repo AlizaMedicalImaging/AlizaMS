@@ -103,23 +103,22 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
   }
   unsigned long long c{};
   mdcm::Tag tmp_t;
-  for (DataSet::Iterator it = ds.Begin(); it != ds.End();)
+  DataSet copy;
+  for (DataSet::ConstIterator it = ds.Begin(); it != ds.End(); ++it)
   {
-    DataElement  de = *it;
-    std::string  strowner;
-    const Tag &  t = de.GetTag();
+    DataElement de = *it;
+    std::string strowner;
+    const Tag & t = de.GetTag();
     if (c > 0 && tmp_t == t)
     {
 #if 1
-      std::cout << "FileExplicitFilter: failed, duplicated Tag " << tmp_t << std::endl;
+      mdcmAlwaysWarnMacro("FileExplicitFilter: duplicated Tag " << tmp_t);
 #endif
-      return false;
     }
     tmp_t = t;
     ++c;
     if (t.IsPrivate() && !ChangePrivateTags && !t.IsGroupLength() && !t.IsPrivateCreator())
     {
-      ++it;
       continue;
     }
     if (t.IsPrivate() && !t.IsPrivateCreator())
@@ -213,9 +212,9 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
       // we cannot make any error here, simply change the VR
       de.SetVR(cvr);
     }
-    ++it;
-    ds.Replace(de);
+    copy.Insert(de);
   }
+  ds = std::move(copy);
   return true;
 }
 

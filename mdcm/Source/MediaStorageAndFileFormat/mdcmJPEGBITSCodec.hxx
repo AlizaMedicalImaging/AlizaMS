@@ -27,7 +27,7 @@
 #include "mdcmImageHelper.h"
 #include <csetjmp>
 
-#if 1
+#if 0
 #ifndef _WIN32
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -371,7 +371,7 @@ JPEGBITSCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
     }
     else
     {
-      mdcmAlwaysWarnMacro("Unsupported precision = " << precision);
+      mdcmWarningMacro("Unsupported precision = " << precision);
       assert(0);
       return false;
     }
@@ -396,11 +396,11 @@ JPEGBITSCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
       {
         PI = PhotometricInterpretation::CMYK;
         this->PF.SetSamplesPerPixel(4);
-        mdcmAlwaysWarnMacro("Not supported: JCS_UNKNOWN and cinfo.num_components = 4, trying CMYK");
+        mdcmWarningMacro("Not supported: JCS_UNKNOWN and cinfo.num_components = 4, trying CMYK");
       }
       else
       {
-        mdcmAlwaysWarnMacro("Error: JCS_UNKNOWN and cinfo.num_components = " << cinfo.num_components);
+        mdcmWarningMacro("Error: JCS_UNKNOWN and cinfo.num_components = " << cinfo.num_components);
         assert(0);
         return false;
       }
@@ -425,7 +425,7 @@ JPEGBITSCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
       PI = PhotometricInterpretation::YBR_FULL_422;
       if (cinfo.process == JPROC_LOSSLESS)
       {
-        mdcmAlwaysWarnMacro("JPROC_LOSSLESS and JCS_YCbCr");
+        mdcmWarningMacro("JPROC_LOSSLESS and JCS_YCbCr");
       }
       this->PF.SetSamplesPerPixel(3);
     }
@@ -434,11 +434,11 @@ JPEGBITSCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
       assert(cinfo.num_components == 4);
       PI = PhotometricInterpretation::CMYK;
       this->PF.SetSamplesPerPixel(4);
-      mdcmAlwaysWarnMacro("JCS_CMYK is not intended to be in DICOM JPEG file");
+      mdcmWarningMacro("JCS_CMYK is not intended to be in DICOM JPEG file");
     }
     else
     {
-      mdcmAlwaysWarnMacro("Error, unknown cinfo.jpeg_color_space");
+      mdcmWarningMacro("Error, unknown cinfo.jpeg_color_space");
       assert(0);
     }
   }
@@ -955,7 +955,7 @@ JPEGBITSCodec::IsStateSuspension() const
 
 } // end namespace mdcm
 
-#if 1
+#if 0
 #ifndef _WIN32
 #  pragma GCC diagnostic pop
 #endif

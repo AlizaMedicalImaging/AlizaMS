@@ -32,8 +32,8 @@
 
 namespace mdcm
 {
-class MDCM_EXPORT DataElementException : public std::exception
-{};
+
+class MDCM_EXPORT DataElementException : public std::exception {};
 
 class PrivateTag;
 /*
@@ -45,11 +45,11 @@ class MDCM_EXPORT DataSet
   friend std::ostream & operator<<(std::ostream &, const DataSet &);
 
 public:
-#if 0
-  typedef std::set<DataElement> DataElementSet;
-#else
+  // The purpose of using 'std::multiset' here is to allow
+  // duplicated tags in broken datasets to be shown in some
+  // metadata viewers. This requires some caution. It can
+  // easily be replaced with 'std::set'.
   typedef std::multiset<DataElement> DataElementSet;
-#endif
   typedef DataElementSet::const_iterator ConstIterator;
   typedef DataElementSet::iterator       Iterator;
   typedef DataElementSet::size_type      SizeType;
@@ -208,12 +208,11 @@ public:
   ReadWithLength(std::istream &, VL &);
 
 protected:
-  // This function is not safe, it does not check for the value of the tag
   void
   InsertDataElement(const DataElement &);
 
-  // Internal function, that will compute the actual Tag (if found) of
-  // a requested Private Tag (XXXX,YY,"PRIVATE")
+  // Internal function, compute the actual Tag (if found) of
+  // the requested Private Tag (XXXX,YY,"PRIVATE")
   Tag
   ComputeDataElement(const PrivateTag &) const;
 

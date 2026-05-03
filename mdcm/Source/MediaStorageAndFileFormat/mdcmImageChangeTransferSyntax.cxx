@@ -252,9 +252,10 @@ ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, const Bitmap
   RAWCodec               codec;
   if (codec.CanCode(ts))
   {
+    const PhotometricInterpretation & input_pi = input.GetPhotometricInterpretation();
     codec.SetDimensions(input.GetDimensions());
     codec.SetPlanarConfiguration(input.GetPlanarConfiguration());
-    codec.SetPhotometricInterpretation(input.GetPhotometricInterpretation());
+    codec.SetPhotometricInterpretation(input_pi);
     codec.SetPixelFormat(input.GetPixelFormat());
     codec.SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     DataElement out;
@@ -265,8 +266,9 @@ ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, const Bitmap
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
       if (ForceYBRFull ||
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
+          input_pi == PhotometricInterpretation::YBR_FULL ||
+          input_pi == PhotometricInterpretation::YBR_FULL_422 ||
+          input_pi == PhotometricInterpretation::YBR_PARTIAL_422)
       {
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
       }
@@ -292,9 +294,10 @@ ImageChangeTransferSyntax::TryEncapsulatedRAWCodec(const DataElement & pixelde, 
   EncapsulatedRAWCodec   codec;
   if (codec.CanCode(ts))
   {
+    const PhotometricInterpretation & input_pi = input.GetPhotometricInterpretation();
     codec.SetDimensions(input.GetDimensions());
     codec.SetPlanarConfiguration(input.GetPlanarConfiguration());
-    codec.SetPhotometricInterpretation(input.GetPhotometricInterpretation());
+    codec.SetPhotometricInterpretation(input_pi);
     codec.SetPixelFormat(input.GetPixelFormat());
     codec.SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     DataElement out;
@@ -305,7 +308,9 @@ ImageChangeTransferSyntax::TryEncapsulatedRAWCodec(const DataElement & pixelde, 
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
       if (ForceYBRFull ||
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL))
+          input_pi == PhotometricInterpretation::YBR_FULL ||
+          input_pi == PhotometricInterpretation::YBR_FULL_422 ||
+          input_pi == PhotometricInterpretation::YBR_PARTIAL_422)
       {
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
       }
@@ -328,9 +333,10 @@ ImageChangeTransferSyntax::TryRLECodec(const DataElement & pixelde, const Bitmap
   RLECodec               codec;
   if (codec.CanCode(ts))
   {
+    const PhotometricInterpretation & input_pi = input.GetPhotometricInterpretation();
     codec.SetDimensions(input.GetDimensions());
     codec.SetPlanarConfiguration(input.GetPlanarConfiguration());
-    codec.SetPhotometricInterpretation(input.GetPhotometricInterpretation());
+    codec.SetPhotometricInterpretation(input_pi);
     codec.SetPixelFormat(input.GetPixelFormat());
     codec.SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     DataElement out;
@@ -341,8 +347,9 @@ ImageChangeTransferSyntax::TryRLECodec(const DataElement & pixelde, const Bitmap
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
       if (ForceYBRFull ||
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
+          input_pi == PhotometricInterpretation::YBR_FULL ||
+          input_pi == PhotometricInterpretation::YBR_FULL_422 ||
+          input_pi == PhotometricInterpretation::YBR_PARTIAL_422)
       {
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
       }
@@ -375,9 +382,13 @@ ImageChangeTransferSyntax::TryJPEGCodec(const DataElement & pixelde, const Bitma
   }
   if (codec->CanCode(ts))
   {
+    const PhotometricInterpretation & input_pi = input.GetPhotometricInterpretation();
+#if 0
+    std::cout << input.GetPhotometricInterpretation() << std::endl;
+#endif
     codec->SetDimensions(input.GetDimensions());
     codec->SetPlanarConfiguration(input.GetPlanarConfiguration());
-    codec->SetPhotometricInterpretation(input.GetPhotometricInterpretation());
+    codec->SetPhotometricInterpretation(input_pi);
     codec->SetPixelFormat(input.GetPixelFormat());
     codec->SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     if (!input.GetPixelFormat().IsCompatible(ts))
@@ -406,7 +417,17 @@ ImageChangeTransferSyntax::TryJPEGCodec(const DataElement & pixelde, const Bitma
       }
       else
       {
-        output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
+        // lossless
+        if (input_pi == PhotometricInterpretation::YBR_FULL ||
+            input_pi == PhotometricInterpretation::YBR_FULL_422 ||
+            input_pi == PhotometricInterpretation::YBR_PARTIAL_422)
+        {
+          output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
+        }
+        else
+        {
+          output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
+        }
       }
     }
     return true;
@@ -429,10 +450,11 @@ ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, const Bit
   }
   if (codec->CanCode(ts))
   {
+    const PhotometricInterpretation & input_pi = input.GetPhotometricInterpretation();
     codec->SetDimensions(input.GetDimensions());
     codec->SetPixelFormat(input.GetPixelFormat());
     codec->SetPlanarConfiguration(input.GetPlanarConfiguration());
-    codec->SetPhotometricInterpretation(input.GetPhotometricInterpretation());
+    codec->SetPhotometricInterpretation(input_pi);
     codec->SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     DataElement out;
     bool        r;
@@ -460,8 +482,9 @@ ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, const Bit
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
       if (ForceYBRFull ||
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
+          input_pi == PhotometricInterpretation::YBR_FULL ||
+          input_pi == PhotometricInterpretation::YBR_FULL_422 ||
+          input_pi == PhotometricInterpretation::YBR_PARTIAL_422)
       {
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
       }
@@ -502,11 +525,12 @@ ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, const B
 #endif
   if (codec->CanCode(ts))
   {
+    const PhotometricInterpretation & input_pi = input.GetPhotometricInterpretation();
     codec->SetDimensions(input.GetDimensions());
     codec->SetPixelFormat(input.GetPixelFormat());
     codec->SetNumberOfDimensions(input.GetNumberOfDimensions());
     codec->SetPlanarConfiguration(input.GetPlanarConfiguration());
-    codec->SetPhotometricInterpretation(input.GetPhotometricInterpretation());
+    codec->SetPhotometricInterpretation(input_pi);
     codec->SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     DataElement out;
     const bool r = codec->Code(pixelde, out);
@@ -514,9 +538,9 @@ ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, const B
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
       if (ForceYBRFull ||
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
-          // TODO this is probably impossible
-          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
+          input_pi == PhotometricInterpretation::YBR_FULL ||
+          input_pi == PhotometricInterpretation::YBR_FULL_422 ||
+          input_pi == PhotometricInterpretation::YBR_PARTIAL_422)
       {
         if (mct)
         {

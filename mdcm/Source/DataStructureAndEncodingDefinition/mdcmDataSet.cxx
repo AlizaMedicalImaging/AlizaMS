@@ -76,23 +76,20 @@ DataSet::Print(std::ostream & os, const std::string & indent) const
 void
 DataSet::Insert(const DataElement & de)
 {
-  // FIXME: there is a special case where a dataset can have value < 0x8, see:
-  // $ gdcmdump --csa gdcmData/SIEMENS-JPEG-CorruptFrag.dcm
-  if (de.GetTag().GetGroup() >= 0x0008 || de.GetTag().GetGroup() == 0x4)
+  const mdcm::Tag & t = de.GetTag();
+  if (t.GetGroup() >= 0x0008 || t.GetGroup() == 0x4)
   {
-    // prevent user error
-    if (de.GetTag() == Tag(0xfffe, 0xe00d) || de.GetTag() == Tag(0xfffe, 0xe0dd) || de.GetTag() == Tag(0xfffe, 0xe000))
-    {
-      ;
-    }
-    else
+    // Prevent user error
+    if (!(t == Tag(0xfffe, 0xe00d) || t == Tag(0xfffe, 0xe0dd) || t == Tag(0xfffe, 0xe000)))
     {
       InsertDataElement(de);
     }
   }
   else
   {
-    mdcmErrorMacro("Cannot add element with group < 0x0008 and != 0x4 in the dataset: " << de.GetTag());
+    // Special case where a dataset can have value < 0x8, s. SIEMENS-JPEG-CorruptFrag.dcm
+    mdcmAlwaysWarnMacro(
+      "Skipped data element with group < 0x8 and != 0x4 in the dataset: " << t);
   }
 }
 
@@ -102,14 +99,6 @@ DataSet::Replace(const DataElement & de)
   ConstIterator it = DES.find(de);
   if (it != DES.cend())
   {
-#if 0
-    // detect loop
-    if (!(&*it != &de)) // FIXME
-    {
-      mdcmAlwaysWarnMacro("DataSet::Replace: loop?");
-      assert(0);
-    }
-#endif
     DES.erase(it);
   }
   DES.insert(de);
@@ -121,14 +110,6 @@ DataSet::ReplaceEmpty(const DataElement & de)
   ConstIterator it = DES.find(de);
   if (it != DES.cend() && it->IsEmpty())
   {
-#if 0
-    // detect loop
-    if (!(&*it != &de)) // FIXME
-    {
-      mdcmAlwaysWarnMacro("DataSet::ReplaceEmpty: loop?");
-      assert(0);
-    }
-#endif
     DES.erase(it);
   }
   DES.insert(de);
@@ -249,17 +230,17 @@ DataSet::GetMediaStorage() const
 void
 DataSet::InsertDataElement(const DataElement & de)
 {
-#if 0
+  DES.insert(de);
+  /*
+  // This is only valid for 'std::set'.
   std::pair<Iterator, bool> pr = DES.insert(de);
-  if(pr.second == false)
+  if (pr.second == false)
   {
     mdcmAlwaysWarnMacro(
       "DataElement: " << de << " was already found, skipping duplicate entry.\n"
       "Original entry kept is: " << *pr.first);
   }
-#else
-  DES.insert(de);
-#endif
+  */
   assert(de.IsEmpty() || de.GetVL() == de.GetValue().GetLength());
 }
 
