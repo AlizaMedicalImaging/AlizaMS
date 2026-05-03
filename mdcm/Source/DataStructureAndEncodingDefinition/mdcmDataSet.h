@@ -36,28 +36,8 @@ class MDCM_EXPORT DataElementException : public std::exception
 {};
 
 class PrivateTag;
-/**
+/*
  * Class to represent a Data Set (which contains Data Elements)
- * A Data Set represents an instance of a real world Information Object
- *
- * DATA SET:
- * Exchanged information consisting of a structured set of Attribute values
- * directly or indirectly related to Information Objects. The value of each
- * Attribute in a Data Set is expressed as a Data Element.
- * A collection of Data Elements ordered by increasing Data Element Tag
- * number that is an encoding of the values of Attributes of a real world
- * object.
- *
- * Implementation note. If one do:
- * DataSet ds;
- * ds.SetLength(0);
- * ds.Read(is);
- * setting length to 0 actually means try to read is as if it was a root
- * DataSet. Other value are undefined (nested dataset with undefined length)
- * or defined length (different from 0) means nested dataset with defined
- * length.
- *
- * a DataSet does not have a Transfer Syntax type, only a File does.
  */
 class MDCM_EXPORT DataSet
 {
@@ -151,7 +131,6 @@ public:
     return ll;
   }
 
-  // Tag need to be >= 0x8 to be considered valid data element.
   void
   Insert(const DataElement &);
   void
@@ -167,19 +146,16 @@ public:
     return count;
   }
 
-  // This only search at the 'root level' of the DataSet.
   const DataElement &
   GetDataElement(const Tag &) const;
   const DataElement &
   GetDataElement(const PrivateTag &) const;
   std::string
   GetPrivateCreator(const Tag &) const;
-  // This only search within the level of the current DataSet.
   bool
   FindDataElement(const Tag & t) const;
   bool
   FindDataElement(const PrivateTag &) const;
-  // This only search at the same level as the DataSet is.
   const DataElement &
   FindNextDataElement(const Tag &) const;
   bool
@@ -233,8 +209,6 @@ public:
 
 protected:
   // This function is not safe, it does not check for the value of the tag
-  // so depending whether we are getting called from a dataset or file meta header
-  // the condition is different
   void
   InsertDataElement(const DataElement &);
 
