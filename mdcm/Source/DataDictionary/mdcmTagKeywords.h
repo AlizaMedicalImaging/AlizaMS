@@ -94,6 +94,7 @@ namespace Keywords
   typedef mdcm::Attribute<0x0008, 0x001a> RelatedGeneralSOPClassUID;
   typedef mdcm::Attribute<0x0008, 0x001b> OriginalSpecializedSOPClassUID;
   typedef mdcm::Attribute<0x0008, 0x001c> SyntheticData;
+  typedef mdcm::Attribute<0x0008, 0x001d> SensitiveContentCodeSequence;
   typedef mdcm::Attribute<0x0008, 0x0020> StudyDate;
   typedef mdcm::Attribute<0x0008, 0x0021> SeriesDate;
   typedef mdcm::Attribute<0x0008, 0x0022> AcquisitionDate;
@@ -1538,6 +1539,9 @@ namespace Keywords
   typedef mdcm::Attribute<0x0018, 0x9382> MaterialAttenuationSequence;
   typedef mdcm::Attribute<0x0018, 0x9383> PhotonEnergy;
   typedef mdcm::Attribute<0x0018, 0x9384> XRayMassAttenuationCoefficient;
+  typedef mdcm::Attribute<0x0018, 0x9390> MetalArtifactReductionSequence;
+  typedef mdcm::Attribute<0x0018, 0x9391> MetalArtifactReductionApplied;
+  typedef mdcm::Attribute<0x0018, 0x9392> MetalArtifactReductionAlgorithmIdentificationSequence;
   typedef mdcm::Attribute<0x0018, 0x9401> ProjectionPixelCalibrationSequence;
   typedef mdcm::Attribute<0x0018, 0x9402> DistanceSourceToIsocenter;
   typedef mdcm::Attribute<0x0018, 0x9403> DistanceObjectToTableTop;
@@ -4116,6 +4120,11 @@ namespace Keywords
   typedef mdcm::Attribute<0x3004, 0x0012> DoseValue;
   typedef mdcm::Attribute<0x3004, 0x0014> TissueHeterogeneityCorrection;
   typedef mdcm::Attribute<0x3004, 0x0016> RecommendedIsodoseLevelSequence;
+  typedef mdcm::Attribute<0x3004, 0x0020> DoseUnitCodeSequence;
+  typedef mdcm::Attribute<0x3004, 0x0021> RTDoseInterpretedTypeCodeSequence;
+  typedef mdcm::Attribute<0x3004, 0x0022> RTDoseInterpretedTypeCodeModifierSequence;
+  typedef mdcm::Attribute<0x3004, 0x0023> DoseRadiobiologicalInterpretationSequence;
+  typedef mdcm::Attribute<0x3004, 0x0024> RTDoseIntentCodeSequence;
   typedef mdcm::Attribute<0x3004, 0x0040> DVHNormalizationPoint;
   typedef mdcm::Attribute<0x3004, 0x0042> DVHNormalizationDoseValue;
   typedef mdcm::Attribute<0x3004, 0x0050> DVHSequence;

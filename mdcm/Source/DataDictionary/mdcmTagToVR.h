@@ -138,6 +138,7 @@ VR::VRType GetVRFromTag(const Tag & t)
     case 0x0008001a: return VR::UI;
     case 0x0008001b: return VR::UI;
     case 0x0008001c: return VR::CS;
+    case 0x0008001d: return VR::SQ;
     case 0x00080020: return VR::DA;
     case 0x00080021: return VR::DA;
     case 0x00080022: return VR::DA;
@@ -1581,6 +1582,9 @@ VR::VRType GetVRFromTag(const Tag & t)
     case 0x00189382: return VR::SQ;
     case 0x00189383: return VR::DS;
     case 0x00189384: return VR::DS;
+    case 0x00189390: return VR::SQ;
+    case 0x00189391: return VR::CS;
+    case 0x00189392: return VR::SQ;
     case 0x00189401: return VR::SQ;
     case 0x00189402: return VR::FL;
     case 0x00189403: return VR::FL;
@@ -4142,6 +4146,11 @@ VR::VRType GetVRFromTag(const Tag & t)
     case 0x30040012: return VR::DS;
     case 0x30040014: return VR::CS;
     case 0x30040016: return VR::SQ;
+    case 0x30040020: return VR::SQ;
+    case 0x30040021: return VR::SQ;
+    case 0x30040022: return VR::SQ;
+    case 0x30040023: return VR::SQ;
+    case 0x30040024: return VR::SQ;
     case 0x30040040: return VR::DS;
     case 0x30040042: return VR::DS;
     case 0x30040050: return VR::SQ;

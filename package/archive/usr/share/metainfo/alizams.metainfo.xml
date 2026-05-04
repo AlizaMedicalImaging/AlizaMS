@@ -26,7 +26,7 @@
       <li>DICOM Study multi-view with intersection lines and side-by-side view</li>
       <li>Volume Rendering, multi-planar reconstruction (MPR)</li>
       <li>2D+t and 3D+t animations</li>
-      <li>DICOM metadata viewer, DICOM 2025e dictionary</li>
+      <li>DICOM metadata viewer, DICOM 2026b dictionary</li>
       <li>Fast directory scanner, DICOMDIR</li>
       <li>RTSTRUCT contours</li>
       <li>Proper measurement in Ultrasound Calibrated Regions</li>
