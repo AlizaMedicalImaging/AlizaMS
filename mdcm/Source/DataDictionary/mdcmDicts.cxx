@@ -60,7 +60,6 @@ Dicts::GetDictEntry(const Tag & tag, const char * owner) const
     }
     else
     {
-      // 0x0000 and [0x1,0xFF] are special cases
       if (tag.IsIllegal())
       {
         return ill;
