@@ -319,7 +319,7 @@ public:
       }
       else
       {
-        // MM: mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
+        // MM: gdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
         // instead of terminator (eof is the next char)
         mdcmDebugMacro("Fragment: failed at " << frag.GetTag() << " Offset "
                        << is.tellg() << '\n' << ex.what());

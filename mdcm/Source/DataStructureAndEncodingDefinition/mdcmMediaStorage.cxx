@@ -526,7 +526,7 @@ MediaStorage::SetFromModality(const DataSet & ds)
   const DataElement & de = ds.GetDataElement(Tag(0x0008, 0x0060));
   if (!de.IsEmpty())
   {
-    // mdcm-CR-DCMTK-16-NonSamplePerPix.dcm
+    // gdcm-CR-DCMTK-16-NonSamplePerPix.dcm
     const ByteValue * bv = de.GetByteValue();
     if (bv)
     {
