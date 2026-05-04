@@ -106,8 +106,9 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
   DataSet copy;
   for (DataSet::ConstIterator it = ds.Begin(); it != ds.End(); ++it)
   {
-    DataElement de = *it;
-    std::string strowner;
+    DataElement  de = *it;
+    std::string  strowner;
+    const char * owner{};
     const Tag & t = de.GetTag();
     if (c > 0 && tmp_t == t)
     {
@@ -124,8 +125,9 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
     if (t.IsPrivate() && !t.IsPrivateCreator())
     {
       strowner = ds.GetPrivateCreator(t);
+      owner = strowner.c_str();
     }
-    const DictEntry & entry = dicts.GetDictEntry(t, strowner.c_str());
+    const DictEntry & entry = dicts.GetDictEntry(t, owner);
     const VR &        vr = entry.GetVR();
     VR                cvr = DataSetHelper::ComputeVR(*F, ds, t);
     VR                oldvr = de.GetVR();
