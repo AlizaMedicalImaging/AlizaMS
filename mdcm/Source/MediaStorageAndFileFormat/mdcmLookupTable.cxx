@@ -39,7 +39,6 @@
 namespace
 {
 
-// abstract class for segment
 template <typename EntryType>
 class Segment
 {
@@ -77,7 +76,7 @@ protected:
   const EntryType * last_;
 };
 
-// discrete segment (opcode = 0)
+// Discrete segment (opcode = 0)
 template <typename EntryType>
 class DiscreteSegment : public Segment<EntryType>
 {
@@ -94,7 +93,7 @@ public:
   }
 };
 
-// linear segment (opcode = 1)
+// Linear segment (opcode = 1)
 template <typename EntryType>
 class LinearSegment : public Segment<EntryType>
 {
@@ -108,7 +107,7 @@ public:
   {
     if (expanded.empty())
     {
-      // linear segment can't be the first segment.
+      // Linear segment can't be the first segment.
       return false;
     }
     const EntryType length = *(this->first_ + 1);
@@ -124,7 +123,7 @@ public:
   }
 };
 
-// indirect segment (opcode = 2)
+// Indirect segment (opcode = 2)
 template <typename EntryType>
 class IndirectSegment : public Segment<EntryType>
 {
@@ -138,7 +137,7 @@ public:
   {
     if (instances.empty())
     {
-      // some other segments are required as references.
+      // Some other segments are required as references.
       return false;
     }
     const EntryType *                   first_segment = instances.begin()->first;
@@ -148,7 +147,7 @@ public:
     typename SegmentMap::const_iterator ppHeadSeg = instances.find(copied_part_head);
     if (ppHeadSeg == instances.cend())
     {
-      // referred segment not found
+      // Referred segment not found.
       return false;
     }
     EntryType                           nNumCopies = *(this->first_ + 1);
@@ -192,21 +191,18 @@ ExpandPalette(const EntryType * raw_values, uint32_t length, std::vector<EntryTy
     }
     else
     {
-      // invalid opcode
+      // Invalid opcode
       break;
     }
   }
   typename Segment<EntryType>::SegmentMap instances;
   std::transform(
     segments.begin(), segments.end(), std::inserter(instances, instances.end()), typename Segment<EntryType>::ToMap());
-  typename SegmentList::iterator ppSeg = segments.begin();
-  typename SegmentList::iterator endOfSegments = segments.end();
-  for (; ppSeg != endOfSegments; ++ppSeg)
+  for (typename SegmentList::iterator ppSeg = segments.begin(); ppSeg != segments.end(); ++ppSeg)
   {
     (*ppSeg)->Expand(instances, palette);
   }
-  ppSeg = segments.begin();
-  for (; ppSeg != endOfSegments; ++ppSeg)
+  for (typename SegmentList::iterator ppSeg = segments.begin(); ppSeg != segments.end(); ++ppSeg)
   {
     delete *ppSeg;
   }

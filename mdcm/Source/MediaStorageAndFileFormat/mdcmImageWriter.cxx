@@ -43,8 +43,6 @@ ImageWriter::ImageWriter()
   PixelData = new Image;
 }
 
-// It will overwrite anything Image infos found in DataSet
-// (see parent class to see how to pass dataset)
 const Image &
 ImageWriter::GetImage() const
 {
@@ -52,13 +50,11 @@ ImageWriter::GetImage() const
 }
 
 Image &
-ImageWriter::GetImage() // FIXME
+ImageWriter::GetImage()
 {
   return dynamic_cast<Image &>(*PixelData);
 }
 
-// Internal function used to compute a target MediaStorage
-// User may want to call this function ahead before Write
 MediaStorage
 ImageWriter::ComputeTargetMediaStorage()
 {
@@ -179,8 +175,8 @@ ImageWriter::Write()
   // StudyID
   if (!ds.FindDataElement(Tag(0x0020, 0x0010)))
   {
-    // FIXME this one is actually bad since the value is
-    // needed for DICOMDIR construction
+    // MM: This one is actually bad since the value is
+    // needed for DICOMDIR construction.
     DataElement de(Tag(0x0020, 0x0010));
     de.SetVR(Attribute<0x0020, 0x0010>::GetVR());
     ds.Insert(de);
@@ -214,7 +210,7 @@ ImageWriter::Write()
     de.SetVR(Attribute<0x0020, 0x0020>::GetVR());
     ds.Insert(de);
   }
-  // (re)compute MediaStorage
+  // (Re)compute MediaStorage
   if (!ds.FindDataElement(Tag(0x0008, 0x0060)))
   {
     const char * modality = ms.GetModality();
@@ -229,7 +225,7 @@ ImageWriter::Write()
     const ByteValue * bv = ds.GetDataElement(Tag(0x0008, 0x0060)).GetByteValue();
     if (!bv)
     {
-      // remove empty Modality, and set a new one
+      // Remove empty Modality, and set a new one
       ds.Remove(Tag(0x0008, 0x0060)); // Modality is Type 1
       assert(ms != MediaStorage::MS_END);
     }
@@ -291,7 +287,7 @@ ImageWriter::Write()
     redde.SetVR(VR::OW);
     redde.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(redde);
-    // descriptor
+    // Descriptor
     Attribute<0x0028, 0x1101, VR::US, VM::VM3> reddesc;
     lut.GetLUTDescriptor(LookupTable::RED, length, subscript, bitsize);
     reddesc.SetValue(length, 0);
@@ -305,7 +301,7 @@ ImageWriter::Write()
     greende.SetVR(VR::OW);
     greende.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(greende);
-    // descriptor
+    // Descriptor
     Attribute<0x0028, 0x1102, VR::US, VM::VM3> greendesc;
     lut.GetLUTDescriptor(LookupTable::GREEN, length, subscript, bitsize);
     greendesc.SetValue(length, 0);
@@ -319,7 +315,7 @@ ImageWriter::Write()
     bluede.SetVR(VR::OW);
     bluede.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(bluede);
-    // descriptor
+    // Descriptor
     Attribute<0x0028, 0x1103, VR::US, VM::VM3> bluedesc;
     lut.GetLUTDescriptor(LookupTable::BLUE, length, subscript, bitsize);
     bluedesc.SetValue(length, 0);
@@ -332,14 +328,14 @@ ImageWriter::Write()
   }
   else if (pi == PhotometricInterpretation::RGB)
   {
-    // usual
+    // Usual
     ds.Remove(Tag(0x0028, 0x1101));
     ds.Remove(Tag(0x0028, 0x1102));
     ds.Remove(Tag(0x0028, 0x1103));
     ds.Remove(Tag(0x0028, 0x1201));
     ds.Remove(Tag(0x0028, 0x1202));
     ds.Remove(Tag(0x0028, 0x1203));
-    // segmented
+    // Segmented
     ds.Remove(Tag(0x0028, 0x1221));
     ds.Remove(Tag(0x0028, 0x1222));
     ds.Remove(Tag(0x0028, 0x1223));
@@ -392,7 +388,6 @@ ImageWriter::Write()
   //
   std::locale::global(current_locale);
   //
-  // Writer sets classic locale
   const bool w_ok = Writer::Write();
   return w_ok;
 }

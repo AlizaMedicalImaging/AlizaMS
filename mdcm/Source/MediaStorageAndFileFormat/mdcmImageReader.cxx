@@ -64,13 +64,11 @@ ImageReader::ReadImage(const MediaStorage & ms)
   Image & pixeldata = GetImage();
   // Pixel Spacing
   std::vector<double> spacing = ImageHelper::GetSpacingValue(*F);
-  // Only SC is allowed not to have spacing
   if (!spacing.empty())
   {
-    // In MR, you can have a Z spacing, but store a 2D image
     assert(spacing.size() >= pixeldata.GetNumberOfDimensions());
     pixeldata.SetSpacing(spacing.data());
-    if (spacing.size() > pixeldata.GetNumberOfDimensions()) // HACK
+    if (spacing.size() > pixeldata.GetNumberOfDimensions()) // MM: hack
     {
       pixeldata.SetSpacing(pixeldata.GetNumberOfDimensions(), spacing[pixeldata.GetNumberOfDimensions()]);
     }
@@ -80,7 +78,7 @@ ImageReader::ReadImage(const MediaStorage & ms)
   if (!origin.empty())
   {
     pixeldata.SetOrigin(origin.data());
-    if (origin.size() > pixeldata.GetNumberOfDimensions()) // HACK
+    if (origin.size() > pixeldata.GetNumberOfDimensions()) // MM: hack
     {
       pixeldata.SetOrigin(pixeldata.GetNumberOfDimensions(), origin[pixeldata.GetNumberOfDimensions()]);
     }
@@ -124,7 +122,7 @@ ImageReader::ReadACRNEMAImage()
       Attribute<0x0020, 0x0030> at = { {} };
       at.SetFromDataElement(de);
       pixeldata.SetOrigin(at.GetValues());
-      if (at.GetNumberOfValues() > pixeldata.GetNumberOfDimensions()) // MM: HACK
+      if (at.GetNumberOfValues() > pixeldata.GetNumberOfDimensions()) // MM: hack
       {
         pixeldata.SetOrigin(pixeldata.GetNumberOfDimensions(), at.GetValue(pixeldata.GetNumberOfDimensions()));
       }
