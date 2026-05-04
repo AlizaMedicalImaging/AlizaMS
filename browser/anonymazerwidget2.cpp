@@ -1,6 +1,7 @@
 #include "helpwidget.h"
 #include "anonymazerwidget2.h"
 #include <QtGlobal>
+#include <QByteArray>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -11,20 +12,20 @@
 #include <QTime>
 #include <QMimeData>
 #include <QUrl>
-#include <mdcmUIDGenerator.h>
-#include <mdcmGlobal.h>
-#include <mdcmDicts.h>
-#include <mdcmFileMetaInformation.h>
-#include <mdcmFile.h>
-#include <mdcmMediaStorage.h>
-#include <mdcmReader.h>
-#include <mdcmWriter.h>
-#include <mdcmAttribute.h>
-#include <mdcmVR.h>
-#include <mdcmVM.h>
-#include <mdcmSequenceOfItems.h>
-#include <mdcmVersion.h>
-#include <mdcmParseException.h>
+#include "mdcmUIDGenerator.h"
+#include "mdcmGlobal.h"
+#include "mdcmDicts.h"
+#include "mdcmFileMetaInformation.h"
+#include "mdcmFile.h"
+#include "mdcmMediaStorage.h"
+#include "mdcmReader.h"
+#include "mdcmWriter.h"
+#include "mdcmAttribute.h"
+#include "mdcmVR.h"
+#include "mdcmVM.h"
+#include "mdcmSequenceOfItems.h"
+#include "mdcmVersion.h"
+#include "mdcmParseException.h"
 #include "dicomutils.h"
 #include "codecutils.h"
 #include "alizams_version.h"
@@ -1241,16 +1242,18 @@ void anonymize_file__(
 	const QString & single_name,
 	const QString & single_id)
 {
-	mdcm::Reader reader;
+	const QByteArray filename_ba =
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-	reader.SetFileName(QDir::toNativeSeparators(filename).toUtf8().constData());
+		QDir::toNativeSeparators(filename).toUtf8();
 #else
-	reader.SetFileName(QDir::toNativeSeparators(filename).toLocal8Bit().constData());
+		QDir::toNativeSeparators(filename).toLocal8Bit();
 #endif
 #else
-	reader.SetFileName(filename.toLocal8Bit().constData());
+		filename.toLocal8Bit();
 #endif
+	mdcm::Reader reader;
+	reader.SetFileName(filename_ba.constData());
 	if (!reader.Read())
 	{
 		if (DicomUtils::is_dicom_file(filename))
@@ -1283,6 +1286,9 @@ void anonymize_file__(
 			implicit,
 			dicts))
 	{
+#if 1
+		std::cout << "Found duplicated tag, can not process " << filename_ba.constData() << std::endl;
+#endif
 		*ok = false;
 		return;
 	}

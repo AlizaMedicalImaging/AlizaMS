@@ -4,6 +4,7 @@
 #include "ui_anonymazerwidget2.h"
 #include <mdcmTag.h>
 #include <mdcmDicts.h>
+#include <QString>
 #include <QStringList>
 #include <QMap>
 #include <QProgressDialog>
