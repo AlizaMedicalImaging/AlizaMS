@@ -107,8 +107,9 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
   for (DataSet::ConstIterator it = ds.Begin(); it != ds.End(); ++it)
   {
     DataElement  de = *it;
+    std::string  strowner;
     const char * owner = nullptr;
-    const Tag & t = de.GetTag();
+    const Tag &  t = de.GetTag();
     if (c > 0 && tmp_t == t)
     {
 #if 1
@@ -123,7 +124,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
     }
     if (t.IsPrivate() && !t.IsPrivateCreator())
     {
-      const std::string strowner = ds.GetPrivateCreator(t);
+      strowner = ds.GetPrivateCreator(t);
       owner = strowner.c_str();
     }
     const DictEntry & entry = dicts.GetDictEntry(t, owner);
