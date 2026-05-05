@@ -108,14 +108,12 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
   }
   const Global & g = GlobalInstance;
   const Dicts &  dicts = g.GetDicts();
-  std::string    strowner;
-  const char *   owner = nullptr;
+  std::string    owner;
   if (t.IsPrivate() && !t.IsPrivateCreator())
   {
-    strowner = ds.GetPrivateCreator(t);
-    owner = strowner.c_str();
+    owner = ds.GetPrivateCreator(t);
   }
-  const DictEntry & entry = dicts.GetDictEntry(t, owner);
+  const DictEntry & entry = dicts.GetDictEntry(t, owner.empty() ? nullptr : owner.c_str());
   const VR &        refvr = entry.GetVR();
   if (refvr == VR::INVALID || refvr == VR::UN)
   {
