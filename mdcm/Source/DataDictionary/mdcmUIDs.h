@@ -1223,22 +1223,22 @@ public:
   };
 
   typedef const char * const (*UIDsStringsType)[2];
-  static UIDsStringsType
-  GetUIDsStrings();
-  static const char * const *
-  GetUIDsString(unsigned int ts);
-  static unsigned int
-  GetNumberOfUIDsStrings();
-  static const char *
-  GetUIDString(unsigned int ts);
-  static const char *
-  GetUIDName(unsigned int ts);
-  bool
-  SetFromUID(const char * str);
-  const char *
-  GetName() const;
-  const char *
-  GetString() const;
+
+  static UIDsStringsType GetUIDsStrings();
+
+  static const char * const * GetUIDsString(unsigned int);
+
+  static unsigned int GetNumberOfUIDsStrings();
+
+  static const char * GetUIDString(unsigned int);
+
+  static const char * GetUIDName(unsigned int);
+
+  bool SetFromUID(const char *);
+
+  const char * GetName() const;
+
+  const char * GetString() const;
 
   operator UIDType() const { return UIDField; }
 
@@ -1246,8 +1246,7 @@ private:
   UIDType UIDField;
 };
 
-inline std::ostream &
-operator<<(std::ostream & _os, const UIDs & uid)
+inline std::ostream & operator<<(std::ostream & _os, const UIDs & uid)
 {
   _os << uid.GetString() << " -> " << uid.GetName();
   return _os;

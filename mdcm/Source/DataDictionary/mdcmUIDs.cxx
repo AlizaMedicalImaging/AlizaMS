@@ -632,34 +632,29 @@ UIDs::UIDs()
   UIDField = uid_0;
 }
 
-unsigned int
-UIDs::GetNumberOfUIDsStrings()
+unsigned int UIDs::GetNumberOfUIDsStrings()
 {
   return static_cast<unsigned int>(sizeof(UIDsStrings) / sizeof(*UIDsStrings) - 2);
 }
 
-const char * const *
-UIDs::GetUIDsString(unsigned int x)
+const char * const * UIDs::GetUIDsString(unsigned int x)
 {
   if (x > 0 && x <= UIDs::GetNumberOfUIDsStrings())
     return UIDsStrings[x];
   return UIDsStrings[UIDs::GetNumberOfUIDsStrings() + 1];
 }
 
-const char *
-UIDs::GetUIDString(unsigned int x)
+const char * UIDs::GetUIDString(unsigned int x)
 {
   return UIDs::GetUIDsString(x)[0];
 }
 
-const char *
-UIDs::GetUIDName(unsigned int x)
+const char * UIDs::GetUIDName(unsigned int x)
 {
   return UIDs::GetUIDsString(x)[1];
 }
 
-UIDs::UIDsStringsType
-UIDs::GetUIDsStrings()
+UIDs::UIDsStringsType UIDs::GetUIDsStrings()
 {
   return UIDsStrings;
 }
@@ -690,13 +685,12 @@ UIDs::SetFromUID(const char * str)
   return false;
 }
 
-const char *
-UIDs::GetString() const
+const char * UIDs::GetString() const
 {
   return GetUIDString(UIDField);
 }
-const char *
-UIDs::GetName() const
+
+const char * UIDs::GetName() const
 {
   return GetUIDName(UIDField);
 }
