@@ -61,6 +61,8 @@ public:
 	QAction * histogramAct;
 	QAction * zyxAct;
 	QAction * slicesAct;
+	QAction * raycastAct;
+	QAction * mipAct;
 	QAction * trans3DAct;
 	QAction * gloptionsAct;
 	QAction * animAct2d;
@@ -102,6 +104,7 @@ private slots:
 	void toggle_segmentation(bool);
 	void set_view_3d(bool);
 	void set_view_rc(bool);
+	void set_view_mip(bool);
 	void set_show_frames_3d(bool);
 	void load_dicom_series2();
 	void reset_rect2();
@@ -220,7 +223,6 @@ private:
 	QAction * collisionAct;
 	QAction * distanceAct;
 	QAction * transp2dAct;
-	QAction * raycastAct;
 	QActionGroup * view_group;
 	QAction  * frames2DAct;
 	QAction  * frames3DAct;
