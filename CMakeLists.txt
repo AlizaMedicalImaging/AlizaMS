@@ -1018,7 +1018,8 @@ if(WIN32)
     ${ALIZAMS_SRCS}
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
-    ${ALIZAMS_QRCS_RCC})
+    ${ALIZAMS_QRCS_RCC}
+    Win32AppUtf8.manifest)
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} crypt32 rpcrt4)
 elseif(APPLE)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES})
