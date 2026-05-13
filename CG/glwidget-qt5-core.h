@@ -164,7 +164,7 @@ public:
 	void  init_opengl(int,int);
 	void  paint__();
 	void  paint_volume();
-	void  paint_raycaster();
+	void  paint_raycaster(int); // 0 -- intensity; 1 -- MIP
 	void  resize__(int, int);
 	int   normalize_angle(int);
 	int   x_rotation, y_rotation, z_rotation;
@@ -225,6 +225,7 @@ public:
 	void set_selected_images_ptr(QList<ImageVariant*>*);
 	void set_view_3d();
 	void set_view_rc();
+	void set_view_mip();
 	bool rect_selection;
 	bool show_cube;
 	bool wireframe;
@@ -260,6 +261,14 @@ public:
 	ShaderObj raycast_color_shader_sigm;
 	ShaderObj raycast_shader_bb_sigm;
 	ShaderObj raycast_color_shader_bb_sigm;
+	ShaderObj mip_shader;
+	ShaderObj mip_color_shader;
+	ShaderObj mip_shader_bb;
+	ShaderObj mip_color_shader_bb;
+	ShaderObj mip_shader_sigm;
+	ShaderObj mip_color_shader_sigm;
+	ShaderObj mip_shader_bb_sigm;
+	ShaderObj mip_color_shader_bb_sigm;
 	ShaderObj c3d_shader_clamp;
 	ShaderObj c3d_shader_gradient_clamp;
 	ShaderObj c3d_shader_bb_clamp;
@@ -300,6 +309,14 @@ public:
 	GLuint raycast_color_shader_sigm_vao;
 	GLuint raycast_shader_bb_sigm_vao;
 	GLuint raycast_color_shader_bb_sigm_vao;
+	GLuint mip_shader_vao;
+	GLuint mip_color_shader_vao;
+	GLuint mip_shader_bb_vao;
+	GLuint mip_color_shader_bb_vao;
+	GLuint mip_shader_sigm_vao;
+	GLuint mip_color_shader_sigm_vao;
+	GLuint mip_shader_bb_sigm_vao;
+	GLuint mip_color_shader_bb_sigm_vao;
 	GLuint c3d_shader_clamp_vao;
 	GLuint c3d_shader_gradient_clamp_vao;
 	GLuint c3d_shader_bb_clamp_vao;

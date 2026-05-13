@@ -394,6 +394,8 @@ MainWindow::MainWindow(
 		histogramAct);
 	aliza->set_3D_views_actions(
 		slicesAct,
+		raycastAct,
+		mipAct,
 		zlockAct,
 		oneAct,
 		show3DAct);
@@ -436,12 +438,14 @@ MainWindow::MainWindow(
 		view3d_label->setText(QString("Physical space, intensity projection, GPU"));
 		slicesAct->setChecked(true);
 		raycastAct->setChecked(false);
+		mipAct->setChecked(false);
 	}
 	else
 	{
 		gl_frame->hide();
 		slicesAct->setEnabled(false);
 		raycastAct->setEnabled(false);
+		mipAct->setEnabled(false);
 		trans3DAct->setEnabled(false);
 		gloptionsAct->setEnabled(false);
 		frames3DAct->setEnabled(false);
@@ -493,6 +497,7 @@ MainWindow::MainWindow(
 	connect(transp2dAct,                    SIGNAL(toggled(bool)),       this,SLOT(toggle_segmentation(bool)));
 	connect(slicesAct,                      SIGNAL(toggled(bool)),       this,SLOT(set_view_3d(bool)));
 	connect(raycastAct,                     SIGNAL(toggled(bool)),       this,SLOT(set_view_rc(bool)));
+	connect(mipAct,                         SIGNAL(toggled(bool)),       this,SLOT(set_view_mip(bool)));
 	connect(gloptionsAct,                   SIGNAL(triggered()),         this,SLOT(toggle_toolbox()));
 	connect(animAct2d,                      SIGNAL(toggled(bool)),       this,SLOT(toggle_animwidget2d(bool)));
 	connect(animAct3d,                      SIGNAL(toggled(bool)),       this,SLOT(toggle_animwidget3d(bool)));
@@ -820,6 +825,10 @@ void MainWindow::createActions()
 		QString("Intensity projection, GPU"), this);
 	raycastAct->setCheckable(true);
 	view_group->addAction(raycastAct);
+	mipAct = new QAction(QIcon(QString(":/bitmaps/mip.svg")),
+		QString("MIP, GPU"), this);
+	mipAct->setCheckable(true);
+	view_group->addAction(mipAct);
 	frames2DAct = new QAction(QIcon(QString(":/bitmaps/cross.svg")),
 		QString("MPR set position"), this);
 	frames2DAct->setCheckable(true);
@@ -917,6 +926,7 @@ void MainWindow::createMenus()
 	QMenu * views3d_menu = new QMenu(this);
 	views3d_menu->addAction(slicesAct);
 	views3d_menu->addAction(raycastAct);
+	views3d_menu->addAction(mipAct);
 	actionViews3DMenu->setMenu(views3d_menu);
 	views_menu->addAction(actionViews3DMenu);
 	actionViews3DMenu->setEnabled(false);
@@ -1060,6 +1070,7 @@ void MainWindow::createToolBars()
 	toolbar5->addWidget(view3d_label);
 	toolbar5->addAction(slicesAct);
 	toolbar5->addAction(raycastAct);
+	toolbar5->addAction(mipAct);
 	toolbar5->addSeparator();
 	QLabel * empty6 = new QLabel(QString("      "), this);
 	toolbar5->addWidget(empty6);
@@ -1689,6 +1700,23 @@ void MainWindow::set_view_rc(bool t)
 	gloptionsAct->setEnabled(true);
 	if (gl_frame->isHidden()) gl_frame->show();
 	glwidget->set_view_rc();
+	glwidget->updateGL();
+	qApp->processEvents();
+}
+
+void MainWindow::set_view_mip(bool t)
+{
+	if (!t) return;
+	if (!aliza->check_3d()) return;
+	view3d_label->setText(QString("MIP, GPU"));
+	frames3DAct->setVisible(false);
+	trans3DAct->setVisible(false);
+	toolbox->alpha_doubleSpinBox->show();
+	toolbox->alpha_label->setEnabled(true);
+	toolbox->contours_checkBox->setEnabled(false);
+	gloptionsAct->setEnabled(true);
+	if (gl_frame->isHidden()) gl_frame->show();
+	glwidget->set_view_mip();
 	glwidget->updateGL();
 	qApp->processEvents();
 }

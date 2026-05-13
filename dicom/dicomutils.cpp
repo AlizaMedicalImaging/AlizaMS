@@ -13900,7 +13900,11 @@ QString DicomUtils::read_dicom(
 				{
 					if (v3.size() == 2)
 					{
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 						s3 = QString::asprintf("%.4f-%.4f", v3.at(0), v3.at(1));
+#else
+						s3.sprintf("%.4f-%.4f", v3.at(0), v3.at(1));
+#endif
 					}
 				}
 				si.spacing = s3;

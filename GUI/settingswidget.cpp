@@ -170,7 +170,7 @@ void SettingsWidget::set_default()
 	mvsep_checkBox->setChecked(false);
 	dcmthread_checkBox->setChecked(true);
 	adjust_spinBox->setValue(14);
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) && QT_VERSION >= QT_VERSION_CHECK(5,11,0)
 	if (QApplication::platformName() == QString("wayland"))
 	{
 		adjust_checkBox->setChecked(true);
@@ -265,7 +265,7 @@ void SettingsWidget::readSettings()
 	const int tmp15 = settings.value(QString("apply_suppl"),     1).toInt();
 	const int tmp16 = settings.value(QString("mvsep"),           0).toInt();
 	const int tmp17 = settings.value(QString("dcm_thread2"),     1).toInt();
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) && QT_VERSION >= QT_VERSION_CHECK(5,11,0)
 	int tmp18;
 	if (QApplication::platformName() == QString("wayland"))
 	{

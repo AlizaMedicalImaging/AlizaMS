@@ -683,6 +683,14 @@ void GLWidget::init_()
 	raycast_color_shader_sigm.program = 0;
 	raycast_shader_bb_sigm.program = 0;
 	raycast_color_shader_bb_sigm.program = 0;
+	mip_shader.program = 0;
+	mip_color_shader.program = 0;
+	mip_shader_bb.program = 0;
+	mip_color_shader_bb.program = 0;
+	mip_shader_sigm.program = 0;
+	mip_color_shader_sigm.program = 0;
+	mip_shader_bb_sigm.program = 0;
+	mip_color_shader_bb_sigm.program = 0;
 	c3d_shader_clamp.program = 0;
 	c3d_shader_gradient_clamp.program = 0;
 	c3d_shader_bb_clamp.program = 0;
@@ -729,6 +737,14 @@ void GLWidget::init_()
 	raycast_color_shader_sigm_vao = 0;
 	raycast_shader_bb_sigm_vao = 0;
 	raycast_color_shader_bb_sigm_vao = 0;
+	mip_shader_vao = 0;
+	mip_color_shader_vao = 0;
+	mip_shader_bb_vao = 0;
+	mip_color_shader_bb_vao = 0;
+	mip_shader_sigm_vao = 0;
+	mip_color_shader_sigm_vao = 0;
+	mip_shader_bb_sigm_vao = 0;
+	mip_color_shader_bb_sigm_vao = 0;
 	c3d_shader_clamp_vao = 0;
 	c3d_shader_gradient_clamp_vao = 0;
 	c3d_shader_bb_clamp_vao = 0;
@@ -884,6 +900,14 @@ void GLWidget::close_()
 	glDeleteVertexArrays(1, &raycast_color_shader_sigm_vao);
 	glDeleteVertexArrays(1, &raycast_shader_bb_sigm_vao);
 	glDeleteVertexArrays(1, &raycast_color_shader_bb_sigm_vao);
+	glDeleteVertexArrays(1, &mip_shader_vao);
+	glDeleteVertexArrays(1, &mip_color_shader_vao);
+	glDeleteVertexArrays(1, &mip_shader_bb_vao);
+	glDeleteVertexArrays(1, &mip_color_shader_bb_vao);
+	glDeleteVertexArrays(1, &mip_shader_sigm_vao);
+	glDeleteVertexArrays(1, &mip_color_shader_sigm_vao);
+	glDeleteVertexArrays(1, &mip_shader_bb_sigm_vao);
+	glDeleteVertexArrays(1, &mip_color_shader_bb_sigm_vao);
 	for (unsigned int x = 0; x < textures.size(); ++x)
 	{
 		glDeleteTextures(1, textures[x]);
@@ -1471,6 +1495,112 @@ void GLWidget::init_opengl(int w, int h)
 		&raycast_color_shader_sigm_vao,
 		raycastcube0,
 		&(raycast_color_shader_sigm.position_handle));
+
+	create_program(raycast_vs, mip_fs_bb, &mip_shader_bb);
+	mip_shader_bb.location_mvp        = glGetUniformLocation(mip_shader_bb.program, "mvp");
+	mip_shader_bb.position_handle     = glGetAttribLocation (mip_shader_bb.program, "v_position");
+	mip_shader_bb.location_sampler[0] = glGetUniformLocation(mip_shader_bb.program, "sampler0");
+	mip_shader_bb.location_sampler[1] = glGetUniformLocation(mip_shader_bb.program, "sampler1");
+	mip_shader_bb.location_sampler[2] = glGetUniformLocation(mip_shader_bb.program, "sampler2");
+	mip_shader_bb.location_mparams    = glGetUniformLocation(mip_shader_bb.program, "mparams");
+	shaders.push_back(&mip_shader_bb);
+	generate_raycast_shader_vao(
+		&mip_shader_bb_vao, raycastcube0, &(mip_shader_bb.position_handle));
+	//
+	create_program(raycast_vs, mip_color_fs_bb, &mip_color_shader_bb);
+	mip_color_shader_bb.location_mvp        = glGetUniformLocation(mip_color_shader_bb.program, "mvp");
+	mip_color_shader_bb.position_handle     = glGetAttribLocation (mip_color_shader_bb.program, "v_position");
+	mip_color_shader_bb.location_sampler[0] = glGetUniformLocation(mip_color_shader_bb.program, "sampler0");
+	mip_color_shader_bb.location_sampler[1] = glGetUniformLocation(mip_color_shader_bb.program, "sampler1");
+	mip_color_shader_bb.location_sampler[2] = glGetUniformLocation(mip_color_shader_bb.program, "sampler2");
+	mip_color_shader_bb.location_sampler[3] = glGetUniformLocation(mip_color_shader_bb.program, "sampler3");
+	mip_color_shader_bb.location_mparams    = glGetUniformLocation(mip_color_shader_bb.program, "mparams");
+	shaders.push_back(&mip_color_shader_bb);
+	generate_raycast_shader_vao(
+		&mip_color_shader_bb_vao,
+		raycastcube0,
+		&(mip_color_shader_bb.position_handle));
+	//
+	create_program(raycast_vs, mip_fs, &mip_shader);
+	mip_shader.location_mvp        = glGetUniformLocation(mip_shader.program, "mvp");
+	mip_shader.position_handle     = glGetAttribLocation (mip_shader.program, "v_position");
+	mip_shader.location_sampler[0] = glGetUniformLocation(mip_shader.program, "sampler0");
+	mip_shader.location_sampler[1] = glGetUniformLocation(mip_shader.program, "sampler1");
+	mip_shader.location_sampler[2] = glGetUniformLocation(mip_shader.program, "sampler2");
+	mip_shader.location_mparams    = glGetUniformLocation(mip_shader.program, "mparams");
+	shaders.push_back(&mip_shader);
+	generate_raycast_shader_vao(
+		&mip_shader_vao,
+		raycastcube0,
+		&(mip_shader.position_handle));
+	//
+	create_program(raycast_vs, mip_color_fs, &mip_color_shader);
+	mip_color_shader.location_mvp        = glGetUniformLocation(mip_color_shader.program, "mvp");
+	mip_color_shader.position_handle     = glGetAttribLocation (mip_color_shader.program, "v_position");
+	mip_color_shader.location_sampler[0] = glGetUniformLocation(mip_color_shader.program, "sampler0");
+	mip_color_shader.location_sampler[1] = glGetUniformLocation(mip_color_shader.program, "sampler1");
+	mip_color_shader.location_sampler[2] = glGetUniformLocation(mip_color_shader.program, "sampler2");
+	mip_color_shader.location_sampler[3] = glGetUniformLocation(mip_color_shader.program, "sampler3");
+	mip_color_shader.location_mparams    = glGetUniformLocation(mip_color_shader.program, "mparams");
+	shaders.push_back(&mip_color_shader);
+	generate_raycast_shader_vao(
+		&mip_color_shader_vao,
+		raycastcube0,
+		&(mip_color_shader.position_handle));
+	//
+	create_program(raycast_vs, mip_fs_bb_sigm, &mip_shader_bb_sigm);
+	mip_shader_bb_sigm.location_mvp        = glGetUniformLocation(mip_shader_bb_sigm.program, "mvp");
+	mip_shader_bb_sigm.position_handle     = glGetAttribLocation (mip_shader_bb_sigm.program, "v_position");
+	mip_shader_bb_sigm.location_sampler[0] = glGetUniformLocation(mip_shader_bb_sigm.program, "sampler0");
+	mip_shader_bb_sigm.location_sampler[1] = glGetUniformLocation(mip_shader_bb_sigm.program, "sampler1");
+	mip_shader_bb_sigm.location_sampler[2] = glGetUniformLocation(mip_shader_bb_sigm.program, "sampler2");
+	mip_shader_bb_sigm.location_mparams    = glGetUniformLocation(mip_shader_bb_sigm.program, "mparams");
+	shaders.push_back(&mip_shader_bb_sigm);
+	generate_raycast_shader_vao(
+		&mip_shader_bb_sigm_vao,
+		raycastcube0,
+		&(mip_shader_bb_sigm.position_handle));
+	//
+	create_program(raycast_vs, mip_color_fs_bb_sigm, &mip_color_shader_bb_sigm);
+	mip_color_shader_bb_sigm.location_mvp        = glGetUniformLocation(mip_color_shader_bb_sigm.program, "mvp");
+	mip_color_shader_bb_sigm.position_handle     = glGetAttribLocation (mip_color_shader_bb_sigm.program, "v_position");
+	mip_color_shader_bb_sigm.location_sampler[0] = glGetUniformLocation(mip_color_shader_bb_sigm.program, "sampler0");
+	mip_color_shader_bb_sigm.location_sampler[1] = glGetUniformLocation(mip_color_shader_bb_sigm.program, "sampler1");
+	mip_color_shader_bb_sigm.location_sampler[2] = glGetUniformLocation(mip_color_shader_bb_sigm.program, "sampler2");
+	mip_color_shader_bb_sigm.location_sampler[3] = glGetUniformLocation(mip_color_shader_bb_sigm.program, "sampler3");
+	mip_color_shader_bb_sigm.location_mparams    = glGetUniformLocation(mip_color_shader_bb_sigm.program, "mparams");
+	shaders.push_back(&mip_color_shader_bb_sigm);
+	generate_raycast_shader_vao(
+		&mip_color_shader_bb_sigm_vao,
+		raycastcube0,
+		&(mip_color_shader_bb_sigm.position_handle));
+	//
+	create_program(raycast_vs, mip_fs_sigm, &mip_shader_sigm);
+	mip_shader_sigm.location_mvp        = glGetUniformLocation(mip_shader_sigm.program, "mvp");
+	mip_shader_sigm.position_handle     = glGetAttribLocation (mip_shader_sigm.program, "v_position");
+	mip_shader_sigm.location_sampler[0] = glGetUniformLocation(mip_shader_sigm.program, "sampler0");
+	mip_shader_sigm.location_sampler[1] = glGetUniformLocation(mip_shader_sigm.program, "sampler1");
+	mip_shader_sigm.location_sampler[2] = glGetUniformLocation(mip_shader_sigm.program, "sampler2");
+	mip_shader_sigm.location_mparams    = glGetUniformLocation(mip_shader_sigm.program, "mparams");
+	shaders.push_back(&mip_shader_sigm);
+	generate_raycast_shader_vao(
+		&mip_shader_sigm_vao,
+		raycastcube0,
+		&(mip_shader_sigm.position_handle));
+	//
+	create_program(raycast_vs, mip_color_fs_sigm, &mip_color_shader_sigm);
+	mip_color_shader_sigm.location_mvp        = glGetUniformLocation(mip_color_shader_sigm.program, "mvp");
+	mip_color_shader_sigm.position_handle     = glGetAttribLocation (mip_color_shader_sigm.program, "v_position");
+	mip_color_shader_sigm.location_sampler[0] = glGetUniformLocation(mip_color_shader_sigm.program, "sampler0");
+	mip_color_shader_sigm.location_sampler[1] = glGetUniformLocation(mip_color_shader_sigm.program, "sampler1");
+	mip_color_shader_sigm.location_sampler[2] = glGetUniformLocation(mip_color_shader_sigm.program, "sampler2");
+	mip_color_shader_sigm.location_sampler[3] = glGetUniformLocation(mip_color_shader_sigm.program, "sampler3");
+	mip_color_shader_sigm.location_mparams    = glGetUniformLocation(mip_color_shader_sigm.program, "mparams");
+	shaders.push_back(&mip_color_shader_sigm);
+	generate_raycast_shader_vao(
+		&mip_color_shader_sigm_vao,
+		raycastcube0,
+		&(mip_color_shader_sigm.position_handle));
 	//
 	////////////////////////////
 	// orient. cube
@@ -1716,7 +1846,10 @@ void GLWidget::paint__()
 		paint_volume();
 		break;
 	case 1:
-		paint_raycaster();
+		paint_raycaster(0);
+		break;
+	case 2:
+		paint_raycaster(1);
 		break;
 	default:
 		break;
@@ -1726,7 +1859,7 @@ void GLWidget::paint__()
 #endif
 }
 
-void GLWidget::paint_raycaster()
+void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 {
 	if (!selected_images__) return;
 	if (selected_images__->empty()) return;
@@ -1833,8 +1966,8 @@ void GLWidget::paint_raycaster()
 	mparams[3]  = static_cast<float>(di->window_width);
 	// [1]
 	mparams[4]  = static_cast<float>(di->idimz); // Z dim
-	mparams[5]  = static_cast<float>(di->from_slice) / static_cast<float>(di->idimz); // z
-	mparams[6]  = static_cast<float>(di->to_slice) / static_cast<float>(di->idimz); // z
+	mparams[5]  = static_cast<float>(di->from_slice) / static_cast<float>(di->idimz - 1); // z
+	mparams[6]  = static_cast<float>(di->to_slice) / static_cast<float>(di->idimz - 1); // z
 	mparams[7]  = static_cast<float>(di->bb_y_min); // y
 	// [2]
 	mparams[8]  = static_cast<float>(di->bb_y_max); // y
@@ -1898,26 +2031,52 @@ void GLWidget::paint_raycaster()
 		{
 			if (rect_selection)
 			{
-				glUseProgram(raycast_shader_bb_sigm.program);
-				glUniform4fv(raycast_shader_bb_sigm.location_mparams, 4, mparams);
-				glUniformMatrix4fv(raycast_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-				glUniform1i(raycast_shader_bb_sigm.location_sampler[0], 2);
-				glUniform1i(raycast_shader_bb_sigm.location_sampler[1], 5);
-				glUniform1i(raycast_shader_bb_sigm.location_sampler[2], 0);
-				glBindVertexArray(raycast_shader_bb_sigm_vao);
+				if (mode == 0)
+				{
+					glUseProgram(raycast_shader_bb_sigm.program);
+					glUniform4fv(raycast_shader_bb_sigm.location_mparams, 4, mparams);
+					glUniformMatrix4fv(raycast_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(raycast_shader_bb_sigm.location_sampler[0], 2);
+					glUniform1i(raycast_shader_bb_sigm.location_sampler[1], 5);
+					glUniform1i(raycast_shader_bb_sigm.location_sampler[2], 0);
+					glBindVertexArray(raycast_shader_bb_sigm_vao);
+				}
+				else
+				{
+					glUseProgram(mip_shader_bb_sigm.program);
+					glUniform4fv(mip_shader_bb_sigm.location_mparams, 4, mparams);
+					glUniformMatrix4fv(mip_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(mip_shader_bb_sigm.location_sampler[0], 2);
+					glUniform1i(mip_shader_bb_sigm.location_sampler[1], 5);
+					glUniform1i(mip_shader_bb_sigm.location_sampler[2], 0);
+					glBindVertexArray(mip_shader_bb_sigm_vao);
+				}
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
 			}
 			else
 			{
-				glUseProgram(raycast_shader_sigm.program);
-				glUniform4fv(raycast_shader_sigm.location_mparams, 4, mparams);
-				glUniformMatrix4fv(raycast_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-				glUniform1i(raycast_shader_sigm.location_sampler[0], 2);
-				glUniform1i(raycast_shader_sigm.location_sampler[1], 5);
-				glUniform1i(raycast_shader_sigm.location_sampler[2], 0);
-				glBindVertexArray(raycast_shader_sigm_vao);
+				if (mode == 0)
+				{
+					glUseProgram(raycast_shader_sigm.program);
+					glUniform4fv(raycast_shader_sigm.location_mparams, 4, mparams);
+					glUniformMatrix4fv(raycast_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(raycast_shader_sigm.location_sampler[0], 2);
+					glUniform1i(raycast_shader_sigm.location_sampler[1], 5);
+					glUniform1i(raycast_shader_sigm.location_sampler[2], 0);
+					glBindVertexArray(raycast_shader_sigm_vao);
+				}
+				else
+				{
+					glUseProgram(mip_shader_sigm.program);
+					glUniform4fv(mip_shader_sigm.location_mparams, 4, mparams);
+					glUniformMatrix4fv(mip_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(mip_shader_sigm.location_sampler[0], 2);
+					glUniform1i(mip_shader_sigm.location_sampler[1], 5);
+					glUniform1i(mip_shader_sigm.location_sampler[2], 0);
+					glBindVertexArray(mip_shader_sigm_vao);
+				}
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
@@ -1954,28 +2113,56 @@ void GLWidget::paint_raycaster()
 			}
 			if (rect_selection)
 			{
-				glUseProgram(raycast_color_shader_bb_sigm.program);
-				glUniform4fv(raycast_color_shader_bb_sigm.location_mparams, 4, mparams);
-				glUniformMatrix4fv(raycast_color_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[0], 2);
-				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[1], 5);
-				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[2], 0);
-				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[3], 3);
-				glBindVertexArray(raycast_color_shader_bb_sigm_vao);
+				if (mode == 0)
+				{
+					glUseProgram(raycast_color_shader_bb_sigm.program);
+					glUniform4fv(raycast_color_shader_bb_sigm.location_mparams, 4, mparams);
+					glUniformMatrix4fv(raycast_color_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(raycast_color_shader_bb_sigm.location_sampler[0], 2);
+					glUniform1i(raycast_color_shader_bb_sigm.location_sampler[1], 5);
+					glUniform1i(raycast_color_shader_bb_sigm.location_sampler[2], 0);
+					glUniform1i(raycast_color_shader_bb_sigm.location_sampler[3], 3);
+					glBindVertexArray(raycast_color_shader_bb_sigm_vao);
+				}
+				else
+				{
+					glUseProgram(mip_color_shader_bb_sigm.program);
+					glUniform4fv(mip_color_shader_bb_sigm.location_mparams, 4, mparams);
+					glUniformMatrix4fv(mip_color_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(mip_color_shader_bb_sigm.location_sampler[0], 2);
+					glUniform1i(mip_color_shader_bb_sigm.location_sampler[1], 5);
+					glUniform1i(mip_color_shader_bb_sigm.location_sampler[2], 0);
+					glUniform1i(mip_color_shader_bb_sigm.location_sampler[3], 3);
+					glBindVertexArray(mip_color_shader_bb_sigm_vao);
+				}
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
 			}
 			else
 			{
-				glUseProgram(raycast_color_shader_sigm.program);
-				glUniform4fv(raycast_color_shader_sigm.location_mparams, 4, mparams);
-				glUniformMatrix4fv(raycast_color_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-				glUniform1i(raycast_color_shader_sigm.location_sampler[0], 2);
-				glUniform1i(raycast_color_shader_sigm.location_sampler[1], 5);
-				glUniform1i(raycast_color_shader_sigm.location_sampler[2], 0);
-				glUniform1i(raycast_color_shader_sigm.location_sampler[3], 3);
-				glBindVertexArray(raycast_color_shader_sigm_vao);
+				if (mode == 0)
+				{
+					glUseProgram(raycast_color_shader_sigm.program);
+					glUniform4fv(raycast_color_shader_sigm.location_mparams, 4, mparams);
+					glUniformMatrix4fv(raycast_color_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(raycast_color_shader_sigm.location_sampler[0], 2);
+					glUniform1i(raycast_color_shader_sigm.location_sampler[1], 5);
+					glUniform1i(raycast_color_shader_sigm.location_sampler[2], 0);
+					glUniform1i(raycast_color_shader_sigm.location_sampler[3], 3);
+					glBindVertexArray(raycast_color_shader_sigm_vao);
+				}
+				else
+				{
+					glUseProgram(mip_color_shader_sigm.program);
+					glUniform4fv(mip_color_shader_sigm.location_mparams, 4, mparams);
+					glUniformMatrix4fv(mip_color_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(mip_color_shader_sigm.location_sampler[0], 2);
+					glUniform1i(mip_color_shader_sigm.location_sampler[1], 5);
+					glUniform1i(mip_color_shader_sigm.location_sampler[2], 0);
+					glUniform1i(mip_color_shader_sigm.location_sampler[3], 3);
+					glBindVertexArray(mip_color_shader_sigm_vao);
+				}
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
@@ -1988,26 +2175,52 @@ void GLWidget::paint_raycaster()
 		{
 			if (rect_selection)
 			{
-				glUseProgram(raycast_shader_bb.program);
-				glUniform4fv(raycast_shader_bb.location_mparams, 4, mparams);
-				glUniformMatrix4fv(raycast_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-				glUniform1i(raycast_shader_bb.location_sampler[0], 2);
-				glUniform1i(raycast_shader_bb.location_sampler[1], 5);
-				glUniform1i(raycast_shader_bb.location_sampler[2], 0);
-				glBindVertexArray(raycast_shader_bb_vao);
+				if (mode == 0)
+				{
+					glUseProgram(raycast_shader_bb.program);
+					glUniform4fv(raycast_shader_bb.location_mparams, 4, mparams);
+					glUniformMatrix4fv(raycast_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(raycast_shader_bb.location_sampler[0], 2);
+					glUniform1i(raycast_shader_bb.location_sampler[1], 5);
+					glUniform1i(raycast_shader_bb.location_sampler[2], 0);
+					glBindVertexArray(raycast_shader_bb_vao);
+				}
+				else
+				{
+					glUseProgram(mip_shader_bb.program);
+					glUniform4fv(mip_shader_bb.location_mparams, 4, mparams);
+					glUniformMatrix4fv(mip_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(mip_shader_bb.location_sampler[0], 2);
+					glUniform1i(mip_shader_bb.location_sampler[1], 5);
+					glUniform1i(mip_shader_bb.location_sampler[2], 0);
+					glBindVertexArray(mip_shader_bb_vao);
+				}
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
 			}
 			else
 			{
-				glUseProgram(raycast_shader.program);
-				glUniform4fv(raycast_shader.location_mparams, 4, mparams);
-				glUniformMatrix4fv(raycast_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-				glUniform1i(raycast_shader.location_sampler[0], 2);
-				glUniform1i(raycast_shader.location_sampler[1], 5);
-				glUniform1i(raycast_shader.location_sampler[2], 0);
-				glBindVertexArray(raycast_shader_vao);
+				if (mode == 0)
+				{
+					glUseProgram(raycast_shader.program);
+					glUniform4fv(raycast_shader.location_mparams, 4, mparams);
+					glUniformMatrix4fv(raycast_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(raycast_shader.location_sampler[0], 2);
+					glUniform1i(raycast_shader.location_sampler[1], 5);
+					glUniform1i(raycast_shader.location_sampler[2], 0);
+					glBindVertexArray(raycast_shader_vao);
+				}
+				else
+				{
+					glUseProgram(mip_shader.program);
+					glUniform4fv(mip_shader.location_mparams, 4, mparams);
+					glUniformMatrix4fv(mip_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(mip_shader.location_sampler[0], 2);
+					glUniform1i(mip_shader.location_sampler[1], 5);
+					glUniform1i(mip_shader.location_sampler[2], 0);
+					glBindVertexArray(mip_shader_vao);
+				}
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
@@ -2044,28 +2257,56 @@ void GLWidget::paint_raycaster()
 			}
 			if (rect_selection)
 			{
-				glUseProgram(raycast_color_shader_bb.program);
-				glUniform4fv(raycast_color_shader_bb.location_mparams, 4, mparams);
-				glUniformMatrix4fv(raycast_color_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-				glUniform1i(raycast_color_shader_bb.location_sampler[0], 2);
-				glUniform1i(raycast_color_shader_bb.location_sampler[1], 5);
-				glUniform1i(raycast_color_shader_bb.location_sampler[2], 0);
-				glUniform1i(raycast_color_shader_bb.location_sampler[3], 3);
-				glBindVertexArray(raycast_color_shader_bb_vao);
+				if (mode == 0)
+				{
+					glUseProgram(raycast_color_shader_bb.program);
+					glUniform4fv(raycast_color_shader_bb.location_mparams, 4, mparams);
+					glUniformMatrix4fv(raycast_color_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(raycast_color_shader_bb.location_sampler[0], 2);
+					glUniform1i(raycast_color_shader_bb.location_sampler[1], 5);
+					glUniform1i(raycast_color_shader_bb.location_sampler[2], 0);
+					glUniform1i(raycast_color_shader_bb.location_sampler[3], 3);
+					glBindVertexArray(raycast_color_shader_bb_vao);
+				}
+				else
+				{
+					glUseProgram(mip_color_shader_bb.program);
+					glUniform4fv(mip_color_shader_bb.location_mparams, 4, mparams);
+					glUniformMatrix4fv(mip_color_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(mip_color_shader_bb.location_sampler[0], 2);
+					glUniform1i(mip_color_shader_bb.location_sampler[1], 5);
+					glUniform1i(mip_color_shader_bb.location_sampler[2], 0);
+					glUniform1i(mip_color_shader_bb.location_sampler[3], 3);
+					glBindVertexArray(mip_color_shader_bb_vao);
+				}
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
 			}
 			else
 			{
-				glUseProgram(raycast_color_shader.program);
-				glUniform4fv(raycast_color_shader.location_mparams, 4, mparams);
-				glUniformMatrix4fv(raycast_color_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-				glUniform1i(raycast_color_shader.location_sampler[0], 2);
-				glUniform1i(raycast_color_shader.location_sampler[1], 5);
-				glUniform1i(raycast_color_shader.location_sampler[2], 0);
-				glUniform1i(raycast_color_shader.location_sampler[3], 3);
-				glBindVertexArray(raycast_color_shader_vao);
+				if (mode == 0)
+				{
+					glUseProgram(raycast_color_shader.program);
+					glUniform4fv(raycast_color_shader.location_mparams, 4, mparams);
+					glUniformMatrix4fv(raycast_color_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(raycast_color_shader.location_sampler[0], 2);
+					glUniform1i(raycast_color_shader.location_sampler[1], 5);
+					glUniform1i(raycast_color_shader.location_sampler[2], 0);
+					glUniform1i(raycast_color_shader.location_sampler[3], 3);
+					glBindVertexArray(raycast_color_shader_vao);
+				}
+				else
+				{
+					glUseProgram(mip_color_shader.program);
+					glUniform4fv(mip_color_shader.location_mparams, 4, mparams);
+					glUniformMatrix4fv(mip_color_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
+					glUniform1i(mip_color_shader.location_sampler[0], 2);
+					glUniform1i(mip_color_shader.location_sampler[1], 5);
+					glUniform1i(mip_color_shader.location_sampler[2], 0);
+					glUniform1i(mip_color_shader.location_sampler[3], 3);
+					glBindVertexArray(mip_color_shader_vao);
+				}
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
@@ -2368,7 +2609,7 @@ void GLWidget::paint_volume()
 				di->G,
 				di->B,
 				1.0f);
-			if (dotv<0)
+			if (dotv < 0)
 			{
 				for (int x = di->from_slice; x <= di->to_slice; ++x)
 					draw_frame2(di->image_slices.at(x)->fv);
@@ -3049,6 +3290,11 @@ void GLWidget::set_view_3d()
 void GLWidget::set_view_rc()
 {
 	view = 1;
+}
+
+void GLWidget::set_view_mip()
+{
+	view = 2;
 }
 
 void GLWidget::set_clear_color(float red, float green, float blue)

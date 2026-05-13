@@ -82,6 +82,8 @@ public:
 		QAction*,
 		QAction*,
 		QAction*,
+		QAction*,
+		QAction*,
 		QAction*);
 	void set_2D_views_actions(
 		QAction*,
@@ -202,6 +204,8 @@ private:
 	QAction * zyxAct{};
 	QAction * histogramAct{};
 	QAction * slicesAct{};
+	QAction * raycastAct{};
+	QAction * mipAct{};
 	QAction * zlockAct{};
 	QAction * oneAct{};
 	QAction * trans3DAct{};

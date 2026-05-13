@@ -1573,11 +1573,15 @@ void Aliza::set_axis_actions(
 
 void Aliza::set_3D_views_actions(
 	QAction * slicesAct_,
+	QAction * raycastAct_,
+	QAction * mipAct_,
 	QAction * zlockAct_,
 	QAction * oneAct_,
 	QAction * show3DAct_)
 {
 	slicesAct = slicesAct_;
+	raycastAct = raycastAct_,
+	mipAct = mipAct_,
 	zlockAct = zlockAct_;
 	oneAct = oneAct_;
 	show3DAct = show3DAct_;
@@ -1628,10 +1632,14 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	if (check_3d())
 	{
 		slicesAct->setEnabled(true);
+		raycastAct->setEnabled(true);
+		mipAct->setEnabled(true);
 	}
 	else
 	{
 		slicesAct->setEnabled(false);
+		raycastAct->setEnabled(false);
+		mipAct->setEnabled(false);
 	}
 	toolbox2D->set_max_width(v->di->rmax - v->di->rmin + 1.0);
 	toolbox2D->set_window_upper(v->di->rmax);
