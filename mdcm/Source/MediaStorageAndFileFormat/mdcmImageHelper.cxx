@@ -1239,10 +1239,10 @@ ImageHelper::GetSpacingValue(const File & f)
               {
                 ;
               }
-              if (singleval == 0.0)
-                singleval = 1.0;
-              sp.push_back(singleval);
-              sp.push_back(singleval);
+              if (singleval == 0)
+                singleval = 1;
+              sp.push_back(static_cast<double>(singleval));
+              sp.push_back(static_cast<double>(singleval));
             }
             else
             {

@@ -323,6 +323,9 @@ public:
         // instead of terminator (eof is the next char)
         mdcmDebugMacro("Fragment: failed at " << frag.GetTag() << " Offset "
                        << is.tellg() << '\n' << ex.what());
+#ifdef NDEBUG
+        (void)ex;
+#endif
       }
 #endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
     }
