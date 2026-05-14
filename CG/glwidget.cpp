@@ -2325,7 +2325,8 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 		glDisable(GL_DEPTH_TEST);
 		glUseProgram(fsquad_shader.program);
 		glActiveTexture(GL_TEXTURE2);
-		// Debug: frontface_tex, backface_tex
+		// To debug frontface_tex replace with: glBindTexture(GL_TEXTURE_2D, frontface_tex);
+		// To debug backface_tex  replace with: glBindTexture(GL_TEXTURE_2D, backface_tex);
 		glBindTexture(GL_TEXTURE_2D, fbo_tex);
 		glUniform1i(fsquad_shader.location_sampler[0], 2);
 		glBindVertexArray(scene_vao);
