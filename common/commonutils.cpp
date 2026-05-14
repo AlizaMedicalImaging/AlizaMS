@@ -133,6 +133,8 @@ template<typename T> void calculate_min_max(
 	{
 #ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
+#else
+		(void)ex;
 #endif
 		return;
 	}
