@@ -1984,6 +1984,9 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 	//
 	glUseProgram(zero_shader.program);
 	//
+	// Store the object-space coordinates as colors in textures,
+	// this maps entry (front) and exit (back) points for each ray to a 2D texture.
+	//
 	// backfacebuffer
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, backfacebuffer);
