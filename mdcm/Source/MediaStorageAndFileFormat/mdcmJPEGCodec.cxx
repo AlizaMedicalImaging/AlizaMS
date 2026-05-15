@@ -162,7 +162,7 @@ JPEGCodec::Decode(const DataElement & in, DataElement & out)
     const bool r = DecodeByStreams(is0, os);
     if (!r)
     {
-      // Let's try another time: JPEGDefinedLengthSequenceOfFragments.dcm
+      // JPEGDefinedLengthSequenceOfFragments.dcm
       is0.seekg(0);
       SequenceOfFragments sf_bug;
       try
@@ -280,9 +280,6 @@ JPEGCodec::Decode2(const DataElement & in, std::stringstream & os)
           mdcmAlwaysWarnMacro("JPEGCodec: suspended");
           return false;
         }
-        // Ok so we are decoding a multiple frame jpeg DICOM file:
-        // if we are lucky, we might be trying to decode some sort of broken multi-frame
-        // DICOM file. In this case check that we have read all Fragment properly:
         if (i >= this->GetDimensions()[2])
         {
           // JPEGInvalidSecondFrag.dcm
@@ -322,7 +319,7 @@ JPEGCodec::Decode2(const DataElement & in, std::stringstream & os)
     const bool r = DecodeByStreams(is0, os);
     if (!r)
     {
-      // Let's try another time: JPEGDefinedLengthSequenceOfFragments.dcm
+      // JPEGDefinedLengthSequenceOfFragments.dcm
       is0.seekg(0);
       SequenceOfFragments sf_bug;
       try
@@ -438,7 +435,7 @@ JPEGCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
   if (!Internal) return false;
   if (!Internal->GetHeaderInfoAndTS(is, ts))
   {
-    // check if this is one of those buggy lossless JPEG
+    // buggy
     if (this->BitSample != Internal->BitSample)
     {
       // MARCONI_MxTWin-12-MONO2-JpegLossless-ZeroLengthSQ.dcm
@@ -608,8 +605,6 @@ JPEGCodec::AppendRowEncode(std::ostream & os, const char * data, size_t datalen)
 bool
 JPEGCodec::AppendFrameEncode(std::ostream &, const char *, size_t)
 {
-  // Technically the frame encoder could use the row encoder when present
-  // this could reduce code duplication
   assert(0);
   return false;
 }

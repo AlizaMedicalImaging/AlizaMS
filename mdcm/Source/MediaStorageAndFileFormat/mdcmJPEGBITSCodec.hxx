@@ -40,10 +40,10 @@ namespace mdcm
 
 typedef struct
 {
-  struct jpeg_source_mgr pub;           /* public fields */
-  std::istream *         infile;        /* source stream */
-  JOCTET *               buffer;        /* start of buffer */
-  boolean                start_of_file; /* have we gotten any data yet? */
+  struct jpeg_source_mgr pub;
+  std::istream *         infile;
+  JOCTET *               buffer;
+  boolean                start_of_file;
 } my_source_mgr;
 
 typedef my_source_mgr * my_src_ptr;
@@ -260,13 +260,15 @@ public:
   JPEGInternals()
     : cinfo()
     , cinfo_comp()
-    , jerr()
+    , cjerr()
+    , djerr()
     , StateSuspension(0)
     , SampBuffer(nullptr)
   {}
   jpeg_decompress_struct cinfo;
   jpeg_compress_struct   cinfo_comp;
-  my_error_mgr           jerr;
+  my_error_mgr           cjerr;
+  my_error_mgr           djerr;
   int                    StateSuspension;
   void *                 SampBuffer;
 };
@@ -295,7 +297,7 @@ bool
 JPEGBITSCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
 {
   jpeg_decompress_struct & cinfo = Internals->cinfo;
-  my_error_mgr & jerr = Internals->jerr;
+  my_error_mgr & jerr = Internals->djerr;
   if (Internals->StateSuspension == 0)
   {
     cinfo.err = jpeg_std_error(&jerr.pub);
@@ -510,7 +512,7 @@ bool
 JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
   jpeg_decompress_struct & cinfo = Internals->cinfo;
-  my_error_mgr &      jerr = Internals->jerr;
+  my_error_mgr &      jerr = Internals->djerr;
   volatile JSAMPARRAY buffer{};
   volatile size_t     row_stride{};
   if (Internals->StateSuspension == 0)
@@ -831,7 +833,7 @@ JPEGBITSCodec::EncodeBuffer(std::ostream & os, const char * data, size_t datalen
   const volatile int            image_height = dims[1];
   const volatile int            image_width = dims[0];
   jpeg_compress_struct & cinfo = Internals->cinfo_comp;
-  my_error_mgr &  jerr = Internals->jerr;
+  my_error_mgr &  jerr = Internals->cjerr;
   std::ostream *  outfile = &os;
   JSAMPROW        row_pointer[1];
   volatile size_t row_stride;
