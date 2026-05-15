@@ -1,7 +1,7 @@
 // clang-format off
 
 //#define ALWAYS_SHOW_GL_ERROR
-#define FBO_SIZE__0  512
+#define FBO_SIZE__0 1024
 #define FBO_SIZE__1 1024
 
 #include "structures.h"
@@ -727,8 +727,8 @@ void GLWidget::init_()
 	c3d_shader_bb_sigm_vbo = new GLuint[2];
 	c3d_shader_gradient_bb_sigm_vbo = new GLuint[2];
 	raycastcube0 = new GLuint[2];
-	//
 	raycastcube0_vao = 0;
+	//
 	raycast_shader_vao = 0;
 	raycast_color_shader_vao = 0;
 	raycast_shader_bb_vao = 0;
@@ -1321,16 +1321,13 @@ void GLWidget::init_opengl(int w, int h)
 	gen_lut_tex(pet_dicom_lut, pet_dicom_lut_size, &gradient6);
 	gen_lut_tex(pet20_dicom_lut, pet20_dicom_lut_size, &gradient7);
 	//
-	bool ok = create_fbos0(FBO_SIZE__0, FBO_SIZE__0,
-			&framebuffer,
-			&fbo_tex,
-			&fbo_depth);
+	bool ok = create_fbos0(FBO_SIZE__0, FBO_SIZE__0, &framebuffer, &fbo_tex, &fbo_depth);
+#ifdef ALIZA_VERBOSE
 	if (!ok)
 	{
-#ifdef ALIZA_VERBOSE
 		std::cout << "create_fbos0() failed" << std::endl;
-#endif
 	}
+#endif
 	create_program(fsquad_vs, fsquad_fs, &fsquad_shader);
 	fsquad_shader.location_sampler[0] = glGetUniformLocation(fsquad_shader.program, "sampler0");
 	fsquad_shader.position_handle     = glGetAttribLocation (fsquad_shader.program, "v_position");
@@ -1338,8 +1335,7 @@ void GLWidget::init_opengl(int w, int h)
 	generate_screen_quad(&scene_vbo, &scene_vao, &(fsquad_shader.position_handle));
 	//
 	{
-		float * tmp99 = new float[12];
-		for (int x = 0; x < 12; ++x) tmp99[x] = 0.0f;
+		float * tmp99 = new float[12]{};
 		glGenVertexArrays(1, &frames_vao);
 		glBindVertexArray(frames_vao);
 		glGenBuffers(1, &frames_vbo);
@@ -1363,33 +1359,29 @@ void GLWidget::init_opengl(int w, int h)
 	}
 	//
 	create_program(zero_vs, zero_fs, &zero_shader);
-	zero_shader.location_mvp        = glGetUniformLocation(zero_shader.program, "mvp");
-	zero_shader.position_handle     = glGetAttribLocation (zero_shader.program, "v_position");
-	zero_shader.color_handle        = glGetAttribLocation (zero_shader.program, "v_color");
+	zero_shader.location_mvp    = glGetUniformLocation(zero_shader.program, "mvp");
+	zero_shader.position_handle = glGetAttribLocation (zero_shader.program, "v_position");
+	zero_shader.color_handle    = glGetAttribLocation (zero_shader.program, "v_color");
 	shaders.push_back(&zero_shader);
 	generate_raycastcube_vao(
-		&raycastcube0_vao, raycastcube0,
-		&(zero_shader.position_handle), &(zero_shader.color_handle));
-	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
-			&backfacebuffer,
-			&backface_tex,
-			&backface_depth);
+		&raycastcube0_vao,
+		raycastcube0,
+		&(zero_shader.position_handle),
+		&(zero_shader.color_handle));
+	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1, &backfacebuffer, &backface_tex, &backface_depth);
+#ifdef ALIZA_VERBOSE
 	if (!ok)
 	{
-#ifdef ALIZA_VERBOSE
 		std::cout << "create_fbos1() failed (1)" << std::endl;
-#endif
 	}
-	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
-			&frontfacebuffer,
-			&frontface_tex,
-			&frontface_depth);
+#endif
+	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1, &frontfacebuffer, &frontface_tex, &frontface_depth);
+#ifdef ALIZA_VERBOSE
 	if (!ok)
 	{
-#ifdef ALIZA_VERBOSE
 		std::cout << "create_fbos1() failed (2)" << std::endl;
-#endif
 	}
+#endif
 	create_program(raycast_vs, raycast_fs_bb, &raycast_shader_bb);
 	raycast_shader_bb.location_mvp        = glGetUniformLocation(raycast_shader_bb.program, "mvp");
 	raycast_shader_bb.position_handle     = glGetAttribLocation (raycast_shader_bb.program, "v_position");
@@ -1604,18 +1596,13 @@ void GLWidget::init_opengl(int w, int h)
 	//
 	////////////////////////////
 	// orient. cube
-	ok = create_fbos0(
-		256,
-		256,
-		&cubebuffer,
-		&cube_tex,
-		&cube_depth);
+	ok = create_fbos0(256, 256, &cubebuffer, &cube_tex, &cube_depth);
+#ifdef ALIZA_VERBOSE
 	if (!ok)
 	{
-#ifdef ALIZA_VERBOSE
 		std::cout << "create_fbos0() failed (cube)" << std::endl;
-#endif
 	}
+#endif
 	//
 	cube = new qMeshData;
 	GLuint * vboid000 = new GLuint[4];
@@ -1981,9 +1968,7 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 	mparams[15] = 0.0f; // unused
 	//
 	glEnable(GL_CULL_FACE);
-	//
 	glUseProgram(zero_shader.program);
-	//
 	// Store the object-space coordinates as colors in textures,
 	// this maps entry (front) and exit (back) points for each ray to a 2D texture.
 	//
@@ -4407,18 +4392,15 @@ bool GLWidget::create_fbos0(
 	unsigned int h,
 	GLuint * fb,
 	GLuint * color_texture,
-	GLuint * depth_texture,
-	GLenum   format,
-	GLenum   type,
-	GLenum   target)
+	GLuint * depth_texture)
 {
 	glGenTextures(1, depth_texture);
-	glBindTexture(target, *depth_texture);
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(target,
+	glBindTexture(GL_TEXTURE_2D, *depth_texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D,
 				0,
 				GL_DEPTH_COMPONENT24,
 				w,
@@ -4428,16 +4410,16 @@ bool GLWidget::create_fbos0(
 				GL_UNSIGNED_INT,
 				nullptr);
 	glGenTextures(1, color_texture);
-	glBindTexture(target, *color_texture );
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(target, 0, format, w, h, 0, format, type, nullptr);
+	glBindTexture(GL_TEXTURE_2D, *color_texture );
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glGenFramebuffers(1, fb);
 	glBindFramebuffer(GL_FRAMEBUFFER, *fb);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, *color_texture, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  target, *depth_texture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *color_texture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, *depth_texture, 0);
 	bool ok = false;
 	switch (glCheckFramebufferStatus(GL_FRAMEBUFFER))
 	{
@@ -4445,11 +4427,8 @@ bool GLWidget::create_fbos0(
 		ok = true;
 		break;
 	case GL_FRAMEBUFFER_UNSUPPORTED:
-		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-		break;
 	default:
 		break;
 	}
@@ -4483,10 +4462,7 @@ bool GLWidget::create_fbos1(
 	unsigned int   h,
 	GLuint * fb,
 	GLuint * color_texture,
-	GLuint * depth_rb,
-	GLenum   format,
-	GLenum   type,
-	GLenum   target)
+	GLuint * depth_rb)
 {
 	glGenRenderbuffers(1, depth_rb);
 	glBindRenderbuffer(GL_RENDERBUFFER, *depth_rb);
@@ -4494,13 +4470,13 @@ bool GLWidget::create_fbos1(
 	glGenFramebuffers(1, fb);
 	glBindFramebuffer(GL_FRAMEBUFFER, *fb);
 	glGenTextures(1, color_texture);
-	glBindTexture(target, *color_texture);
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(target, 0, format, w, h, 0, format, type, nullptr);
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, *color_texture, 0);
+	glBindTexture(GL_TEXTURE_2D, *color_texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, w, h, 0, GL_RGBA, GL_UNSIGNED_SHORT, nullptr);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *color_texture, 0);
 	bool ok = false;
 	switch (glCheckFramebufferStatus(GL_FRAMEBUFFER))
 	{
@@ -4508,11 +4484,8 @@ bool GLWidget::create_fbos1(
 		ok = true;
 		break;
 	case GL_FRAMEBUFFER_UNSUPPORTED:
-		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-		break;
 	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-		break;
 	default:
 		break;
 	}

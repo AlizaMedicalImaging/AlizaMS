@@ -371,10 +371,7 @@ public:
 	bool create_fbos0(unsigned int w, unsigned int h,
 		GLuint * framebuffer,
 		GLuint * color_texture,
-		GLuint * depth_texture,
-		GLenum   format = GL_RGBA,
-		GLenum   type   = GL_UNSIGNED_BYTE,
-		GLenum   target = GL_TEXTURE_2D);
+		GLuint * depth_texture);
 	void free_fbos1(
 		GLuint * framebuffer,
 		GLuint * color_texture,
@@ -382,10 +379,7 @@ public:
 	bool create_fbos1(unsigned int w, unsigned int h,
 		GLuint * framebuffer,
 		GLuint * color_texture,
-		GLuint * depth_rb,
-		GLenum   format = GL_RGBA,
-		GLenum   type   = GL_UNSIGNED_BYTE,
-		GLenum   target = GL_TEXTURE_2D);
+		GLuint * depth_rb);
 	void generate_raycastcube_vao(GLuint*, GLuint*, GLuint*, GLuint*);
 	void generate_raycast_shader_vao(GLuint*, GLuint*, GLuint*);
 	bool update_raycast_shader_vbo(
