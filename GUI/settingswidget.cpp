@@ -26,6 +26,10 @@
 SettingsWidget::SettingsWidget(float si) : scale_icons(si)
 {
 	setupUi(this);
+#if 1
+	f_trilinear_radioButton->setEnabled(false);
+	f_trilinear_radioButton->hide();
+#endif
 	x_comboBox->addItem(QString("256"));
 	x_comboBox->addItem(QString("128"));
 	x_comboBox->addItem(QString("64"));
@@ -46,8 +50,9 @@ SettingsWidget::SettingsWidget(float si) : scale_icons(si)
 
 short SettingsWidget::get_filtering() const
 {
-	if      (f_no_radioButton->isChecked())       return 0;
-	else if (f_bilinear_radioButton->isChecked()) return 1;
+	if      (f_no_radioButton->isChecked())        return 0;
+	else if (f_bilinear_radioButton->isChecked())  return 1;
+	else if (f_trilinear_radioButton->isChecked()) return 2;
 	return 0;
 }
 
@@ -128,6 +133,7 @@ void SettingsWidget::set_default()
 	y_comboBox->setItemText(0,QString("256"));
 #endif
 	f_bilinear_radioButton->setChecked(false);
+	f_trilinear_radioButton->setChecked(false);
 	f_no_radioButton->setChecked(true);
 	textureoptions_groupBox->setVisible(true);
 	textureoptions_groupBox->setChecked(true);
@@ -279,6 +285,7 @@ void SettingsWidget::readSettings()
 	const int tmp18 = settings.value(QString("adj_fps2"), 0).toInt();
 #endif
 	const int tmp19 = settings.value(QString("adj_fps_value"), 14).toInt();
+	const int tmp20 = settings.value(QString("filtering"),     0).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -351,6 +358,24 @@ void SettingsWidget::readSettings()
 	dcmthread_checkBox->setChecked((tmp17 == 1));
 	adjust_spinBox->setValue(tmp19);
 	adjust_checkBox->setChecked((tmp18 == 1));
+	if (tmp20 == 2)
+	{
+		f_no_radioButton->setChecked(false);
+		f_bilinear_radioButton->setChecked(false);
+		f_trilinear_radioButton->setChecked(true);
+	}
+	else if (tmp20 == 1)
+	{
+		f_no_radioButton->setChecked(false);
+		f_bilinear_radioButton->setChecked(true);
+		f_trilinear_radioButton->setChecked(false);
+	}
+	else // default
+	{
+		f_no_radioButton->setChecked(true);
+		f_bilinear_radioButton->setChecked(false);
+		f_trilinear_radioButton->setChecked(false);
+	}
 }
 
 void SettingsWidget::writeSettings(QSettings & s)
@@ -391,6 +416,18 @@ void SettingsWidget::writeSettings(QSettings & s)
 	else // default
 	{
 		s.setValue(QString("enh_strategy"), QVariant(1));
+	}
+	if (f_trilinear_radioButton->isChecked())
+	{
+		s.setValue(QString("filtering"), QVariant(2));
+	}
+	else if (f_bilinear_radioButton->isChecked())
+	{
+		s.setValue(QString("filtering"), QVariant(1));
+	}
+	else // default
+	{
+		s.setValue(QString("filtering"), QVariant(0));
 	}
 	s.endGroup();
 	s.beginGroup(QString("StyleDialog"));
