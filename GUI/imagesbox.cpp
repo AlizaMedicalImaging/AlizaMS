@@ -704,6 +704,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 			QString texfilt, texinfo;
 			if      (v->di->filtering == 0) texfilt = QString(" (no filtering)");
 			else if (v->di->filtering == 1) texfilt = QString(" (bilinear)");
+			else if (v->di->filtering == 2) texfilt = QString(" (trilinear)");
 			else                            texfilt = QString(" (?)");
 			if      (v->di->tex_info == 0)  texinfo = QString(" R16F ");
 			else if (v->di->tex_info == 1)  texinfo = QString(" R16 ");

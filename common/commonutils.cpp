@@ -852,7 +852,6 @@ template<typename T> int generate_tex3d(
 		{
 			gl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			gl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			gl->glGenerateMipmap(GL_TEXTURE_3D);
 		}
 		break;
 	default: // no
@@ -880,7 +879,6 @@ template<typename T> int generate_tex3d(
 		{
 			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glGenerateMipmap(GL_TEXTURE_3D);
 		}
 		break;
 	default: // no
@@ -961,6 +959,15 @@ template<typename T> int generate_tex3d(
 		break;
 	default:
 		break;
+	}
+	//
+	if (ivariant->di->filtering == 2)
+	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+		gl->glGenerateMipmap(GL_TEXTURE_3D);
+#else
+		glGenerateMipmap(GL_TEXTURE_3D);
+#endif
 	}
 	//
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
