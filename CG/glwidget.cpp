@@ -1862,15 +1862,13 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 	}
 	bool warn1 = false;
 	bool warn2 = false;
-	if (
-		(display_contours && !selected_images__->at(0)->di->rois.empty()) ||
+	if ((display_contours && !selected_images__->at(0)->di->rois.empty()) ||
 		!selected_images__->at(0)->di->spectroscopy_slices.empty())
 	{
 		warn1 = true;
 	}
 	if (!selected_images__->at(0)->equi ||
 		di->skip_texture ||
-		(di->idimz < 2) ||
 		!selected_images__->at(0)->di->slices_generated)
 	{
 		if (warn1)
@@ -1946,26 +1944,52 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 	VECTORMATH_ALIGNED(float mv_aos_ptr[16]);
 	camera->matrix4_to_float(mv_aos, mv_aos_ptr);
 	//
-	// [0]
-	mparams[0]  = static_cast<float>(di->dimx); // X dim
-	mparams[1]  = static_cast<float>(di->window_center - di->window_width * 0.5);
-	mparams[2]  = static_cast<float>(di->window_center + di->window_width * 0.5);
-	mparams[3]  = static_cast<float>(di->window_width);
-	// [1]
-	mparams[4]  = static_cast<float>(di->idimz); // Z dim
-	mparams[5]  = static_cast<float>(di->from_slice) / static_cast<float>(di->idimz - 1); // z
-	mparams[6]  = static_cast<float>(di->to_slice) / static_cast<float>(di->idimz - 1); // z
-	mparams[7]  = static_cast<float>(di->bb_y_min); // y
-	// [2]
-	mparams[8]  = static_cast<float>(di->bb_y_max); // y
-	mparams[9]  = static_cast<float>(di->bb_x_min); // x
-	mparams[10] = static_cast<float>(di->bb_x_max); // x
-	mparams[11] = static_cast<float>(di->dimy); // Y dim
-	// [3]
-	mparams[12] = alpha; // premultiply alpha
-	mparams[13] = brightness; // multiply color
-	mparams[14] = static_cast<float>(di->window_center);
-	mparams[15] = 0.0f; // unused
+	{
+		float from_slice_tmp;
+		float to_slice_tmp;
+		if (di->idimz > 1)
+		{
+			const float idimz_minus_one = static_cast<float>(di->idimz - 1);
+			if (di->from_slice == di->to_slice)
+			{
+				const float incr = 0.4f / idimz_minus_one;
+				from_slice_tmp = (static_cast<float>(di->from_slice) - incr) / idimz_minus_one;
+				to_slice_tmp   = (static_cast<float>(di->to_slice)   + incr) / idimz_minus_one;
+				if (from_slice_tmp < 0.0f) from_slice_tmp = 0.0f;
+				if (to_slice_tmp   > 1.0f) to_slice_tmp   = 1.0f;
+			}
+			else
+			{
+				from_slice_tmp = static_cast<float>(di->from_slice) / idimz_minus_one;
+				to_slice_tmp   = static_cast<float>(di->to_slice)   / idimz_minus_one;
+			}
+		}
+		else
+		{
+			from_slice_tmp = 0.0f;
+			to_slice_tmp   = 1.0f;
+		}
+		// [0]
+		mparams[0]  = static_cast<float>(di->dimx); // X dim
+		mparams[1]  = static_cast<float>(di->window_center - di->window_width * 0.5);
+		mparams[2]  = static_cast<float>(di->window_center + di->window_width * 0.5);
+		mparams[3]  = static_cast<float>(di->window_width);
+		// [1]
+		mparams[4]  = static_cast<float>(di->idimz); // Z dim
+		mparams[5]  = from_slice_tmp; // z
+		mparams[6]  = to_slice_tmp;   // z
+		mparams[7]  = static_cast<float>(di->bb_y_min); // y
+		// [2]
+		mparams[8]  = static_cast<float>(di->bb_y_max); // y
+		mparams[9]  = static_cast<float>(di->bb_x_min); // x
+		mparams[10] = static_cast<float>(di->bb_x_max); // x
+		mparams[11] = static_cast<float>(di->dimy); // Y dim
+		// [3]
+		mparams[12] = alpha; // premultiply alpha
+		mparams[13] = brightness; // multiply color
+		mparams[14] = static_cast<float>(di->window_center);
+		mparams[15] = 0.0f; // unused
+	}
 	//
 	glEnable(GL_CULL_FACE);
 	glUseProgram(zero_shader.program);
