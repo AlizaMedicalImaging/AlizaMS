@@ -4,7 +4,7 @@
 #
 ####################################################################
 
-cmake_minimum_required(VERSION 3.11.0)
+cmake_minimum_required(VERSION 3.13)
 #
 # Note, for CMAKE_CXX_STANDARD:
 # For C++20 version 3.12 is required.
@@ -317,7 +317,7 @@ endmacro()
 
 set(MDCM_MAJOR_VERSION 1)
 set(MDCM_MINOR_VERSION 6)
-set(MDCM_BUILD_VERSION 3)
+set(MDCM_BUILD_VERSION 5)
 set(MDCM_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}.${MDCM_BUILD_VERSION}")
 set(MDCM_API_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}")
 

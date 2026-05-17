@@ -969,8 +969,6 @@ const char raycast_color_fs_bb_sigm[] =
 "	fragColor=acc;\n"
 "}\n";
 
-// MIPS
-
 const char mip_fs[] =
 "#version 150\n"
 "uniform sampler2D sampler0;\n"
