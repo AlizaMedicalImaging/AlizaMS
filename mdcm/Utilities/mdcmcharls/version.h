@@ -16,7 +16,7 @@ extern "C" {
 
 #define CHARLS_VERSION_MAJOR 2
 #define CHARLS_VERSION_MINOR 4
-#define CHARLS_VERSION_PATCH 2
+#define CHARLS_VERSION_PATCH 3
 
 /// <summary>
 /// Returns the version of CharLS in the semver format "major.minor.patch" or "major.minor.patch-pre_release"
