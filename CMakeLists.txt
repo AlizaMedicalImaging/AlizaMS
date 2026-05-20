@@ -327,6 +327,7 @@ if(MDCM_HAVE_BYTESWAP_FILE_H)
   include(CheckCXXSourceCompiles)
   check_cxx_source_compiles("#include <byteswap.h>\nint main(){return bswap_32(42);}" MDCM_HAVE_BYTESWAP_H)
 endif()
+
 check_include_file("rpc.h" MDCM_HAVE_RPC_H)
 
 include(CheckCXXSourceCompiles)
@@ -552,14 +553,13 @@ endif()
 #
 #
 #
-if(ALIZA_COREGL)
-  add_definitions(-DALIZA_GL_3_2_CORE)
-endif()
-
 find_package(OpenGL REQUIRED)
-
 if(APPLE)
   add_definitions(-DALIZA_GL_3_2_CORE -DGL_SILENCE_DEPRECATION)
+else()
+  if(ALIZA_COREGL)
+    add_definitions(-DALIZA_GL_3_2_CORE)
+  endif()
 endif()
 #
 #
