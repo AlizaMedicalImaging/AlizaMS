@@ -22,10 +22,11 @@
     <ul>
       <li>2D and 3D views with many tools</li>
       <li>3D view also for non-uniform images</li>
-      <li>Consistently de-identify DICOM, maintain integrity</li>
       <li>DICOM Study multi-view with intersection lines and side-by-side view</li>
-      <li>Volume Rendering, multi-planar reconstruction (MPR)</li>
+      <li>Maximum intensity projection</li>
+      <li>Multi-planar reconstruction (MPR)</li>
       <li>2D+t and 3D+t animations</li>
+      <li>Consistently de-identify DICOM, maintain integrity</li>
       <li>DICOM metadata viewer, DICOM 2026b dictionary</li>
       <li>Fast directory scanner, DICOMDIR</li>
       <li>RTSTRUCT contours</li>
@@ -61,25 +62,42 @@
   <screenshots>
     <screenshot type="default">
       <caption>Main Window</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.12/package/art/alizams_scr1.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/1.png</image>
     </screenshot>
     <screenshot>
       <caption>Multi-view</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.12/package/art/alizams_scr2.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/2.png</image>
     </screenshot>
     <screenshot>
       <caption>Metadata Viewer</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.12/package/art/alizams_scr3.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/3.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>Main Window</caption>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/4.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Multi-view</caption>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/5.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Metadata Viewer</caption>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/6.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Metadata Viewer</caption>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/7.png</image>
     </screenshot>
   </screenshots>
   <releases>
-    <release date="2026-04-16" version="1.9.12">
+    <release date="2026-05-21" version="1.10.0">
       <description>
-        <p>Release 1.9.12</p>
+        <p>Release 1.10.0</p>
       </description>
-      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.12</url>
+      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.10.0</url>
     </release>
-    <release date="2026-01-17" version="1.9.11"/>
+    </release>
+    <release date="2026-04-16" version="1.9.12"/>
     <release date="2024-05-24" version="1.9.10"/>
     <release date="2024-04-22" version="1.9.9"/>
     <release date="2024-04-01" version="1.9.8"/>
