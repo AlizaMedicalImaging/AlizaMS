@@ -29,8 +29,8 @@ Recommendations
 
 
 * Adjust application font size and icons size in _Settings->Application_
-* Press *f* (having focus in 2D view) to fit the image size
-* Press *s* (having focus in 2D view) to toggle smoothing
+* Press *f* (with focus on the 2D view) to fit the image size
+* Press *s* (with focus on the 2D view) to toggle smoothing
 * Press *g* (2D or 3D view) to save screenshot of the view
 * Try to enable linear filtering for 3D view in _Settings->3D_
     - Restart is not required, will be applicable to the next opened image
