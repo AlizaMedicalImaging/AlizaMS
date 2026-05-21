@@ -24,6 +24,21 @@ Select one or more series and click _arrow_ action (or double-click selected row
 
 View short introductory videos on [Youtube Channel](https://www.youtube.com/channel/UCPGvoSYX7PC5XCp-81Q4MAg) _(new, WIP)_
 
+Recommendations
+---------------
+
+
+* Adjust application font size and icons size in _Settings->Application_
+* Press *f* (having focus in 2D view) to fit the image size
+* Press *s* (having focus in 2D view) to toggle smoothing
+* Press *g* (2D or 3D view) to save screenshot of the view
+* Try to enable linear filtering for 3D view in _Settings->3D_
+    - Restart is not required, will be applicable to the next opened image
+    - Note: this slightly alters the image; if the distance between slices is large, it can lead to the appearance of artifacts
+* Try _Show frames_ option (lower panel) in _3D Physical Space View_, specially for non-uniform images
+
+
+
 Highlights
 ----------
 
