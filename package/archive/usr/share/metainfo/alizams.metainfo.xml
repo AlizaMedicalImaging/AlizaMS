@@ -61,23 +61,23 @@
   </content_rating>
   <screenshots>
     <screenshot type="default">
-      <caption>Main Window</caption>
+      <caption>Main Window, RTSTRUCT, Physical Space View</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/1.png</image>
     </screenshot>
     <screenshot>
-      <caption>Multi-view</caption>
+      <caption>Main Window, Intensity Projection</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/2.png</image>
     </screenshot>
     <screenshot>
-      <caption>Metadata Viewer</caption>
+      <caption>Main Window, Maximum Intensity Projection</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/3.png</image>
     </screenshot>
-    <screenshot type="default">
-      <caption>Main Window</caption>
+    <screenshot>
+      <caption>Main Window, Maximum Intensity Projection, LUT</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/4.png</image>
     </screenshot>
     <screenshot>
-      <caption>Multi-view</caption>
+      <caption>Study View</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/5.png</image>
     </screenshot>
     <screenshot>
@@ -85,7 +85,7 @@
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/6.png</image>
     </screenshot>
     <screenshot>
-      <caption>Metadata Viewer</caption>
+      <caption>De-identify</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/7.png</image>
     </screenshot>
   </screenshots>
@@ -95,7 +95,6 @@
         <p>Release 1.10.0</p>
       </description>
       <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.10.0</url>
-    </release>
     </release>
     <release date="2026-04-16" version="1.9.12"/>
     <release date="2024-05-24" version="1.9.10"/>
