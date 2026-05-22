@@ -58,11 +58,13 @@ Highlights
  * Encapsulated transfer syntaxes incl. HTJ2K
  * Most IODs are supported incl. Structured Reports, Key Objects Selection, Grayscale Softcopy Presentation State</li>
 
-![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/alizams_scr1.jpg)
+![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/1.png)
 
-![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/alizams_scr2.jpg)
+![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/4.png)
 
-![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/alizams_scr3.jpg)
+![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/5.png)
+
+![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/6.png)
 
 Build
 -----
