@@ -66,6 +66,8 @@ Highlights
 
 ![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/6.png)
 
+![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/8.png)
+
 Build
 -----
 
