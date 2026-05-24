@@ -62,31 +62,27 @@
   <screenshots>
     <screenshot type="default">
       <caption>Main Window, RTSTRUCT, Physical Space View</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/1.png</image>
-    </screenshot>
-    <screenshot>
-      <caption>Main Window, Intensity Projection</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/2.png</image>
-    </screenshot>
-    <screenshot>
-      <caption>Main Window, Maximum Intensity Projection</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/3.png</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/master/package/art/1.png</image>
     </screenshot>
     <screenshot>
       <caption>Main Window, Maximum Intensity Projection, LUT</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/4.png</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/master/package/art/4.png</image>
     </screenshot>
     <screenshot>
       <caption>Study View</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/5.png</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/master/package/art/5.png</image>
     </screenshot>
     <screenshot>
       <caption>Metadata Viewer</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/6.png</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/master/package/art/6.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Structured Report Viewer</caption>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/master/package/art/8.png</image>
     </screenshot>
     <screenshot>
       <caption>De-identify</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.10.0/package/art/7.png</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/master/package/art/7.png</image>
     </screenshot>
   </screenshots>
   <releases>
