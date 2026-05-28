@@ -1327,6 +1327,8 @@ void GLWidget::init_opengl(int w, int h)
 	{
 		std::cout << "create_fbos0() failed" << std::endl;
 	}
+#else
+	(void)ok;
 #endif
 	create_program(fsquad_vs, fsquad_fs, &fsquad_shader);
 	fsquad_shader.location_sampler[0] = glGetUniformLocation(fsquad_shader.program, "sampler0");
@@ -1381,6 +1383,8 @@ void GLWidget::init_opengl(int w, int h)
 	{
 		std::cout << "create_fbos1() failed (2)" << std::endl;
 	}
+#else
+	(void)ok;
 #endif
 	create_program(raycast_vs, raycast_fs_bb, &raycast_shader_bb);
 	raycast_shader_bb.location_mvp        = glGetUniformLocation(raycast_shader_bb.program, "mvp");
@@ -1602,6 +1606,8 @@ void GLWidget::init_opengl(int w, int h)
 	{
 		std::cout << "create_fbos0() failed (cube)" << std::endl;
 	}
+#else
+	(void)ok;
 #endif
 	//
 	cube = new qMeshData;
