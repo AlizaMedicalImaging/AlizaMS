@@ -150,8 +150,6 @@ TYPETOLENGTH(VM35,   35);
 TYPETOLENGTH(VM99,   99);
 TYPETOLENGTH(VM256, 256);
 
-// clang-format on
-
 } // end namespace mdcm
 
 #endif // MDCMVM_H

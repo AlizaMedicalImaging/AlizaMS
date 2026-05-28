@@ -371,5 +371,3 @@ VR::GetSize() const
 } // end namespace mdcm
 
 #endif // MDCMVR_H
-
-// clang-format on

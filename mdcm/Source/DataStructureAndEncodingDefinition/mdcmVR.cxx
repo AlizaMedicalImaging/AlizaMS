@@ -516,5 +516,3 @@ VR::IsDual() const
 }
 
 } // end of namespace mdcm
-
-// clang-format on
