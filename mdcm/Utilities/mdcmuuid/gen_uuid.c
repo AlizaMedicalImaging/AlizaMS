@@ -145,7 +145,9 @@ static int get_random_fd(void)
     fd = open("/dev/urandom", O_RDONLY);
     if (fd == -1)
       fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
-    srand((getpid() << 16) ^ getuid() ^ tv.tv_sec ^ tv.tv_usec);
+    // May 2026: disabled left shift sanitizer warning,
+    // data types in this ancient utility should be examined.
+    srand(((pid_t)((unsigned int)getpid() << 16)) ^ getuid() ^ tv.tv_sec ^ tv.tv_usec);
   }
   /* Crank the random number generator a few times */
   gettimeofday(&tv, 0);
