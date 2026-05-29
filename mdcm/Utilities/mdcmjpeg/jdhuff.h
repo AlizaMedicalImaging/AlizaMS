@@ -13,6 +13,8 @@
 
 /* Short forms of external names for systems with brain-damaged linkers. */
 
+#include <limits.h>
+
 #ifdef NEED_SHORT_EXTERNAL_NAMES
 #  define jpeg_make_d_derived_tbl jMkDDerived
 #  define jpeg_fill_bit_buffer jFilBitBuf
@@ -69,14 +71,11 @@ EXTERN(void) jpeg_make_d_derived_tbl JPP((j_decompress_ptr cinfo, boolean isDC, 
  * necessary.
  */
 
-typedef IJG_INT bit_buf_type; /* type of bit-extraction buffer */
+// Note: was IJG_INT in orig. code, jpeg-turbo uses size_t or other
+// unsigned types.
+typedef size_t bit_buf_type; /* type of bit-extraction buffer */
 
-/*
- * Warning: define BIT_BUF_SIZE manually if plantform doesn't measure
- * sizeof in 8-bit bytes!
- */
-
-#define BIT_BUF_SIZE ((size_t)sizeof(bit_buf_type)*8) /* size of buffer in bits */
+#define BIT_BUF_SIZE ((size_t)sizeof(bit_buf_type)*CHAR_BIT) /* size of buffer in bits */
 
 typedef struct
 {                          /* Bitreading state saved across MCUs */

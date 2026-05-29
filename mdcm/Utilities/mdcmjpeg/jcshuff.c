@@ -245,7 +245,7 @@ emit_bits(working_state * state, unsigned int code, int size)
     { /* need to stuff a zero byte? */
       emit_byte(state, 0, return FALSE);
     }
-    put_buffer <<= 8;
+    put_buffer = LEFT_SHIFT(put_buffer, 8);
     put_bits -= 8;
   }
 

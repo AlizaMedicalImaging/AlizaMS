@@ -140,15 +140,15 @@ Sorry, this code only copes with 8x8 DCTs./* deliberate syntax err */
 #  define DEQUANTIZE(coef, quantval) (((ISLOW_MULT_TYPE)(coef)) * (quantval))
 
 
-       /*
-        * Perform dequantization and inverse DCT on one block of coefficients.
-        */
+/*
+ * Perform dequantization and inverse DCT on one block of coefficients.
+ */
 
-       GLOBAL(void) jpeg_idct_islow(j_decompress_ptr      cinfo,
-                                    jpeg_component_info * compptr,
-                                    JCOEFPTR              coef_block,
-                                    JSAMPARRAY            output_buf,
-                                    JDIMENSION            output_col)
+GLOBAL(void) jpeg_idct_islow(j_decompress_ptr      cinfo,
+                             jpeg_component_info * compptr,
+                             JCOEFPTR              coef_block,
+                             JSAMPARRAY            output_buf,
+                             JDIMENSION            output_col)
 {
   IJG_INT           tmp0, tmp1, tmp2, tmp3;
   IJG_INT           tmp10, tmp11, tmp12, tmp13;
@@ -184,7 +184,7 @@ Sorry, this code only copes with 8x8 DCTs./* deliberate syntax err */
         inptr[DCTSIZE * 5] == 0 && inptr[DCTSIZE * 6] == 0 && inptr[DCTSIZE * 7] == 0)
     {
       /* AC terms all zero */
-      int dcval = DEQUANTIZE(inptr[DCTSIZE * 0], quantptr[DCTSIZE * 0]) << PASS1_BITS;
+      int dcval = LEFT_SHIFT(DEQUANTIZE(inptr[DCTSIZE * 0], quantptr[DCTSIZE * 0]), PASS1_BITS);
 
       wsptr[DCTSIZE * 0] = dcval;
       wsptr[DCTSIZE * 1] = dcval;
@@ -214,8 +214,8 @@ Sorry, this code only copes with 8x8 DCTs./* deliberate syntax err */
     z2 = DEQUANTIZE(inptr[DCTSIZE * 0], quantptr[DCTSIZE * 0]);
     z3 = DEQUANTIZE(inptr[DCTSIZE * 4], quantptr[DCTSIZE * 4]);
 
-    tmp0 = (z2 + z3) << CONST_BITS;
-    tmp1 = (z2 - z3) << CONST_BITS;
+    tmp0 = LEFT_SHIFT((z2 + z3), CONST_BITS);
+    tmp1 = LEFT_SHIFT((z2 - z3), CONST_BITS);
 
     tmp10 = tmp0 + tmp3;
     tmp13 = tmp0 - tmp3;
@@ -317,8 +317,8 @@ Sorry, this code only copes with 8x8 DCTs./* deliberate syntax err */
     tmp2 = z1 + MULTIPLY(z3, -FIX_1_847759065);
     tmp3 = z1 + MULTIPLY(z2, FIX_0_765366865);
 
-    tmp0 = ((IJG_INT)wsptr[0] + (IJG_INT)wsptr[4]) << CONST_BITS;
-    tmp1 = ((IJG_INT)wsptr[0] - (IJG_INT)wsptr[4]) << CONST_BITS;
+    tmp0 = LEFT_SHIFT(((IJG_INT)wsptr[0] + (IJG_INT)wsptr[4]), CONST_BITS);
+    tmp1 = LEFT_SHIFT(((IJG_INT)wsptr[0] - (IJG_INT)wsptr[4]), CONST_BITS);
 
     tmp10 = tmp0 + tmp3;
     tmp13 = tmp0 - tmp3;

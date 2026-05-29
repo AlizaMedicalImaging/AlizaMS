@@ -278,7 +278,7 @@ emit_bits(working_state * state, unsigned int code, int size)
 
   put_bits += size; /* new number of bits in buffer */
 
-  put_buffer <<= 24 - put_bits; /* align incoming bits */
+  put_buffer = LEFT_SHIFT(put_buffer, (24 - put_bits)); /* align incoming bits */
 
   put_buffer |= state->cur.put_buffer; /* and merge with old buffer contents */
 
@@ -291,7 +291,7 @@ emit_bits(working_state * state, unsigned int code, int size)
     { /* need to stuff a zero byte? */
       emit_byte(state, 0, return FALSE);
     }
-    put_buffer <<= 8;
+    put_buffer = LEFT_SHIFT(put_buffer, 8);
     put_bits -= 8;
   }
 

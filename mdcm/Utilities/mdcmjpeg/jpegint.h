@@ -10,6 +10,7 @@
  * applications using the library shouldn't need to include this file.
  */
 
+#define LEFT_SHIFT(a, b) ((IJG_INT)((unsigned int)(a) << (b)))
 
 /* Declarations for both compression & decompression */
 

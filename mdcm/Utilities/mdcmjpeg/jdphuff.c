@@ -19,6 +19,7 @@
 #include "jpeglib.h"
 #include "jlossy.h" /* Private declarations for lossy subsystem */
 #include "jdhuff.h" /* Declarations shared with jd*huff.c */
+#include <limits.h>
 
 
 #ifdef D_PROGRESSIVE_SUPPORTED
@@ -360,10 +361,18 @@ decode_mcu_DC_first(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
       }
 
       /* Convert DC difference to actual value, update last_dc_val */
+#if 1
+      // This is picked from jpeg-turbo
+      if ((state.last_dc_val[ci] >= 0 && s > INT_MAX - state.last_dc_val[ci]) ||
+          (state.last_dc_val[ci] <  0 && s < INT_MIN - state.last_dc_val[ci]))
+      {
+        ERREXIT(cinfo, JERR_BAD_DCT_COEF);
+      }
+#endif
       s += state.last_dc_val[ci];
       state.last_dc_val[ci] = s;
       /* Scale and output the coefficient (assumes jpeg_natural_order[0]=0) */
-      (*block)[0] = (JCOEF)(s << Al);
+      (*block)[0] = (JCOEF)LEFT_SHIFT(s, Al);
     }
 
     /* Completed MCU, so update state */
@@ -439,7 +448,7 @@ decode_mcu_AC_first(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
           r = GET_BITS(s);
           s = HUFF_EXTEND(r, s);
           /* Scale and output coefficient in natural (dezigzagged) order */
-          (*block)[jpeg_natural_order[k]] = (JCOEF)(s << Al);
+          (*block)[jpeg_natural_order[k]] = (JCOEF)LEFT_SHIFT(s, Al);
         }
         else
         {
