@@ -124,6 +124,8 @@ if(WIN32)
   option(MDCM_USE_WIN32_UNC "Unicode, long file path (Windows)" ON)
 endif()
 
+option(MDCM_NO_MESSAGES "Disable all notifications" OFF)
+
 option(MDCM_USE_SYSTEM_ZLIB "Use system zlib" OFF)
 
 if(UNIX AND NOT APPLE)
@@ -245,6 +247,10 @@ if(WIN32)
   if(MDCM_USE_WIN32_UNC)
     add_definitions(-DMDCM_WIN32_UNC)
   endif()
+endif()
+
+if(MDCM_NO_MESSAGES)
+  add_definitions(-DMDCM_NO_MESSAGES)
 endif()
 
 set(MDCM_LJPEG_LIBRARIES mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)

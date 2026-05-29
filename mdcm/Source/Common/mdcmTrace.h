@@ -43,17 +43,6 @@ namespace mdcm
 #  define MDCM_FUNCTION "<unknown>"
 #endif
 
-// The 'MDCM_NO_MESSAGES' option is not intended for release builds, but e.g.
-// for compilation with flags like e.g. '-g -fsanitize=undefined' or the use
-// of other debugging methods, to reduce excessive output in debug mode.
-// It is intended exclusively for use within this file and will become
-// undefined at the end of the file.
-//
-//#define MDCM_NO_MESSAGES
-//
-//
-//
-
 #ifdef MDCM_NO_MESSAGES
 
 #define mdcmDebugMacro(msg) {}
