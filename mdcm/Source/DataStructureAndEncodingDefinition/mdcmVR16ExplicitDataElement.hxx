@@ -68,19 +68,18 @@ VR16ExplicitDataElement::ReadPreValue(std::istream & is)
     }
     if (ValueLengthField)
     {
-      mdcmAlwaysWarnMacro("Item Delimitation Item has a length different from 0 and is: " << ValueLengthField);
+      mdcmWarningMacro("Item Delimitation Item has a length different from 0 and is: " << ValueLengthField);
     }
     ValueField = nullptr;
     return is;
   }
-
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   if (TagField == Tag(0x00ff, 0x4aa5))
   {
     assert(0 && "Should not happen");
   }
 #endif
-  // MM: FIXME
+  // MM:
   // Special hack for KONICA_VROX.dcm where in fact the VR=OX, in Pixel Data element
   // in which case we need to assume a 32bits VR ... for now this is a big phat hack !
   bool OX_hack = false;
@@ -95,10 +94,9 @@ VR16ExplicitDataElement::ReadPreValue(std::istream & is)
   catch (const std::logic_error &)
   {
     VRField = VR::INVALID;
-    // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
     if (TagField == Tag(0xfffe, 0xe000))
     {
-      mdcmAlwaysWarnMacro("Found item delimitor in item");
+      mdcmWarningMacro("Found item delimitor in item");
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
@@ -111,15 +109,15 @@ VR16ExplicitDataElement::ReadPreValue(std::istream & is)
     if (TagField == Tag(0x7fe0, 0x0010))
     {
       OX_hack = true;
-      VRField = VR::UN; // make it a fake 32bits for now
+      VRField = VR::UN; // MM: make it a fake 32bits for now
       char dummy[2];
       is.read(dummy, 2);
       assert(dummy[0] == 0 && dummy[1] == 0);
-      mdcmAlwaysWarnMacro("Assuming 32 bits VR for Tag=" << TagField << " in order to read a buggy DICOM file.");
+      mdcmWarningMacro("Assuming 32 bits VR for Tag=" << TagField << " in order to read a buggy DICOM file.");
     }
     else
     {
-      mdcmAlwaysWarnMacro("Assuming 16 bits VR for Tag=" << TagField << " in order to read a buggy DICOM file.");
+      mdcmWarningMacro("Assuming 16 bits VR for Tag=" << TagField << " in order to read a buggy DICOM file.");
     }
   }
   if (VR::GetLength(VRField) == 4)
@@ -144,11 +142,11 @@ VR16ExplicitDataElement::ReadPreValue(std::istream & is)
       return is;
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // HACK for SIEMENS Leonardo
+    // Hack for SIEMENS Leonardo
     if (ValueLengthField == 0x0006 && VRField == VR::UL && TagField.GetGroup() == 0x0009)
     {
-      mdcmAlwaysWarnMacro("Replacing VL=0x0006 with VL=0x0004, for Tag=" << TagField
-                                                                         << " in order to read a buggy DICOM file.");
+      mdcmWarningMacro("Replacing VL=0x0006 with VL=0x0004, for Tag=" << TagField
+                        << " in order to read a buggy DICOM file.");
       ValueLengthField = 0x0004;
     }
 #endif

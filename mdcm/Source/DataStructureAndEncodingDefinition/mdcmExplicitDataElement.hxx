@@ -45,7 +45,6 @@ std::istream &
 ExplicitDataElement::ReadPreValue(std::istream & is)
 {
   TagField.Read<TSwap>(is);
-  // See PS 3.5, Data Element Structure With Explicit VR
   if (!is)
   {
     if (!is.eof())
@@ -72,9 +71,7 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
     {
       mdcmDebugMacro("Item Delimitation Item has a length different from 0 and is: " << ValueLengthField);
     }
-    // Reset ValueLengthField
     ValueLengthField = 0;
-    // Set pointer to nullptr
     ValueField = nullptr;
     VRField = VR::INVALID;
     return is;
@@ -112,24 +109,11 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
   catch (const std::logic_error &)
   {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // MM:
-    // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
-    // assert(TagField == Tag(0xfffe, 0xe000));
-    // -> For some reason VR is written as {44,0} well I guess this is a VR...
-    // Technically there is a second bug, dcmtk assume other things when reading this tag,
-    // so I need to change this tag too, if I ever want dcmtk to read this file. oh well
-    // 0019004_Baseline_IMG1.dcm
-    // -> VR is garbage also...
-    // assert(TagField == Tag(8348,0339) || TagField == Tag(b5e8,0338))
-    // mdcmWarningMacro("Assuming 16 bits VR for Tag=" <<
-    //  TagField << " in order to read a buggy DICOM file.");
-    // VRField = VR::INVALID;
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
 #endif
   }
-  // Read Value Length
   if (VR::GetLength(VRField) == 4)
   {
     if (!ValueLengthField.Read<TSwap>(is))
@@ -147,7 +131,7 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
       return is;
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // HACK for SIEMENS Leonardo
+    // Hack for SIEMENS Leonardo
     if (ValueLengthField == 0x0006 && VRField == VR::UL && TagField.GetGroup() == 0x0009)
     {
       mdcmWarningMacro("Replacing VL=0x0006 with VL=0x0004, for Tag=" << TagField
@@ -156,7 +140,7 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
     }
 #endif
   }
-  // What if 0000,0000 was indeed -wrongly- sent, we should be able to continue
+  // MM: What if 0000,0000 was indeed -wrongly- sent, we should be able to continue
   // chances is that 99% of times there is now way we can reach here, so safely throw an exception
   if (TagField == Tag(0x0000, 0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
@@ -189,7 +173,6 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   }
   if (VRField == VR::SQ)
   {
-    // Check whether or not this is an undefined length sequence
     assert(TagField != Tag(0x7fe0, 0x0010));
     ValueField = new SequenceOfItems;
   }
@@ -197,7 +180,6 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   {
     if (TagField == Tag(0x7fe0, 0x0010))
     {
-      // Pixel Data
       assert(VRField & VR::OB_OW || VRField == VR::UN);
       ValueField = new SequenceOfFragments;
     }
@@ -263,16 +245,11 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     }
 #endif
   }
-  // We have the length we should be able to read the value
   this->SetValueFieldLength(ValueLengthField, readvalues);
 #if defined(MDCM_SUPPORT_BROKEN_IMPLEMENTATION) && 0
   // PHILIPS_Intera-16-MONO2-Uncompress.dcm
   if (TagField == Tag(0x2001, 0xe05f) || TagField == Tag(0x2001, 0xe100) || TagField == Tag(0x2005, 0xe080) ||
-      TagField == Tag(0x2005, 0xe083) || TagField == Tag(0x2005, 0xe084) || TagField == Tag(0x2005, 0xe402)
-      // TagField.IsPrivate() && VRField == VR::SQ
-      //-> Does not work for 0029
-      // we really need to read item marker
-  )
+      TagField == Tag(0x2005, 0xe083) || TagField == Tag(0x2005, 0xe084) || TagField == Tag(0x2005, 0xe402))
   {
     mdcmWarningMacro("ByteSwaping Private SQ: " << TagField);
     assert(VRField == VR::SQ);
@@ -338,9 +315,7 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     if (TagField == Tag(0x7fe0, 0x0010))
     {
-      // BUG this should be moved to the ImageReader class, only this class
-      // knows what 7fe0 actually is, and should tolerate partial Pixel Data
-      // element.  PMS-IncompletePixelData.dcm
+      // PMS-IncompletePixelData.dcm
       mdcmAlwaysWarnMacro("Pixel Data may be corrupted");
       is.clear();
     }
@@ -358,7 +333,6 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   if (SequenceOfItems * sqi = dynamic_cast<SequenceOfItems *>(&GetValue()))
   {
     assert(ValueField->GetLength() == ValueLengthField);
-    // Recompute the total length
     if (!ValueLengthField.IsUndefined())
     {
       // PhilipsInteraSeqTermInvLen.dcm
@@ -510,7 +484,6 @@ ExplicitDataElement::Write(std::ostream & os) const
       assert(ValueField->GetLength() == ValueLengthField);
     }
 #endif
-    // Should be able to write the value
     if (VRField == VR::UN && ValueLengthField.IsUndefined())
     {
       assert(TagField == Tag(0x7fe0, 0x0010) || GetValueAsSQ());
@@ -519,14 +492,14 @@ ExplicitDataElement::Write(std::ostream & os) const
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     else if (VRField == VR::INVALID && dynamic_cast<const SequenceOfItems *>(&*ValueField))
     {
-      // We have pretended so far that the Sequence was encoded as UN. Well the real
+      // MM: We have pretended so far that the Sequence was encoded as UN. Well the real
       // troubles is that we cannot store the length as explicit length, otherwise
       // we will loose the SQ, therefore change the length into undefined length
       // and add a seq del item:
       ValueIO<ImplicitDataElement, TSwap>::Write(os, *ValueField);
       if (!ValueLengthField.IsUndefined())
       {
-        // eg. TestWriter with ExplicitVRforPublicElementsImplicitVRforShadowElements.dcm
+        // MM: eg. TestWriter with ExplicitVRforPublicElementsImplicitVRforShadowElements.dcm
         // seq del item is not stored, write it !
         const Tag seqDelItem(0xfffe, 0xe0dd);
         seqDelItem.Write<TSwap>(os);

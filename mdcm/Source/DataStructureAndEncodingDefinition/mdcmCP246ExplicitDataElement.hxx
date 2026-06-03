@@ -47,8 +47,6 @@ std::istream &
 CP246ExplicitDataElement::ReadPreValue(std::istream & is)
 {
   TagField.Read<TSwap>(is);
-  // See PS 3.5, Data Element Structure With Explicit VR
-  // Read Tag
   if (!is)
   {
     if (!is.eof())
@@ -70,11 +68,9 @@ CP246ExplicitDataElement::ReadPreValue(std::istream & is)
     {
       mdcmDebugMacro("Item Delimitation Item has a length different from 0");
     }
-    // Set pointer to nullptr to avoid user error
     ValueField = nullptr;
     return is;
   }
-  // Read VR
   try
   {
     if (!VRField.Read(is))
@@ -85,19 +81,9 @@ CP246ExplicitDataElement::ReadPreValue(std::istream & is)
   }
   catch (const std::exception &)
   {
-    // MM:
-    // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
-    // assert(TagField == Tag(0xfffe, 0xe000));
-    // -> For some reason VR is written as {44,0} well I guess this is a VR...
-    // Technically there is a second bug, dcmtk assume other things when reading this tag,
-    // so I need to change this tag too, if I ever want dcmtk to read this file. oh well
-    // 0019004_Baseline_IMG1.dcm
-    // -> VR is garbage also...
-    // assert(TagField == Tag(8348,0339) || TagField == Tag(b5e8,0338))
     mdcmWarningMacro("Assuming 16 bits VR for Tag=" << TagField << " in order to read a buggy DICOM file.");
     VRField = VR::INVALID;
   }
-  // Read Value Length
   if (VR::GetLength(VRField) == 4)
   {
     if (!ValueLengthField.Read<TSwap>(is))
@@ -134,10 +120,8 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     ValueField = nullptr;
     return is;
   }
-  // Read the Value
   if (VRField == VR::SQ)
   {
-    // Check this is an undefined length sequence
     assert(TagField != Tag(0x7fe0, 0x0010));
     ValueField = new SequenceOfItems;
   }
@@ -203,14 +187,10 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     }
 #endif
   }
-  // We have the length, we should be able to read the value
-  ValueField->SetLength(ValueLengthField); // perform realloc
+  ValueField->SetLength(ValueLengthField);
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   if (TagField == Tag(0x2001, 0xe05f) || TagField == Tag(0x2001, 0xe100) || TagField == Tag(0x2005, 0xe080) ||
       TagField == Tag(0x2005, 0xe083) || TagField == Tag(0x2005, 0xe084))
-  // TagField.IsPrivate() && VRField == VR::SQ
-  //-> Does not work for 0029
-  // we really need to read item marker
   {
     mdcmWarningMacro("ByteSwaping Private SQ: " << TagField);
     assert(VRField == VR::SQ);

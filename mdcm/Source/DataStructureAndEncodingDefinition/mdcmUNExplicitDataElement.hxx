@@ -89,17 +89,6 @@ UNExplicitDataElement::ReadPreValue(std::istream & is)
   catch (const std::logic_error &)
   {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
-    // assert(TagField == Tag(0xfffe, 0xe000));
-    // -> For some reason VR is written as {44,0} well I guess this is a VR...
-    // Technically there is a second bug, dcmtk assume other things when reading this tag,
-    // so I need to change this tag too, if I ever want dcmtk to read this file. oh well
-    // 0019004_Baseline_IMG1.dcm
-    // -> VR is garbage also...
-    // assert(TagField == Tag(8348,0339) || TagField == Tag(b5e8,0338))
-    // mdcmWarningMacro("Assuming 16 bits VR for Tag=" <<
-    //  TagField << " in order to read a buggy DICOM file.");
-    // VRField = VR::INVALID;
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;

@@ -130,7 +130,7 @@ ByteValue::SetLength(VL vl)
   }
   if (l.IsOdd())
   {
-    mdcmAlwaysWarnMacro("Odd length value field, trying to workaround");
+    mdcmWarningMacro("Odd length value field, trying to workaround");
     ++l;
   }
 #else

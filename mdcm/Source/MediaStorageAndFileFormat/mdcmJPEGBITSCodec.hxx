@@ -61,7 +61,6 @@ METHODDEF(void) init_source(j_decompress_ptr cinfo)
 METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr)cinfo->src;
-  size_t     nbytes = 0;
   std::streampos pos = src->infile->tellg();
   std::streampos end = src->infile->seekg(0, std::ios::end).tellg();
   src->infile->seekg(pos, std::ios::beg);
@@ -82,11 +81,11 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
     src->infile->read((char *)src->buffer, INPUT_BUF_SIZE);
   }
   std::streamsize gcount = src->infile->gcount();
+#if 0
+    std::cout << "fill_input_buffer: gcount = " << gcount << std::endl;
+#endif
   if (gcount <= 0)
   {
-#if 0
-    std::cout << "fill_input_buffer: gcount <= 0" << std::endl;
-#endif
     if (src->start_of_file)
     {
       ERREXIT(cinfo, JERR_INPUT_EMPTY);
@@ -94,14 +93,10 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
     WARNMS(cinfo, JWRN_JPEG_EOF);
     src->buffer[0] = (JOCTET)0xFF;
     src->buffer[1] = (JOCTET)JPEG_EOI;
-    nbytes = 2;
-  }
-  else
-  {
-    nbytes = (size_t)gcount;
+    gcount = 2;
   }
   src->pub.next_input_byte = src->buffer;
-  src->pub.bytes_in_buffer = nbytes;
+  src->pub.bytes_in_buffer = (size_t)gcount;
   src->start_of_file = FALSE;
   return TRUE;
 }
@@ -566,7 +561,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         jpeg_destroy_decompress(&cinfo);
         return false;
       }
-      mdcmAlwaysWarnMacro("jerr.pub.num_warnings = " << jerr.pub.num_warnings);
+      mdcmWarningMacro("jerr.pub.num_warnings = " << jerr.pub.num_warnings);
     }
     const volatile unsigned int * dims = this->GetDimensions();
     if (cinfo.image_width != dims[0] || cinfo.image_height != dims[1])
@@ -632,7 +627,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         if ((GetPhotometricInterpretation() != PhotometricInterpretation::MONOCHROME1) &&
             (GetPhotometricInterpretation() != PhotometricInterpretation::MONOCHROME2))
         {
-          mdcmAlwaysWarnMacro("JPEG: PhotometricInterpretation " << GetPhotometricInterpretation()
+          mdcmWarningMacro("JPEG: PhotometricInterpretation " << GetPhotometricInterpretation()
                               << ", but jpeg_color_space is JCS_GRAYSCALE");
           this->PI = PhotometricInterpretation::MONOCHROME2;
         }
@@ -706,7 +701,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
   jpeg_destroy_decompress(&cinfo);
   if (jerr.pub.num_warnings > 0)
   {
-    mdcmAlwaysWarnMacro("jerr.pub.num_warnings = " << jerr.pub.num_warnings);
+    mdcmWarningMacro("jerr.pub.num_warnings = " << jerr.pub.num_warnings);
   }
   Internals->StateSuspension = 0;
   return true;
