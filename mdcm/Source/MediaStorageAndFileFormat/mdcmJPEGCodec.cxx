@@ -71,7 +71,8 @@ JPEGCodec::CanCode(const TransferSyntax & ts) const
 bool
 JPEGCodec::Decode(const DataElement & in, DataElement & out)
 {
-  assert(Internal);
+  if (!Internal)
+    return false;
   out = in;
   const SequenceOfFragments * sf0 = in.GetSequenceOfFragments();
   const ByteValue *           jpegbv = in.GetByteValue();
@@ -225,7 +226,8 @@ JPEGCodec::Decode(const DataElement & in, DataElement & out)
 bool
 JPEGCodec::Decode2(const DataElement & in, std::stringstream & os)
 {
-  assert(Internal);
+  if (!Internal)
+    return false;
   const SequenceOfFragments * sf0 = in.GetSequenceOfFragments();
   const ByteValue *           jpegbv = in.GetByteValue();
   if (!sf0 && !jpegbv)
