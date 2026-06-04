@@ -36,7 +36,7 @@ Tips
 * Try to enable linear filtering for 3D view in _Settings->3D_
     - Restart is not required, will be applicable to the next opened image
     - Note: this slightly alters the image; if the distance between slices is large, it can lead to the appearance of artifacts
-* Try _Show frames_ option (lower panel) in _3D Physical Space View_, specially for non-uniform images
+* Try _Show frames_ option in _3D Physical Space View_ (lower panel), specially for non-uniform images
 
 
 
