@@ -20,7 +20,10 @@
 
 =========================================================================*/
 
-#define JPEGBITS_PRINT_COLORSPACES 0
+// Not intended for release:
+//#define JPBITS_PRINT_COLORSPACES
+//#define JPBITS_DEBUG_FILL_INPUT_BUFFER
+//
 
 #include "mdcmTrace.h"
 #include "mdcmTransferSyntax.h"
@@ -53,6 +56,9 @@ typedef my_source_mgr * my_src_ptr;
 // cppcheck-suppress unknownMacro
 METHODDEF(void) init_source(j_decompress_ptr cinfo)
 {
+#ifdef JPBITS_DEBUG_FILL_INPUT_BUFFER
+  std::cout << "init_source()" << std::endl;
+#endif
   my_src_ptr src = (my_src_ptr)cinfo->src;
   src->start_of_file = TRUE;
 }
@@ -60,16 +66,84 @@ METHODDEF(void) init_source(j_decompress_ptr cinfo)
 // cppcheck-suppress unknownMacro
 METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
 {
+  // The fuction always returns FALSE if a single slice is encoded
+  // as multiple fragments.
+  //
+  // Example files from 'gdcmData'
+  // https://sourceforge.net/p/gdcm/gdcmdata/ci/master/tree/
+  //   gdcm-JPEG-LossLessThoravision.dcm
+  //   GE_RHAPSODE-16-MONO2-JPEG-Fragments.dcm
+  // and more.
+  //
+  // And many files from 'compsamples_jpeg.tar' from
+  // ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
+  //
+  // For example, for MR3_JPLL (3 fragments), this works as follows:
+  //
+  // init_source()
+  // fill_input_buffer: gcount=4096, end=65536, pos=0
+  // fill_input_buffer: gcount=4096, end=65536, pos=4096
+  // fill_input_buffer: gcount=4096, end=65536, pos=8192
+  // fill_input_buffer: gcount=4096, end=65536, pos=12288
+  // fill_input_buffer: gcount=4096, end=65536, pos=16384
+  // fill_input_buffer: gcount=4096, end=65536, pos=20480
+  // fill_input_buffer: gcount=4096, end=65536, pos=24576
+  // fill_input_buffer: gcount=4096, end=65536, pos=28672
+  // fill_input_buffer: gcount=4096, end=65536, pos=32768
+  // fill_input_buffer: gcount=4096, end=65536, pos=36864
+  // fill_input_buffer: gcount=4096, end=65536, pos=40960
+  // fill_input_buffer: gcount=4096, end=65536, pos=45056
+  // fill_input_buffer: gcount=4096, end=65536, pos=49152
+  // fill_input_buffer: gcount=4096, end=65536, pos=53248
+  // fill_input_buffer: gcount=4096, end=65536, pos=57344
+  // fill_input_buffer: gcount=4096, end=65536, pos=61440
+  // fill_input_buffer: return FALSE; end=65536, pos=65536
+  // fill_input_buffer: gcount=4096, end=65536, pos=0
+  // fill_input_buffer: gcount=4096, end=65536, pos=4096
+  // fill_input_buffer: gcount=4096, end=65536, pos=8192
+  // fill_input_buffer: gcount=4096, end=65536, pos=12288
+  // fill_input_buffer: gcount=4096, end=65536, pos=16384
+  // fill_input_buffer: gcount=4096, end=65536, pos=20480
+  // fill_input_buffer: gcount=4096, end=65536, pos=24576
+  // fill_input_buffer: gcount=4096, end=65536, pos=28672
+  // fill_input_buffer: gcount=4096, end=65536, pos=32768
+  // fill_input_buffer: gcount=4096, end=65536, pos=36864
+  // fill_input_buffer: gcount=4096, end=65536, pos=40960
+  // fill_input_buffer: gcount=4096, end=65536, pos=45056
+  // fill_input_buffer: gcount=4096, end=65536, pos=49152
+  // fill_input_buffer: gcount=4096, end=65536, pos=53248
+  // fill_input_buffer: gcount=4096, end=65536, pos=57344
+  // fill_input_buffer: gcount=4096, end=65536, pos=61440
+  // fill_input_buffer: return FALSE; end=65536, pos=65536
+  // fill_input_buffer: gcount=4096, end=32410, pos=0
+  // fill_input_buffer: gcount=4096, end=32410, pos=4096
+  // fill_input_buffer: gcount=4096, end=32410, pos=8192
+  // fill_input_buffer: gcount=4096, end=32410, pos=12288
+  // fill_input_buffer: gcount=4096, end=32410, pos=16384
+  // fill_input_buffer: gcount=4096, end=32410, pos=20480
+  // fill_input_buffer: gcount=4096, end=32410, pos=24576
+  // fill_input_buffer: gcount=3738, end=32410, pos=28672
+  //
   my_src_ptr src = (my_src_ptr)cinfo->src;
+  //
+  // The 'badbit' signals a read error on I/O operation.
+  // Other !good() bits:
+  //   'eofbit'  (End-Of-File reached on input operation)
+  //   'failbit' (logical error on I/O operation)
+  // are not checked.
+  if (src->infile->bad()) // The 'badbit' signals an I/O error.
+  {
+    ERREXIT(cinfo, JERR_FILE_READ);
+  }
+  //
   std::streampos pos = src->infile->tellg();
   std::streampos end = src->infile->seekg(0, std::ios::end).tellg();
   src->infile->seekg(pos, std::ios::beg);
   if (end == pos)
   {
-#if 0
-    std::cout << "fill_input_buffer: return FALSE" << std::endl;
+#ifdef JPBITS_DEBUG_FILL_INPUT_BUFFER
+    std::cout << "fill_input_buffer: return FALSE; end=" << end << ", pos=" << pos << std::endl;
 #endif
-    // S. comment in 'skip_input_data'
     return FALSE;
   }
   if ((end - pos) < INPUT_BUF_SIZE)
@@ -81,8 +155,8 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
     src->infile->read((char *)src->buffer, INPUT_BUF_SIZE);
   }
   std::streamsize gcount = src->infile->gcount();
-#if 0
-    std::cout << "fill_input_buffer: gcount = " << gcount << std::endl;
+#ifdef JPBITS_DEBUG_FILL_INPUT_BUFFER
+  std::cout << "fill_input_buffer: gcount=" << gcount << ", end=" << end << ", pos=" << pos << std::endl;
 #endif
   if (gcount <= 0)
   {
@@ -110,25 +184,6 @@ METHODDEF(void) skip_input_data(j_decompress_ptr cinfo, IJG_LONG num_bytes)
     while (num_bytes > (IJG_LONG)src->pub.bytes_in_buffer)
     {
       num_bytes -= (IJG_LONG)src->pub.bytes_in_buffer;
-      // The comment in GDCM states that 'fill_input_buffer'
-      // is supposed to "never return FALSE".
-      // But it does, and everything seems to work fine.
-      //
-      // Example files from 'gdcmData'
-      // https://sourceforge.net/p/gdcm/gdcmdata/ci/master/tree/
-      //
-      // gdcm-JPEG-LossLessThoravision.dcm
-      // D_CLUNIE_CT1_JPLL.dcm
-      // D_CLUNIE_MR1_JPLY.dcm
-      // D_CLUNIE_RG1_JPLL.dcm
-      // D_CLUNIE_RG2_JPLY.dcm
-      // D_CLUNIE_RG3_JPLY.dcm
-      // D_CLUNIE_SC1_JPLY.dcm
-      // GE_RHAPSODE-16-MONO2-JPEG-Fragments.dcm
-      // and probaly more.
-      //
-      // The files seem to have a single slice encoded in
-      // multiple fragments.
       (void)fill_input_buffer(cinfo);
     }
     src->pub.next_input_byte += (size_t)num_bytes;
@@ -569,7 +624,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       mdcmAlwaysWarnMacro("JPEG is " << cinfo.image_width << "x" << cinfo.image_height << ", DICOM "
                            << dims[0] << "x" << dims[1]);
     }
-#if (defined JPEGBITS_PRINT_COLORSPACES && JPEGBITS_PRINT_COLORSPACES == 1)
+#ifdef JPEGBITS_PRINT_COLORSPACES
     std::cout << "cinfo.jpeg_color_space = ";
     switch (cinfo.jpeg_color_space)
     {
@@ -958,6 +1013,11 @@ JPEGBITSCodec::IsStateSuspension() const
 #endif
 #endif
 
-#ifdef JPEGBITS_PRINT_COLORSPACES
-#undef JPEGBITS_PRINT_COLORSPACES
+#ifdef JPBITS_PRINT_COLORSPACES
+#undef JPBITS_PRINT_COLORSPACES
 #endif
+
+#ifdef JPBITS_DEBUG_FILL_INPUT_BUFFER
+#undef JPBITS_DEBUG_FILL_INPUT_BUFFER
+#endif
+

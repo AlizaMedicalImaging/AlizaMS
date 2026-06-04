@@ -115,7 +115,7 @@ JPEGCodec::Decode(const DataElement & in, DataElement & out)
       const bool r = DecodeByStreams(is, os);
       if (!r)
       {
-        mdcmAlwaysWarnMacro("JPEGCodec: failed to decompress Frag #" << i);
+        mdcmAlwaysWarnMacro("JPEGCodec: failed to decompress fragment #" << i);
         const bool suspended = Internal->IsStateSuspension();
         if (suspended)
         {
@@ -268,7 +268,7 @@ JPEGCodec::Decode2(const DataElement & in, std::stringstream & os)
       const bool r = DecodeByStreams(is, os);
       if (!r)
       {
-        mdcmAlwaysWarnMacro("JPEGCodec: failed to decompress Frag #" << i);
+        mdcmAlwaysWarnMacro("JPEGCodec: failed to decompress fragment #" << i);
         const bool suspended = Internal->IsStateSuspension();
         if (suspended)
         {
