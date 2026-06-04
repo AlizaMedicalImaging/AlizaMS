@@ -116,7 +116,7 @@ JPEGCodec::Decode(const DataElement & in, DataElement & out)
       if (!r)
       {
         mdcmAlwaysWarnMacro("JPEGCodec: failed to decompress Frag #" << i);
-        const bool   suspended = Internal->IsStateSuspension();
+        const bool suspended = Internal->IsStateSuspension();
         if (suspended)
         {
           mdcmAlwaysWarnMacro("JPEGCodec: suspended");
@@ -447,7 +447,7 @@ JPEGCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
       }
       else
       {
-        mdcmAlwaysWarnMacro("JPEGCodec: not supported");
+        mdcmWarningMacro("JPEGCodec: not supported");
         return false;
       }
     }
@@ -542,7 +542,7 @@ JPEGCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 #if 1
   if (this->PF == PixelFormat::UINT12 || this->PF == PixelFormat::INT12)
   {
-    mdcmAlwaysWarnMacro("JPEGCodec: PixelFormat is UINT12 or INT12");
+    mdcmWarningMacro("JPEGCodec: PixelFormat is UINT12 or INT12");
   }
 #endif
   return ImageCodec::DecodeByStreams(tmpos, os);
@@ -568,7 +568,7 @@ JPEGCodec::IsValid(const PhotometricInterpretation & pi)
     case PhotometricInterpretation::YBR_PARTIAL_422: // Retired
       return true;
     case PhotometricInterpretation::YBR_PARTIAL_420: // MPEG
-      mdcmAlwaysWarnMacro("YBR_PARTIAL_420 is not intended to be here");
+      mdcmWarningMacro("YBR_PARTIAL_420 is not intended to be here");
       return true;
     default:
       break;
@@ -651,7 +651,7 @@ JPEGCodec::SetupJPEGBitCodec(int b)
   }
   else
   {
-    mdcmAlwaysWarnMacro("JPEGCodec: SetupJPEGBitCodec(" << b << ") failed");
+    mdcmWarningMacro("JPEGCodec: SetupJPEGBitCodec(" << b << ") failed");
   }
 }
 
