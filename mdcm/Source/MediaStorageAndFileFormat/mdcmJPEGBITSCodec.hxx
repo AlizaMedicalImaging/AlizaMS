@@ -66,19 +66,11 @@ METHODDEF(void) init_source(j_decompress_ptr cinfo)
 // cppcheck-suppress unknownMacro
 METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
 {
-  // The fuction always returns FALSE if a single slice is encoded
+  // The fuction can return FALSE if a single slice is encoded
   // as multiple fragments.
   //
-  // Example files from 'gdcmData'
-  // https://sourceforge.net/p/gdcm/gdcmdata/ci/master/tree/
-  //   gdcm-JPEG-LossLessThoravision.dcm
-  //   GE_RHAPSODE-16-MONO2-JPEG-Fragments.dcm
-  // and more.
-  //
-  // And many files from 'compsamples_jpeg.tar' from
-  // ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
-  //
-  // For example, for MR3_JPLL (3 fragments), this works as follows:
+  // For example, MR3_JPLL (one slice and 3 fragments)
+  // from 'compsamples_jpeg.tar' from ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
   //
   // init_source()
   // fill_input_buffer: gcount=4096, end=65536, pos=0
@@ -130,8 +122,8 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
   // Other !good() bits:
   //   'eofbit'  (End-Of-File reached on input operation)
   //   'failbit' (logical error on I/O operation)
-  // are not checked.
-  if (src->infile->bad()) // The 'badbit' signals an I/O error.
+  // are purposely not checked.
+  if (src->infile->bad())
   {
     ERREXIT(cinfo, JERR_FILE_READ);
   }
