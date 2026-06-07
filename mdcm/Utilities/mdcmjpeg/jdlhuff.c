@@ -127,7 +127,7 @@ start_pass_lhuff_decoder(j_decompress_ptr cinfo)
 
 #  ifdef AVOID_TABLES
 
-#    define HUFF_EXTEND(x, s) ((x) < (1 << ((s)-1)) ? (x) + (((~0U) << (s)) + 1) : (x))
+#    define HUFF_EXTEND(x, s) ((x) < (1 << ((s) - 1)) ? (x) + ((int)((~0U) << (s)) + 1) : (x))
 
 #  else
 
@@ -139,15 +139,15 @@ static const int extend_test[18] = /* entry n is 2**(n-1) */
 
 static const int extend_offset[18] = /* entry n is (-1 << n) + 1 */
   { 0,
-    (int)((~0U) << 1) + 1,
-    (int)((~0U) << 2) + 1,
-    (int)((~0U) << 3) + 1,
-    (int)((~0U) << 4) + 1,
-    (int)((~0U) << 5) + 1,
-    (int)((~0U) << 6) + 1,
-    (int)((~0U) << 7) + 1,
-    (int)((~0U) << 8) + 1,
-    (int)((~0U) << 9) + 1,
+    (int)((~0U) <<  1) + 1,
+    (int)((~0U) <<  2) + 1,
+    (int)((~0U) <<  3) + 1,
+    (int)((~0U) <<  4) + 1,
+    (int)((~0U) <<  5) + 1,
+    (int)((~0U) <<  6) + 1,
+    (int)((~0U) <<  7) + 1,
+    (int)((~0U) <<  8) + 1,
+    (int)((~0U) <<  9) + 1,
     (int)((~0U) << 10) + 1,
     (int)((~0U) << 11) + 1,
     (int)((~0U) << 12) + 1,
