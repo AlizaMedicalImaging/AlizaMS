@@ -209,6 +209,11 @@ int main(int argc, char * argv[])
 		{
 			std::cout << "System is little-endian\n\n";
 		}
+#ifdef NDEBUG
+		std::cout << "NDEBUG is defined\n\n";
+#else
+		std::cout << "NDEBUG is not defined\n\n";
+#endif
 #ifdef __cplusplus
 		std::cout << "__cplusplus is defined: " << __cplusplus << "\n\n";
 #else

@@ -165,17 +165,6 @@ if(NOT LIBRARY_OUTPUT_PATH)
   mark_as_advanced(LIBRARY_OUTPUT_PATH)
 endif()
 
-set(tmp0_build_type "None")
-if(CMAKE_BUILD_TYPE)
-  set(tmp0_build_type "${CMAKE_BUILD_TYPE}")
-endif()
-string(TOUPPER ${tmp0_build_type} tmp1_build_type)
-if(${tmp1_build_type} STREQUAL "DEBUG")
-  add_definitions(-D_DEBUG)
-else()
-  add_definitions(-DNDEBUG)
-endif()
-
 # Required for x86 32 bit GCC build only.
 if(NOT WIN32)
   if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8))
