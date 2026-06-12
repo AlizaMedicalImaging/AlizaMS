@@ -73,50 +73,6 @@ if(UNIX)
   target_link_libraries(${OPENJPEG_LIBRARY_NAME} m)
 endif()
 set_target_properties(${OPENJPEG_LIBRARY_NAME} PROPERTIES ${OPENJPEG_LIBRARY_PROPERTIES})
-if(NOT ${CMAKE_VERSION} VERSION_LESS "2.8.12")
-  target_compile_options(${OPENJPEG_LIBRARY_NAME} PRIVATE ${OPENJP2_COMPILE_OPTIONS})
-endif()
-
-#if(BUILD_DOC)
-## install man page of the library
-#install(
-#  FILES       ${OPENJPEG_SOURCE_DIR}/doc/man/man3/libopenjp2.3
-#  DESTINATION ${OPENJPEG_INSTALL_MAN_DIR}/man3)
-#endif()
-
-#if(BUILD_LUTS_GENERATOR)
-## internal utility to generate t1_luts.h (part of the jp2 lib)
-## no need to install:
-#  add_executable(t1_generate_luts t1_generate_luts.c)
-#  if(UNIX)
-#    target_link_libraries(t1_generate_luts m)
-#  endif()
-#endif()
-
-# Experimental option; let's how cppcheck performs
-# Implementation details:
-# I could not figure out how to easily upload a file to CDash. Instead simply
-# pretend cppcheck is part of the Build step. Technically cppcheck can even
-# output gcc formatted error/warning report
-# Another implementation detail: I could not redirect error to the error
-# catching mechanism something is busted in cmake 2.8.5, I had to use the
-# warning regex to catch them.
-if(OPENJPEG_CPPCHECK)
-  find_package(CPPCHECK REQUIRED)
-  foreach(f ${OPENJPEG_SRCS})
-    # cppcheck complains about too many configuration, pretend to be WIN32:
-    add_custom_command(TARGET ${OPENJPEG_LIBRARY_NAME} COMMAND ${CPPCHECK_EXECUTABLE} -DWIN32 ${f})
-  endforeach()
-endif()
-
-if(OPJ_USE_DSYMUTIL)
-  if(BUILD_SHARED_LIBS)
-    add_custom_command(TARGET ${OPENJPEG_LIBRARY_NAME} POST_BUILD
-    COMMAND "dsymutil" "$<TARGET_SONAME_FILE:${OPENJPEG_LIBRARY_NAME}>"
-    COMMENT "dsymutil $<TARGET_SONAME_FILE:${OPENJPEG_LIBRARY_NAME}>"
-    DEPENDS ${OPENJPEG_LIBRARY_NAME})
-  endif()
-endif()
 
 #################################################################################
 # threading configuration
@@ -127,7 +83,7 @@ option(OPJ_USE_THREAD "Build with thread/mutex support " ON)
 mark_as_advanced(OPJ_USE_THREAD)
 if(NOT OPJ_USE_THREAD)
   add_definitions(-DMUTEX_stub)
-endif(NOT OPJ_USE_THREAD)
+endif()
 
 find_package(Threads QUIET)
 
@@ -138,34 +94,17 @@ endif()
 
 if(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_WIN32_THREADS_INIT)
   add_definitions(-DMUTEX_win32)
-endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_WIN32_THREADS_INIT)
+endif()
 
 if(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
   add_definitions(-DMUTEX_pthread)
-endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
+endif()
 
 if(OPJ_USE_THREAD AND NOT Threads_FOUND)
   message(FATAL_ERROR "No thread library found and thread/mutex support is required by OPJ_USE_THREAD option")
-endif(OPJ_USE_THREAD AND NOT Threads_FOUND)
+endif()
 
 if(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
-  TARGET_LINK_LIBRARIES(${OPENJPEG_LIBRARY_NAME} ${CMAKE_THREAD_LIBS_INIT})
-endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
+  target_link_libraries(${OPENJPEG_LIBRARY_NAME} ${CMAKE_THREAD_LIBS_INIT})
+endif()
 
-#if(BUILD_UNIT_TESTS)
-#    add_executable(bench_dwt bench_dwt.c)
-#    if(UNIX)
-#        target_link_libraries(bench_dwt m ${OPENJPEG_LIBRARY_NAME})
-#    endif()
-#    if(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
-#        target_link_libraries(bench_dwt ${CMAKE_THREAD_LIBS_INIT})
-#    endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
-#
-#    add_executable(test_sparse_array test_sparse_array.c)
-#    if(UNIX)
-#        target_link_libraries(test_sparse_array m ${OPENJPEG_LIBRARY_NAME})
-#    endif()
-#    if(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
-#        target_link_libraries(test_sparse_array ${CMAKE_THREAD_LIBS_INIT})
-#    endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
-#endif(BUILD_UNIT_TESTS)

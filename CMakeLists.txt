@@ -1,8 +1,8 @@
-####################################################################
+##########################################################################
 #
 # Aliza MS
 #
-####################################################################
+##########################################################################
 
 cmake_minimum_required(VERSION 3.13)
 #
@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 3.13)
 # A compiler should support at least C++14.
 #
 
-####################################################################
+##########################################################################
 #
 #
 #
@@ -63,11 +63,11 @@ endif()
 #
 #
 #
-####################################################################
+##########################################################################
 
 project(ALIZAMS)
 
-####################################################################
+##########################################################################
 #
 #
 # Options
@@ -149,7 +149,67 @@ endif()
 #
 #
 #
-####################################################################
+##########################################################################
+
+# Required for x86 32 bit GCC build only.
+if(NOT WIN32)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    if(NOT ALIZA_DISABLE_SIMDMATH)
+      if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686")
+        set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -msse2")
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -msse2")
+      endif()
+    endif()
+  endif()
+endif()
+
+##########################################################################
+#
+# C/C++ flags; no changes, this is informational to prevent potential errors.
+#
+#
+get_cmake_property(TMP_IS_MULTI_CONFIG_GENERATOR GENERATOR_IS_MULTI_CONFIG)
+if(TMP_IS_MULTI_CONFIG_GENERATOR)
+  foreach(TMP_MCCONFIG IN LISTS CMAKE_CONFIGURATION_TYPES)
+    string(TOUPPER ${TMP_MCCONFIG} TMPMC_BUILD_TYPE)
+    if((NOT "${TMPMC_BUILD_TYPE}" STREQUAL "DEBUG") AND
+       (NOT "${TMPMC_BUILD_TYPE}" STREQUAL "RELEASE") AND
+       (NOT "${TMPMC_BUILD_TYPE}" STREQUAL "RELWITHDEBINFO") AND
+       (NOT "${TMPMC_BUILD_TYPE}" STREQUAL "MINSIZEREL"))
+      message(STATUS "Caution: non-standard " ${TMP_MCCONFIG} " configuration")
+    endif()
+    if(NOT "${TMP_MCCONFIG}" STREQUAL "")
+      message(STATUS "Found configuration: ${MCCONFIG}")
+      message(STATUS "  CXX " ${MCCONFIG} " flags: " "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_}${TMPMC_BUILD_TYPE}")
+      message(STATUS "  C " ${MCCONFIG} " flags: " "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_}${TMPMC_BUILD_TYPE}")
+    else()
+      message(WARNING "Empty configuration in CMAKE_CONFIGURATION_TYPES?")
+    endif()
+  endforeach()
+else()
+  if(CMAKE_BUILD_TYPE)
+    string(TOUPPER ${CMAKE_BUILD_TYPE} TMP_BUILD_TYPE)
+    if((NOT "${TMP_BUILD_TYPE}" STREQUAL "DEBUG") AND
+       (NOT "${TMP_BUILD_TYPE}" STREQUAL "RELEASE") AND
+       (NOT "${TMP_BUILD_TYPE}" STREQUAL "RELWITHDEBINFO") AND
+       (NOT "${TMP_BUILD_TYPE}" STREQUAL "MINSIZEREL"))
+      message(STATUS "Caution: non-standard " ${CMAKE_BUILD_TYPE} " configuration")
+    endif()
+    set(TMP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${TMP_BUILD_TYPE}}")
+    set(TMP_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${TMP_BUILD_TYPE}}")
+    message(STATUS "CXX flags: " ${TMP_CXX_FLAGS})
+    message(STATUS "C flags: " ${TMP_C_FLAGS})
+  else()
+    message(WARNING "CMAKE_BUILD_TYPE is not set, this is not recommended, NDEBUG is not defined, "
+                    "set to Release, Debug, RelWithDebInfo or MinSizeRel (standard configurations).")
+    message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
+    message(STATUS "C flags: " ${CMAKE_C_FLAGS})
+  endif()
+endif()
+#
+#
+#
+##########################################################################
 
 message(STATUS "System processor: " ${CMAKE_SYSTEM_PROCESSOR})
 message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
@@ -164,19 +224,6 @@ if(NOT LIBRARY_OUTPUT_PATH)
   set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin CACHE PATH "Output directory for libraries")
   mark_as_advanced(LIBRARY_OUTPUT_PATH)
 endif()
-
-# Required for x86 32 bit GCC build only.
-if(NOT WIN32)
-  if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8))
-    if(NOT ALIZA_DISABLE_SIMDMATH)
-      if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686")
-        set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -msse2")
-        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -msse2")
-      endif()
-    endif()
-  endif()
-endif()
-message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
 
 if(ALIZA_QT_VERSION STREQUAL "4")
   set(USE_QT_V_4 TRUE)
