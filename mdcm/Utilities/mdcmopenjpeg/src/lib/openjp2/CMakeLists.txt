@@ -1,8 +1,5 @@
 include_regular_expression("^.*$")
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/opj_config.h
- DESTINATION ${OPENJPEG_INSTALL_INCLUDE_DIR} COMPONENT Headers)
-
 include_directories(BEFORE ${${OPENJPEG_NAMESPACE}_BINARY_DIR}/src/lib/openjp2)
 
 set(OPENJPEG_SRCS
@@ -66,33 +63,12 @@ if(NOT WIN32 AND CMAKE_COMPILER_IS_GNUCC AND CMAKE_C_COMPILER MATCHES ".*mingw32
   set(WIN32 YES)
 endif()
 
-# Build the library
-if(WIN32)
-  if(BUILD_SHARED_LIBS)
-    add_definitions(-DOPJ_EXPORTS)
-  else()
-    add_definitions(-DOPJ_STATIC)
-  endif()
-  add_library(${OPENJPEG_LIBRARY_NAME} ${OPENJPEG_SRCS})
-  set(INSTALL_LIBS ${OPENJPEG_LIBRARY_NAME})
-else()
-  if(BUILD_SHARED_LIBS AND BUILD_STATIC_LIBS)
-    # Builds both static and dynamic libs
-    add_library(${OPENJPEG_LIBRARY_NAME} SHARED ${OPENJPEG_SRCS})
-    add_library(openjp2_static STATIC ${OPENJPEG_SRCS})
-    set_target_properties(openjp2_static PROPERTIES OUTPUT_NAME ${OPENJPEG_LIBRARY_NAME})
-    target_compile_definitions(openjp2_static PRIVATE OPJ_STATIC)
-    set(INSTALL_LIBS ${OPENJPEG_LIBRARY_NAME} openjp2_static)
-  else()
-    add_library(${OPENJPEG_LIBRARY_NAME} ${OPENJPEG_SRCS})
-    set(INSTALL_LIBS ${OPENJPEG_LIBRARY_NAME})
-  endif()
-endif()
-
-if(NOT BUILD_SHARED_LIBS)
-  target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE OPJ_STATIC)
-endif()
-
+add_library(${OPENJPEG_LIBRARY_NAME} ${OPENJPEG_SRCS})
+# Safely add NDEBUG
+target_compile_definitions(
+  ${OPENJPEG_LIBRARY_NAME} PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
+# Only static libs here
+target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE OPJ_STATIC)
 if(UNIX)
   target_link_libraries(${OPENJPEG_LIBRARY_NAME} m)
 endif()

@@ -82,4 +82,7 @@ if(WIN32 AND BUILD_SHARED_LIBS AND NOT MINGW)
 endif()
 
 add_library(${ZLIB_LIBRARY_NAME} ${ZLIB_SRCS})
+# Safely add NDEBUG
+target_compile_definitions(
+  ${ZLIB_LIBRARY_NAME} PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
 set_target_properties(${ZLIB_LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE C)

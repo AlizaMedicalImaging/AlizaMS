@@ -65,54 +65,12 @@ if(WIN32)
 endif()
 
 string(TOLOWER ${PROJECT_NAME} projectname)
-set(OPENJPEG_INSTALL_SUBDIR "${projectname}-${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}")
-
-if(NOT OPENJPEG_INSTALL_BIN_DIR)
-  set(OPENJPEG_INSTALL_BIN_DIR "bin")
-endif()
-
-if(NOT OPENJPEG_INSTALL_LIB_DIR)
-  set(OPENJPEG_INSTALL_LIB_DIR "lib")
-endif()
-
-if(NOT OPENJPEG_INSTALL_SHARE_DIR)
-  set(OPENJPEG_INSTALL_SHARE_DIR "share")
-endif()
-
-if(NOT OPENJPEG_INSTALL_DATA_DIR)
-  set(OPENJPEG_INSTALL_DATA_DIR "${OPENJPEG_INSTALL_SHARE_DIR}/${OPENJPEG_INSTALL_SUBDIR}")
-endif()
-
-if(NOT OPENJPEG_INSTALL_INCLUDE_DIR)
-  set(OPENJPEG_INSTALL_INCLUDE_DIR "include/${OPENJPEG_INSTALL_SUBDIR}")
-endif()
-
-if(NOT OPENJPEG_INSTALL_JNI_DIR)
-  if(WIN32)
-    set(OPENJPEG_INSTALL_JNI_DIR ${OPENJPEG_INSTALL_BIN_DIR})
-  else()
-    set(OPENJPEG_INSTALL_JNI_DIR ${OPENJPEG_INSTALL_LIB_DIR})
-  endif()
-endif()
-
-if(NOT OPENJPEG_INSTALL_PACKAGE_DIR)
-  # We could install *.cmake files in share/ however those files contains
-  # hardcoded path to libraries on a multi-arch system (fedora/debian) those
-  # path will be different (lib/i386-linux-gnu vs lib/x86_64-linux-gnu)
-  set(OPENJPEG_INSTALL_PACKAGE_DIR "${OPENJPEG_INSTALL_LIB_DIR}/${OPENJPEG_INSTALL_SUBDIR}")
-endif()
-
-if (APPLE)
-	list(APPEND OPENJPEG_LIBRARY_PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${OPENJPEG_INSTALL_LIB_DIR}")
-	option(OPJ_USE_DSYMUTIL "Call dsymutil on binaries after build." OFF)
-endif()
 
 # Big endian test
 include(${CMAKE_ROOT}/Modules/TestBigEndian.cmake)
 TEST_BIG_ENDIAN(OPJ_BIG_ENDIAN)
 
 # OpenJPEG build configuration options
-#option(BUILD_SHARED_LIBS "Build OpenJPEG shared library and link executables against it." ON)
 set(EXECUTABLE_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all executables.")
 set(LIBRARY_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all libraries.")
 mark_as_advanced(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)

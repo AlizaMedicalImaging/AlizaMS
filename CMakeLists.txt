@@ -1015,6 +1015,9 @@ if(WIN32)
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC}
     Win32AppUtf8.manifest)
+  # Safely add NDEBUG
+  target_compile_definitions(
+    alizams PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} crypt32 rpcrt4)
 elseif(APPLE)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES})
@@ -1027,6 +1030,9 @@ elseif(APPLE)
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC}
     ${ALIZAMS_OSX_ICON})
+  # Safely add NDEBUG
+  target_compile_definitions(
+    alizams PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
   set_target_properties(AlizaMS PROPERTIES
     MACOSX_BUNDLE_BUNDLE_NAME "AlizaMS"
     MACOSX_BUNDLE_BUNDLE_VERSION ${ALIZAMS_OSX_BUNDLE_VERSION}
@@ -1046,6 +1052,9 @@ else()
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC})
+  # Safely add NDEBUG
+  target_compile_definitions(
+    alizams PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
   install(TARGETS alizams RUNTIME DESTINATION "bin")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/icons" DESTINATION "share")
