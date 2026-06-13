@@ -449,34 +449,34 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities")
 #
 
 set(MDCM_COMMON_SRCS
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmVersion.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmEvent.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmBase64.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSHA1.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmCryptoFactory.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmASN1.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSubject.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmFilename.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmFilenameGenerator.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSwapCode.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSystem.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmUnpacker12Bits.cxx")
+  "mdcm/Source/Common/mdcmVersion.cxx"
+  "mdcm/Source/Common/mdcmEvent.cxx"
+  "mdcm/Source/Common/mdcmBase64.cxx"
+  "mdcm/Source/Common/mdcmSHA1.cxx"
+  "mdcm/Source/Common/mdcmCryptoFactory.cxx"
+  "mdcm/Source/Common/mdcmASN1.cxx"
+  "mdcm/Source/Common/mdcmSubject.cxx"
+  "mdcm/Source/Common/mdcmFilename.cxx"
+  "mdcm/Source/Common/mdcmFilenameGenerator.cxx"
+  "mdcm/Source/Common/mdcmSwapCode.cxx"
+  "mdcm/Source/Common/mdcmSystem.cxx"
+  "mdcm/Source/Common/mdcmUnpacker12Bits.cxx")
 
 if(WIN32)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
-    "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmCAPICryptographicMessageSyntax.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmCAPICryptoFactory.cxx")
+    "mdcm/Source/Common/mdcmCAPICryptographicMessageSyntax.cxx"
+    "mdcm/Source/Common/mdcmCAPICryptoFactory.cxx")
 endif()
 
 if(MDCM_USE_SYSTEM_OPENSSL)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
-    "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLP7CryptographicMessageSyntax.cxx")
+    "mdcm/Source/Common/mdcmOpenSSLP7CryptographicMessageSyntax.cxx")
 endif()
 
 if(MDCM_USE_SYSTEM_OPENSSL AND MDCM_HAVE_CMS_RECIPIENT_PASSWORD)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
-    "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLCryptoFactory.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLCryptographicMessageSyntax.cxx")
+    "mdcm/Source/Common/mdcmOpenSSLCryptoFactory.cxx"
+    "mdcm/Source/Common/mdcmOpenSSLCryptographicMessageSyntax.cxx")
 endif()
 
 if(MDCM_USE_SYSTEM_OPENSSL)
@@ -484,98 +484,98 @@ if(MDCM_USE_SYSTEM_OPENSSL)
 endif()
 
 set(MDCM_DICT_SRCS
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDicts.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDefaultDicts.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmPrivateDefaultDicts.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmGlobal.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmUIDs.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmCSAHeaderDefaultDicts.cxx")
+  "mdcm/Source/DataDictionary/mdcmDicts.cxx"
+  "mdcm/Source/DataDictionary/mdcmDefaultDicts.cxx"
+  "mdcm/Source/DataDictionary/mdcmPrivateDefaultDicts.cxx"
+  "mdcm/Source/DataDictionary/mdcmGlobal.cxx"
+  "mdcm/Source/DataDictionary/mdcmUIDs.cxx"
+  "mdcm/Source/DataDictionary/mdcmCSAHeaderDefaultDicts.cxx")
 
 set(MDCM_DSED_SRCS
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteValue.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmDataElement.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmDataSet.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitDataElement.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmFile.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmFileMetaInformation.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmFragment.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmImplicitDataElement.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmMediaStorage.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmPrivateTag.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmReader.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmSequenceOfFragments.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmSequenceOfItems.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmValue.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTag.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCodeString.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteSwapFilter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmWriter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCSAHeader.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmMrProtocol.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTransferSyntax.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVM.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmPreamble.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitDataElement.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCP246ExplicitDataElement.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitImplicitDataElement.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR16ExplicitDataElement.cxx")
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteValue.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmDataElement.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmDataSet.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitDataElement.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmFile.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmFileMetaInformation.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmFragment.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmImplicitDataElement.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmMediaStorage.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmPrivateTag.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmReader.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmSequenceOfFragments.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmSequenceOfItems.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmValue.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmTag.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmCodeString.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteSwapFilter.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmWriter.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmCSAHeader.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmMrProtocol.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmTransferSyntax.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmVM.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmPreamble.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitDataElement.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmCP246ExplicitDataElement.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitImplicitDataElement.cxx"
+  "mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR16ExplicitDataElement.cxx")
 
 # Code for segments and surfaces is currently unused.
 set(MDCM_MSFF_SRCS
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageFilter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileExplicitFilter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageFragmentSplitter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSimpleSubjectWatcher.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmap.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmBitmap.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRescaler.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageToImageFilter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmBitmapToBitmapFilter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapToPixmapFilter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageChangeTransferSyntax.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageApplyLookupTable.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmApplySupplementalLUT.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileDecompressLookupTable.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmOrientation.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmDataSetHelper.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageChangePlanarConfiguration.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmDirectionCosines.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSplitMosaicFilter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmUIDGenerator.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmUUIDGenerator.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmScanner.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapReader.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageReader.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapWriter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageWriter.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageHelper.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImage.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageCodec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG12Codec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRLE.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRLECodec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG16Codec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG8Codec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGCodec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRAWCodec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmEncapsulatedRAWCodec.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmLookupTable.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmOverlay.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmCurve.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPhotometricInterpretation.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixelFormat.cxx"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx")
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageFilter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmFileExplicitFilter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageFragmentSplitter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmSimpleSubjectWatcher.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmPixmap.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmBitmap.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmRescaler.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageToImageFilter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmBitmapToBitmapFilter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapToPixmapFilter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageChangeTransferSyntax.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageApplyLookupTable.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmApplySupplementalLUT.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmFileDecompressLookupTable.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmOrientation.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmDataSetHelper.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageChangePlanarConfiguration.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmDirectionCosines.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmSplitMosaicFilter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmUIDGenerator.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmUUIDGenerator.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmScanner.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapReader.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageReader.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapWriter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageWriter.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageHelper.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImage.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmImageCodec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG12Codec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmRLE.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmRLECodec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG16Codec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG8Codec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGCodec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmRAWCodec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmEncapsulatedRAWCodec.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmLookupTable.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmOverlay.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmCurve.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmPhotometricInterpretation.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmPixelFormat.cxx"
+  "mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx")
 
 if(NOT MDCM_USE_SYSTEM_OPENJPEG)
-  set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx" PROPERTIES COMPILE_DEFINITIONS OPJ_STATIC)
+  set_source_files_properties("mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx" PROPERTIES COMPILE_DEFINITIONS OPJ_STATIC)
 endif()
 
 if(NOT MDCM_USE_SYSTEM_CHARLS)
-  set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx" PROPERTIES COMPILE_DEFINITIONS CHARLS_STATIC)
+  set_source_files_properties("mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx" PROPERTIES COMPILE_DEFINITIONS CHARLS_STATIC)
 else()
-  set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx" PROPERTIES COMPILE_DEFINITIONS CHARLS_DLL)
+  set_source_files_properties("mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx" PROPERTIES COMPILE_DEFINITIONS CHARLS_DLL)
 endif()
 
 #
@@ -680,114 +680,114 @@ if(WIN32)
 endif()
 
 set(ALIZAMS_SRCS
-  "${CMAKE_CURRENT_SOURCE_DIR}/common/mmath.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/common/structures.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
+  "common/mmath.cpp"
+  "common/structures.cpp"
+  "main.cpp")
 
 if(NOT ALIZA_USE_SYSTEM_BULLET)
   include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/b")
   set(BULLET_SRCS
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btAlignedAllocator.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btConvexHull.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btConvexHullComputer.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btGeometryUtil.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btPolarDecomposition.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btQuickprof.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btReducedVector.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btSerializer.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btSerializer64.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btThreads.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btVector3.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/TaskScheduler/btTaskScheduler.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/TaskScheduler/btThreadSupportPosix.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/TaskScheduler/btThreadSupportWin32.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btAxisSweep3.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btBroadphaseProxy.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btDbvt.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btDbvtBroadphase.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btDispatcher.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btOverlappingPairCache.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btQuantizedBvh.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/BroadphaseCollision/btSimpleBroadphase.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btCollisionDispatcherMt.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btCollisionObject.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btCollisionWorld.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btCollisionWorldImporter.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btGhostObject.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btHashedSimplePairCache.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btInternalEdgeUtility.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btManifoldResult.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btSimulationIslandManager.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/btUnionFind.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionDispatch/SphereTriangleDetector.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btBoxShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btBox2dShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btCapsuleShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btCollisionShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btCompoundShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConcaveShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConeShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConvexHullShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConvexInternalShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConvexPointCloudShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConvexPolyhedron.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConvexShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConvex2dShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btCylinderShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btEmptyShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btMiniSDF.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btMinkowskiSumShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btMultiSphereShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btOptimizedBvh.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btPolyhedralConvexShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btSdfCollisionShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btShapeHull.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btSphereShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btStaticPlaneShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btStridingMeshInterface.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btTetrahedronShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btTriangleBuffer.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btTriangleCallback.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btTriangleIndexVertexMaterialArray.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btTriangleMesh.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btTriangleMeshShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/CollisionShapes/btUniformScalingShape.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btConvexCast.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btGjkEpa2.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btPersistentManifold.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btRaycastCallback.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp")
+    "b/LinearMath/btAlignedAllocator.cpp"
+    "b/LinearMath/btConvexHull.cpp"
+    "b/LinearMath/btConvexHullComputer.cpp"
+    "b/LinearMath/btGeometryUtil.cpp"
+    "b/LinearMath/btPolarDecomposition.cpp"
+    "b/LinearMath/btQuickprof.cpp"
+    "b/LinearMath/btReducedVector.cpp"
+    "b/LinearMath/btSerializer.cpp"
+    "b/LinearMath/btSerializer64.cpp"
+    "b/LinearMath/btThreads.cpp"
+    "b/LinearMath/btVector3.cpp"
+    "b/LinearMath/TaskScheduler/btTaskScheduler.cpp"
+    "b/LinearMath/TaskScheduler/btThreadSupportPosix.cpp"
+    "b/LinearMath/TaskScheduler/btThreadSupportWin32.cpp"
+    "b/BulletCollision/BroadphaseCollision/btAxisSweep3.cpp"
+    "b/BulletCollision/BroadphaseCollision/btBroadphaseProxy.cpp"
+    "b/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.cpp"
+    "b/BulletCollision/BroadphaseCollision/btDbvt.cpp"
+    "b/BulletCollision/BroadphaseCollision/btDbvtBroadphase.cpp"
+    "b/BulletCollision/BroadphaseCollision/btDispatcher.cpp"
+    "b/BulletCollision/BroadphaseCollision/btOverlappingPairCache.cpp"
+    "b/BulletCollision/BroadphaseCollision/btQuantizedBvh.cpp"
+    "b/BulletCollision/BroadphaseCollision/btSimpleBroadphase.cpp"
+    "b/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btBox2dBox2dCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp"
+    "b/BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp"
+    "b/BulletCollision/CollisionDispatch/btCollisionDispatcherMt.cpp"
+    "b/BulletCollision/CollisionDispatch/btCollisionObject.cpp"
+    "b/BulletCollision/CollisionDispatch/btCollisionWorld.cpp"
+    "b/BulletCollision/CollisionDispatch/btCollisionWorldImporter.cpp"
+    "b/BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btConvex2dConvex2dAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.cpp"
+    "b/BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btGhostObject.cpp"
+    "b/BulletCollision/CollisionDispatch/btHashedSimplePairCache.cpp"
+    "b/BulletCollision/CollisionDispatch/btInternalEdgeUtility.cpp"
+    "b/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h"
+    "b/BulletCollision/CollisionDispatch/btManifoldResult.cpp"
+    "b/BulletCollision/CollisionDispatch/btSimulationIslandManager.cpp"
+    "b/BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.cpp"
+    "b/BulletCollision/CollisionDispatch/btUnionFind.cpp"
+    "b/BulletCollision/CollisionDispatch/SphereTriangleDetector.cpp"
+    "b/BulletCollision/CollisionShapes/btBoxShape.cpp"
+    "b/BulletCollision/CollisionShapes/btBox2dShape.cpp"
+    "b/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.cpp"
+    "b/BulletCollision/CollisionShapes/btCapsuleShape.cpp"
+    "b/BulletCollision/CollisionShapes/btCollisionShape.cpp"
+    "b/BulletCollision/CollisionShapes/btCompoundShape.cpp"
+    "b/BulletCollision/CollisionShapes/btConcaveShape.cpp"
+    "b/BulletCollision/CollisionShapes/btConeShape.cpp"
+    "b/BulletCollision/CollisionShapes/btConvexHullShape.cpp"
+    "b/BulletCollision/CollisionShapes/btConvexInternalShape.cpp"
+    "b/BulletCollision/CollisionShapes/btConvexPointCloudShape.cpp"
+    "b/BulletCollision/CollisionShapes/btConvexPolyhedron.cpp"
+    "b/BulletCollision/CollisionShapes/btConvexShape.cpp"
+    "b/BulletCollision/CollisionShapes/btConvex2dShape.cpp"
+    "b/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.cpp"
+    "b/BulletCollision/CollisionShapes/btCylinderShape.cpp"
+    "b/BulletCollision/CollisionShapes/btEmptyShape.cpp"
+    "b/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.cpp"
+    "b/BulletCollision/CollisionShapes/btMiniSDF.cpp"
+    "b/BulletCollision/CollisionShapes/btMinkowskiSumShape.cpp"
+    "b/BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.cpp"
+    "b/BulletCollision/CollisionShapes/btMultiSphereShape.cpp"
+    "b/BulletCollision/CollisionShapes/btOptimizedBvh.cpp"
+    "b/BulletCollision/CollisionShapes/btPolyhedralConvexShape.cpp"
+    "b/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.cpp"
+    "b/BulletCollision/CollisionShapes/btSdfCollisionShape.cpp"
+    "b/BulletCollision/CollisionShapes/btShapeHull.cpp"
+    "b/BulletCollision/CollisionShapes/btSphereShape.cpp"
+    "b/BulletCollision/CollisionShapes/btStaticPlaneShape.cpp"
+    "b/BulletCollision/CollisionShapes/btStridingMeshInterface.cpp"
+    "b/BulletCollision/CollisionShapes/btTetrahedronShape.cpp"
+    "b/BulletCollision/CollisionShapes/btTriangleBuffer.cpp"
+    "b/BulletCollision/CollisionShapes/btTriangleCallback.cpp"
+    "b/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.cpp"
+    "b/BulletCollision/CollisionShapes/btTriangleIndexVertexMaterialArray.cpp"
+    "b/BulletCollision/CollisionShapes/btTriangleMesh.cpp"
+    "b/BulletCollision/CollisionShapes/btTriangleMeshShape.cpp"
+    "b/BulletCollision/CollisionShapes/btUniformScalingShape.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btConvexCast.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btGjkConvexCast.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btGjkEpa2.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btPersistentManifold.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btRaycastCallback.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.cpp"
+    "b/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp")
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${BULLET_SRCS})
 else()
   find_package(Bullet REQUIRED COMPONENTS LinearMath BulletCollision)
@@ -808,7 +808,7 @@ if(ALIZA_USE_SYSTEM_LCMS2)
   add_definitions(-DALIZA_USE_SYSTEM_LCMS2)
   message(STATUS "LCMS2: ${LCMS2_LIBRARIES}")
 else()
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/alizalcms)
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/alizalcms")
   message(STATUS "LCMS2: alizalcms2")
 endif()
 #
@@ -818,61 +818,61 @@ endif()
 #
 
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
-  "${CMAKE_CURRENT_SOURCE_DIR}/common/commonutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/common/contourutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/common/colorspace/colorspace.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/common/codecutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/ultrasoundregionutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom_t.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/dicomutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/prconfigutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/splituihgridfilter.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/spectroscopyutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/srutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/CG/camera.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/CG/testgl.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/mainwindow.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/updateqtcommand.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/iconutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramgen.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/settingswidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/qxtspanslider.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/imagesbox.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/animwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/zrangewidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/lutwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/handleitem.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/levelitem.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/rectitem.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsutils.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicspathitem.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsview.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studygraphicswidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studygraphicsview.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicswidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramview.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/zoomwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/infodialog.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/matrixbutton.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.cpp")
+  "common/commonutils.cpp"
+  "common/contourutils.cpp"
+  "common/colorspace/colorspace.cpp"
+  "common/codecutils.cpp"
+  "dicom/ultrasoundregionutils.cpp"
+  "dicom/loaddicom_t.cpp"
+  "dicom/loaddicom.cpp"
+  "dicom/dicomutils.cpp"
+  "dicom/prconfigutils.cpp"
+  "dicom/splituihgridfilter.cpp"
+  "dicom/spectroscopyutils.cpp"
+  "dicom/srutils.cpp"
+  "CG/camera.cpp"
+  "CG/glwidget.cpp"
+  "CG/testgl.cpp"
+  "GUI/mainwindow.cpp"
+  "GUI/updateqtcommand.cpp"
+  "GUI/iconutils.cpp"
+  "GUI/histogramgen.cpp"
+  "GUI/settingswidget.cpp"
+  "GUI/qxtspanslider.cpp"
+  "GUI/imagesbox.cpp"
+  "GUI/toolbox.cpp"
+  "GUI/animwidget.cpp"
+  "GUI/toolbox2D.cpp"
+  "GUI/sliderwidget.cpp"
+  "GUI/zrangewidget.cpp"
+  "GUI/lutwidget.cpp"
+  "GUI/handleitem.cpp"
+  "GUI/levelitem.cpp"
+  "GUI/rectitem.cpp"
+  "GUI/graphicsutils.cpp"
+  "GUI/graphicspathitem.cpp"
+  "GUI/graphicsview.cpp"
+  "GUI/studygraphicswidget.cpp"
+  "GUI/studygraphicsview.cpp"
+  "GUI/graphicswidget.cpp"
+  "GUI/histogramview.cpp"
+  "GUI/aboutwidget.cpp"
+  "GUI/zoomwidget.cpp"
+  "GUI/findrefdialog.cpp"
+  "GUI/infodialog.cpp"
+  "GUI/imageinfodialog.cpp"
+  "GUI/srwidget.cpp"
+  "GUI/matrixbutton.cpp"
+  "GUI/studyframewidget.cpp"
+  "GUI/studyviewwidget.cpp"
+  "browser/sqtree.cpp"
+  "browser/browserwidget2.cpp"
+  "browser/helpwidget.cpp"
+  "browser/anonymazerwidget2.cpp"
+  "GUI/aliza.cpp")
 
 if(NOT ALIZA_MEDIASTORAGE_MODE)
-  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.cpp")
+  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "browser/ctkdialog.cpp")
 endif()
 
 if(USE_QT_V_4 AND NOT ALIZA_QT4_SYSTEM_GLEW)
@@ -880,68 +880,68 @@ if(USE_QT_V_4 AND NOT ALIZA_QT4_SYSTEM_GLEW)
 endif()
 
 if(WIN32)
-  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "${CMAKE_CURRENT_SOURCE_DIR}/alizams.rc")
+  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "alizams.rc")
 endif()
 
-set(ALIZAMS_QRCS "${CMAKE_CURRENT_SOURCE_DIR}/alizams.qrc")
+set(ALIZAMS_QRCS "alizams.qrc")
 
 set(ALIZAMS_MOC_HRDS
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/mainwindow.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom_t.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/infodialog.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/settingswidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/qxtspanslider_p.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/qxtspanslider.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/imagesbox.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/animwidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/zrangewidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/lutwidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/matrixbutton.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsview.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicswidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studygraphicsview.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studygraphicswidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramview.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/zoomwidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.h")
+  "GUI/mainwindow.h"
+  "browser/sqtree.h"
+  "browser/browserwidget2.h"
+  "browser/helpwidget.h"
+  "browser/anonymazerwidget2.h"
+  "dicom/loaddicom_t.h"
+  "GUI/findrefdialog.h"
+  "GUI/infodialog.h"
+  "GUI/imageinfodialog.h"
+  "GUI/settingswidget.h"
+  "GUI/qxtspanslider_p.h"
+  "GUI/qxtspanslider.h"
+  "GUI/imagesbox.h"
+  "GUI/toolbox.h"
+  "GUI/animwidget.h"
+  "GUI/toolbox2D.h"
+  "GUI/sliderwidget.h"
+  "GUI/zrangewidget.h"
+  "GUI/lutwidget.h"
+  "GUI/matrixbutton.h"
+  "GUI/studyframewidget.h"
+  "GUI/studyviewwidget.h"
+  "GUI/graphicsview.h"
+  "GUI/graphicswidget.h"
+  "GUI/studygraphicsview.h"
+  "GUI/studygraphicswidget.h"
+  "GUI/histogramview.h"
+  "GUI/zoomwidget.h"
+  "GUI/aboutwidget.h"
+  "GUI/srwidget.h"
+  "GUI/aliza.h")
 
 if(APPLE)
   if(USE_QT_V_6)
-    set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h")
+    set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "CG/glwidget-qt5-core.h")
   else()
     message(FATAL_ERROR "Only Qt6 is supported with macOS")
   endif()
 else()
   if(USE_QT_V_6)
     if(ALIZA_COREGL)
-      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h")
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "CG/glwidget-qt5-core.h")
     else()
-      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h")
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "CG/glwidget-qt5.h")
     endif()
   elseif(USE_QT_V_5)
     if(ALIZA_COREGL)
-      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h")
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "CG/glwidget-qt5-core.h")
     else()
-      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h")
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "CG/glwidget-qt5.h")
     endif()
   elseif(USE_QT_V_4)
     if(ALIZA_COREGL)
-      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4-core.h")
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "CG/glwidget-qt4-core.h")
     else()
-      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4.h")
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "CG/glwidget-qt4.h")
     endif()
   else()
     message(FATAL_ERROR "Can not determine Qt version to use")
@@ -949,31 +949,31 @@ else()
 endif()
 
 if(NOT ALIZA_MEDIASTORAGE_MODE)
-  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.h")
+  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} "browser/ctkdialog.h")
 endif()
 
 set(ALIZAMS_UIS
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/settingswidget.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/mainwindow.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/infodialog.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/imagesbox.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/animwidget.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.ui"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.ui")
+  "GUI/settingswidget.ui"
+  "GUI/mainwindow.ui"
+  "GUI/aboutwidget.ui"
+  "browser/sqtree.ui"
+  "browser/browserwidget2.ui"
+  "browser/helpwidget.ui"
+  "browser/anonymazerwidget2.ui"
+  "GUI/findrefdialog.ui"
+  "GUI/infodialog.ui"
+  "GUI/imagesbox.ui"
+  "GUI/toolbox.ui"
+  "GUI/animwidget.ui"
+  "GUI/toolbox2D.ui"
+  "GUI/sliderwidget.ui"
+  "GUI/srwidget.ui"
+  "GUI/studyframewidget.ui"
+  "GUI/studyviewwidget.ui"
+  "GUI/imageinfodialog.ui")
 
 if(NOT ALIZA_MEDIASTORAGE_MODE)
-  set(ALIZAMS_UIS ${ALIZAMS_UIS} "${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.ui")
+  set(ALIZAMS_UIS ${ALIZAMS_UIS} "browser/ctkdialog.ui")
 endif()
 
 include_directories(
@@ -1063,7 +1063,7 @@ if(WIN32)
 elseif(APPLE)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES})
   set(ALIZAMS_OSX_ICON_NAME "AlizaMS.icns")
-  set(ALIZAMS_OSX_ICON ${CMAKE_CURRENT_SOURCE_DIR}/${ALIZAMS_OSX_ICON_NAME})
+  set(ALIZAMS_OSX_ICON "${CMAKE_CURRENT_SOURCE_DIR}/${ALIZAMS_OSX_ICON_NAME}")
   set_source_files_properties(${ALIZAMS_OSX_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
   add_executable(AlizaMS MACOSX_BUNDLE
     ${ALIZAMS_SRCS}
