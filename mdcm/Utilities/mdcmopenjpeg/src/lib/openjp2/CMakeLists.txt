@@ -65,8 +65,7 @@ endif()
 
 add_library(${OPENJPEG_LIBRARY_NAME} ${OPENJPEG_SRCS})
 # Safely add NDEBUG
-target_compile_definitions(
-  ${OPENJPEG_LIBRARY_NAME} PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
+target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
 # Only static libs here
 target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE OPJ_STATIC)
 if(UNIX)

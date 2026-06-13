@@ -36,8 +36,7 @@ endif()
 
 set_target_properties(${CHARLS_LIBRARY_NAME} PROPERTIES VERSION ${CHARLS_VERSION} SOVERSION ${CHARLS_MAJOR_VERSION})
 # Safely add NDEBUG
-target_compile_definitions(
-  ${CHARLS_LIBRARY_NAME} PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
+target_compile_definitions(${CHARLS_LIBRARY_NAME} PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
 target_compile_definitions(${CHARLS_LIBRARY_NAME} PRIVATE CHARLS_LIBRARY_BUILD)
 target_compile_features(${CHARLS_LIBRARY_NAME} PUBLIC cxx_std_14)
 set_target_properties(${CHARLS_LIBRARY_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)

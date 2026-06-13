@@ -165,25 +165,36 @@ endif()
 
 ##########################################################################
 #
-# C/C++ flags; no changes, this is informational to prevent potential errors.
+#
+# C/C++ flags
+#
+#
+#
+# Note: For any build configuration other than 'Debug' (including
+# non-standard ones), the NDEBUG is defined automatically; there is
+# no need to specify it via C/C++ flags (but there is no harm in
+# this, and no need to change the standard configurations).
+#
 #
 #
 get_cmake_property(TMP_IS_MULTI_CONFIG_GENERATOR GENERATOR_IS_MULTI_CONFIG)
 if(TMP_IS_MULTI_CONFIG_GENERATOR)
   foreach(TMP_MCCONFIG IN LISTS CMAKE_CONFIGURATION_TYPES)
-    string(TOUPPER ${TMP_MCCONFIG} TMPMC_BUILD_TYPE)
-    if((NOT "${TMPMC_BUILD_TYPE}" STREQUAL "DEBUG") AND
-       (NOT "${TMPMC_BUILD_TYPE}" STREQUAL "RELEASE") AND
-       (NOT "${TMPMC_BUILD_TYPE}" STREQUAL "RELWITHDEBINFO") AND
-       (NOT "${TMPMC_BUILD_TYPE}" STREQUAL "MINSIZEREL"))
-      message(STATUS "Caution: non-standard " ${TMP_MCCONFIG} " configuration")
+    string(TOUPPER ${TMP_MCCONFIG} TMP_MCCONGIG_UPPER)
+    if((NOT "${TMP_MCCONGIG_UPPER}" STREQUAL "DEBUG") AND
+       (NOT "${TMP_MCCONGIG_UPPER}" STREQUAL "RELEASE") AND
+       (NOT "${TMP_MCCONGIG_UPPER}" STREQUAL "RELWITHDEBINFO") AND
+       (NOT "${TMP_MCCONGIG_UPPER}" STREQUAL "MINSIZEREL"))
+      message(STATUS "Non-standard " ${TMP_MCCONFIG} " configuration")
     endif()
     if(NOT "${TMP_MCCONFIG}" STREQUAL "")
-      message(STATUS "Found configuration: ${MCCONFIG}")
-      message(STATUS "  CXX " ${MCCONFIG} " flags: " "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_}${TMPMC_BUILD_TYPE}")
-      message(STATUS "  C " ${MCCONFIG} " flags: " "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_}${TMPMC_BUILD_TYPE}")
+      message(STATUS "Configuration: ${TMP_MCCONFIG}")
+      message(STATUS "  CXX flags: " "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${TMP_MCCONGIG_UPPER}}")
+      message(STATUS "  C flags: "   "${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_${TMP_MCCONGIG_UPPER}}")
     else()
       message(WARNING "Empty configuration in CMAKE_CONFIGURATION_TYPES?")
+      message(STATUS "  CXX flags: " "${CMAKE_CXX_FLAGS}")
+      message(STATUS "  C flags: "   "${CMAKE_C_FLAGS}")
     endif()
   endforeach()
 else()
@@ -193,17 +204,17 @@ else()
        (NOT "${TMP_BUILD_TYPE}" STREQUAL "RELEASE") AND
        (NOT "${TMP_BUILD_TYPE}" STREQUAL "RELWITHDEBINFO") AND
        (NOT "${TMP_BUILD_TYPE}" STREQUAL "MINSIZEREL"))
-      message(STATUS "Caution: non-standard " ${CMAKE_BUILD_TYPE} " configuration")
+      message(STATUS "Non-standard " ${CMAKE_BUILD_TYPE} " configuration")
     endif()
     set(TMP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${TMP_BUILD_TYPE}}")
-    set(TMP_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${TMP_BUILD_TYPE}}")
-    message(STATUS "CXX flags: " ${TMP_CXX_FLAGS})
-    message(STATUS "C flags: " ${TMP_C_FLAGS})
+    set(TMP_C_FLAGS   "${CMAKE_C_FLAGS}   ${CMAKE_C_FLAGS_${TMP_BUILD_TYPE}}")
+	message(STATUS "Configuration " ${CMAKE_BUILD_TYPE})
+    message(STATUS "  CXX flags: " "${TMP_CXX_FLAGS}")
+    message(STATUS "  C flags: "   "${TMP_C_FLAGS}")
   else()
-    message(WARNING "CMAKE_BUILD_TYPE is not set, this is not recommended, NDEBUG is not defined, "
-                    "set to Release, Debug, RelWithDebInfo or MinSizeRel (standard configurations).")
-    message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
-    message(STATUS "C flags: " ${CMAKE_C_FLAGS})
+    message(WARNING "CMAKE_BUILD_TYPE is not set")
+    message(STATUS "  CXX flags: " "${CMAKE_CXX_FLAGS}")
+    message(STATUS "  C flags: "   "${CMAKE_C_FLAGS}")
   endif()
 endif()
 #
@@ -1064,7 +1075,7 @@ if(WIN32)
     Win32AppUtf8.manifest)
   # Safely add NDEBUG
   target_compile_definitions(
-    alizams PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
+    alizams PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} crypt32 rpcrt4)
 elseif(APPLE)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES})
@@ -1079,7 +1090,7 @@ elseif(APPLE)
     ${ALIZAMS_OSX_ICON})
   # Safely add NDEBUG
   target_compile_definitions(
-    alizams PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
+    alizams PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
   set_target_properties(AlizaMS PROPERTIES
     MACOSX_BUNDLE_BUNDLE_NAME "AlizaMS"
     MACOSX_BUNDLE_BUNDLE_VERSION ${ALIZAMS_OSX_BUNDLE_VERSION}
@@ -1101,7 +1112,7 @@ else()
     ${ALIZAMS_QRCS_RCC})
   # Safely add NDEBUG
   target_compile_definitions(
-    alizams PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
+     alizams PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
   install(TARGETS alizams RUNTIME DESTINATION "bin")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/icons" DESTINATION "share")

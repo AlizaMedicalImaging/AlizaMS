@@ -89,8 +89,7 @@ include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(${UUID_LIBRARY_NAME} ${UUID_SRCS})
 # Safely add NDEBUG
-target_compile_definitions(
-  ${UUID_LIBRARY_NAME} PRIVATE $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:NDEBUG>)
+target_compile_definitions(${UUID_LIBRARY_NAME} PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
 if(MDCM_LIBRARY_PROPERTIES)
 set_target_properties(${UUID_LIBRARY_NAME} PROPERTIES ${MDCM_LIBRARY_PROPERTIES})
 endif()
