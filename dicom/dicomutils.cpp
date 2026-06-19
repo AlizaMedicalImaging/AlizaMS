@@ -12706,11 +12706,14 @@ QString DicomUtils::read_dicom(
 	unsigned short ba_tmp1{};
 	bool localizer_tmp0{};
 	bool localizer_tmp1{};
-	QString sop_tmp0, sop_tmp1;
-	QString photometric_tmp0, photometric_tmp1;
-	QString pspacing_tmp0, pspacing_tmp1;
 	bool icc_found_tmp0{};
 	bool icc_found_tmp1{};
+	QString sop_tmp0, sop_tmp1;
+	QString photometric_tmp0, photometric_tmp1;
+	double pspacing_x_tmp0{};
+	double pspacing_y_tmp0{};
+	double pspacing_x_tmp1{};
+	double pspacing_y_tmp1{};
 	const SettingsWidget * const wsettings =
 		static_cast<const SettingsWidget * const>(settings);
 	std::map<unsigned int, SliceInstance> slice_pos_map;
@@ -12728,18 +12731,7 @@ QString DicomUtils::read_dicom(
 #ifndef ALIZA_LOAD_DCM_THREAD
 		QApplication::processEvents();
 #endif
-		QString sop;
-		QString photometric;
-		QString pspacing;
-		bool icc_found{};
-		unsigned short columns_{};
-		unsigned short rows_{};
-		unsigned short ba_{};
-		unsigned short bs_{};
-		unsigned short hb_{};
-		short pr_{-1};
-		bool localizer_{};
-		QFileInfo fi(filenames.at(x));
+		const QFileInfo fi(filenames.at(x));
 		mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -12765,24 +12757,13 @@ QString DicomUtils::read_dicom(
 #ifndef ALIZA_LOAD_DCM_THREAD
 		QApplication::processEvents();
 #endif
+		QString sop;
 		{
-			const mdcm::DataElement & sop_ = ds.GetDataElement(tSOPClassUID);
-			if (!sop_.IsEmpty() && !sop_.IsUndefinedLength() && sop_.GetByteValue())
+			QString sop_tmp;
+			if (get_string_value(ds, mdcm::Tag(0x0008,0x0016), sop_tmp))
 			{
-				sop = QString::fromLatin1(
-					sop_.GetByteValue()->GetPointer(),
-					sop_.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+				sop = sop_tmp.remove(QChar('\0'));
 			}
-		}
-		const bool tPhotometricInterpretation_ok =
-			DicomUtils::get_string_value(ds, tPhotometricInterpretation, photometric);
-		(void)tPhotometricInterpretation_ok;
-		const bool tPixelSpacing_ok = DicomUtils::get_string_value(
-			ds, tPixelSpacing, pspacing);
-		(void)tPixelSpacing_ok;
-		if (wsettings->get_apply_icc() && ds.FindDataElement(mdcm::Tag(0x0028,0x2000)))
-		{
-			icc_found = true;
 		}
 #if 1
 		if (sop == QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // TODO
@@ -12939,98 +12920,77 @@ QString DicomUtils::read_dicom(
 			continue;
 		}
 		//
-		if (is_image(
-				ds,
-				&rows_, &columns_,
-				&ba_, &bs_, &hb_,
-				&pr_,
-				&localizer_))
 		{
-			sop_tmp0 = sop;
-			rows_tmp0 = rows_;
-			columns_tmp0 = columns_;
-			ba_tmp0 = ba_;
-			localizer_tmp0 = localizer_;
-			photometric_tmp0 = std::move(photometric);
-			pspacing_tmp0 = std::move(pspacing);
-			icc_found_tmp0 = icc_found;
-			if (sop == QString("1.2.840.10008.5.1.4.1.1.6.1") ||
-				sop == QString("1.2.840.10008.5.1.4.1.1.6")   ||
-				sop == QString("1.2.840.10008.5.1.4.1.1.3.1") ||
-				sop == QString("1.2.840.10008.5.1.4.1.1.3"))
+			unsigned short columns_{};
+			unsigned short rows_{};
+			unsigned short ba_{};
+			unsigned short bs_{};
+			unsigned short hb_{};
+			short pr_{-1};
+			bool localizer_{};
+			if (is_image(
+					ds,
+					&rows_, &columns_,
+					&ba_, &bs_, &hb_,
+					&pr_,
+					&localizer_))
 			{
-				ultrasound = true;
-			}
-			else if (sop == QString("1.2.840.10008.5.1.4.1.1.20"))
-			{
-				nuclear = true;
-			}
-			else
-			{
-				// for possible multiseries
+				QString photometric;
+				(void)get_string_value(ds, mdcm::Tag(0x0028,0x0004), photometric);
+				//
+				double pspacing[2]{};
 				{
-					const mdcm::DataElement & sp_ = ds.GetDataElement(tSlicePosition);
-					if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
+					QString pspacing_s;
+					if (get_string_value(ds, mdcm::Tag(0x0028,0x0030), pspacing_s))
 					{
-						bool sp_ok{};
-						QString sp = QString::fromLatin1(
-							sp_.GetByteValue()->GetPointer(),
-							sp_.GetByteValue()->GetLength());
-						if (sp.contains(QString(",")))
-						{
-							// Workaround invalid VR
-							sp.replace(QString(","), QString("."));
-						}
-						const double spvd =
-							QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
-						if (sp_ok)
-						{
-							const long long spvl = 1000 * CommonUtils::set_digits(spvd, 3);
-							SliceInstance si;
-							si.id = x;
-							si.slice_position = spvl;
-							si.instance_number = read_instance_number(ds);
-							slice_pos_map[x] = si;
-							slice_pos_list.push_back(spvl);
-						}
+						(void)get_pixel_spacing(pspacing_s, pspacing);
 					}
 				}
-				if (has_functional_groups(ds))
+				//
+				bool icc_found{};
+				if (wsettings->get_apply_icc() && ds.FindDataElement(mdcm::Tag(0x0028,0x2000)))
 				{
-					// "1.2.840.10008.5.1.4.1.1.4.1"      Enhanced MR
-					// "1.2.840.10008.5.1.4.1.1.2.1"      Enhanced CT
-					// "1.2.840.10008.5.1.4.1.1.130"      Enhanced PET
-					// "1.2.840.10008.5.1.4.1.1.6.2"      Enhanced US Volume
-
-					// "1.2.840.10008.5.1.4.1.1.13.1.1"   Enhanced X Ray 3D Angiographic
-					// "1.2.840.10008.5.1.4.1.1.13.1.2"   Enhanced X-Ray 3D Craniofacial
-					// "1.2.840.10008.5.1.4.1.1.13.1.3"   Breast Tomosynthesis
-					// "1.2.840.10008.5.1.4.1.1.2.2"      Legacy Converted Enhanced CT
-					// "1.2.840.10008.5.1.4.1.1.4.4"      Legacy Converted Enhanced MR
-					// "1.2.840.10008.5.1.4.1.1.128.1"    Legacy Converted Enhanced PET
-					// "1.2.840.10008.5.1.4.1.1.30"       Parametric Map
-					// "1.2.840.10008.5.1.4.1.1.66.4"     Segmentation
-					// "1.2.840.10008.5.1.4.1.1.4.3"      Enhanced MR Color
-					// "1.2.840.10008.5.1.4.1.1.77.1.5.4" Ophthalmic Tomography
-					// "1.2.840.10008.5.1.4.1.1.14.1"     Intravascular Optical Coherence Tomography Image Storage - For Presentation
-					// "1.2.840.10008.5.1.4.1.1.14.2"     Intravascular Optical Coherence Tomography Image Storage - For Processing
-					// "1.2.840.10008.5.1.4.1.1.13.1.4"   Breast Projection X-Ray Image Storage - For Presentation
-					// "1.2.840.10008.5.1.4.1.1.13.1.5"   Breast Projection X-Ray Image Storage - For Processing
-					// "1.2.840.10008.5.1.4.1.1.77.1.5.5" Wide Field Ophthalmic Photography Stereographic Projection
-					// "1.2.840.10008.5.1.4.1.1.77.1.5.6" Wide Field Ophthalmic Photography 3D Coordinates
-					// "1.2.840.10008.5.1.4.1.1.12.1.1"   Enhanced X-Ray Angiographic
-					// "1.2.840.10008.5.1.4.1.1.12.2.1"   Enhanced X-Ray RF
-					//
-					// "1.2.840.10008.5.1.4.1.1.7.3" Multi-frame Grayscale Word SC
-					// "1.2.840.10008.5.1.4.1.1.7.2" Multi-frame Grayscale Byte SC
-					// "1.2.840.10008.5.1.4.1.1.7.4" Multi-frame True Color SC
-					//
-					// and unknown IODs
-					//
-					enhanced = true;
+					icc_found = true;
 				}
-				if (enhanced)
+				//
+				sop_tmp0 = sop;
+				rows_tmp0 = rows_;
+				columns_tmp0 = columns_;
+				ba_tmp0 = ba_;
+				localizer_tmp0 = localizer_;
+				photometric_tmp0 = std::move(photometric);
+				pspacing_x_tmp0 = pspacing[0];
+				pspacing_y_tmp0 = pspacing[1];
+				icc_found_tmp0 = icc_found;
+				if (sop == QString("1.2.840.10008.5.1.4.1.1.6.1") ||
+					sop == QString("1.2.840.10008.5.1.4.1.1.6")   ||
+					sop == QString("1.2.840.10008.5.1.4.1.1.3.1") ||
+					sop == QString("1.2.840.10008.5.1.4.1.1.3"))
 				{
+					ultrasound = true;
+				}
+				else if (sop == QString("1.2.840.10008.5.1.4.1.1.20"))
+				{
+					nuclear = true;
+				}
+				else if (
+				   sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
+				   sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
+				   sop == QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
+				   sop == QString("1.2.840.10008.5.1.4.1.1.12.2"))      // X-Ray RF
+				{
+					skip_volume = true;
+				}
+				else if (has_functional_groups(ds))
+				{
+					enhanced = true;
 					if (force_suppllut == 0)
 					{
 						if ((load_type == 0||load_type == 2) && has_supp_palette(ds))
@@ -13047,32 +13007,54 @@ QString DicomUtils::read_dicom(
 						supp_palette = false;
 					}
 				}
-				if (wsettings->get_mosaic())
+				else
 				{
-					if (is_mosaic(ds))
+					if (is_multiframe(ds))
 					{
-						mosaic  = true;
+						multiframe = true;
 					}
-					else if (is_uih_grid(ds))
+					//
+					if (wsettings->get_mosaic())
 					{
-						uihgrid = true;
+						if (is_mosaic(ds))
+						{
+							mosaic  = true;
+						}
+						else if (is_uih_grid(ds))
+						{
+							uihgrid = true;
+						}
 					}
-				}
-				if (is_elscint(ds))
-				{
-					elscint = true;
-				}
-				else if (ts == mdcm::TransferSyntax::CT_private_ELE)
-				{
-#ifdef ALIZA_VERBOSE
-					std::cout << "Warning: transfer syntax CT-private-ELE" << std::endl;
-#else
-					(void)ts;
-#endif
-				}
-				if (is_multiframe(ds))
-				{
-					multiframe = true;
+					//
+					if (!(mosaic || uihgrid || multiframe))
+					{
+						// for possible multiseries
+						const mdcm::DataElement & sp_ = ds.GetDataElement(tSlicePosition);
+						if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
+						{
+							bool sp_ok{};
+							QString sp = QString::fromLatin1(
+								sp_.GetByteValue()->GetPointer(),
+								sp_.GetByteValue()->GetLength());
+							if (sp.contains(QString(",")))
+							{
+								// Workaround invalid VR
+								sp.replace(QString(","), QString("."));
+							}
+							const double spvd =
+								QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
+							if (sp_ok)
+							{
+								const long long spvl = 1000 * CommonUtils::set_digits(spvd, 3);
+								SliceInstance si;
+								si.id = x;
+								si.slice_position = spvl;
+								si.instance_number = read_instance_number(ds);
+								slice_pos_map[x] = si;
+								slice_pos_list.push_back(spvl);
+							}
+						}
+					}
 				}
 				if ((count_images > 0) && (
 					rows_tmp1        != rows_tmp0        ||
@@ -13080,45 +13062,34 @@ QString DicomUtils::read_dicom(
 					ba_tmp1          != ba_tmp0          ||
 					sop_tmp1         != sop_tmp0         ||
 					photometric_tmp1 != photometric_tmp0 ||
-					pspacing_tmp1    != pspacing_tmp0    ||
 					icc_found_tmp1   != icc_found_tmp0   ||
-					localizer_tmp1   != localizer_tmp0))
+					localizer_tmp1   != localizer_tmp0   ||
+					!(MMath::AlmostEqual(pspacing_x_tmp1, pspacing_x_tmp0, 0.0001) &&
+					  MMath::AlmostEqual(pspacing_y_tmp1, pspacing_y_tmp0, 0.0001))))
 				{
 					mixed = true;
 #if 0
 					std::cout << "Mixed series" << std::endl;
 #endif
 				}
-				if (
-#if 0
-				   sop == QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
-#endif
-				   sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
-				   sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
-				   sop == QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography
-				   sop == QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
-				   sop == QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
-				   sop == QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
-				   sop == QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
-				   sop == QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
-				   sop == QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
-				   sop == QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
-				   sop == QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
-				)
+				sop_tmp1 = sop_tmp0;
+				rows_tmp1 = rows_tmp0;
+				columns_tmp1 = columns_tmp0;
+				ba_tmp1 = ba_tmp0;
+				photometric_tmp1 = photometric_tmp0;
+				pspacing_x_tmp1 = pspacing_x_tmp0;
+				pspacing_y_tmp1 = pspacing_y_tmp0;
+				icc_found_tmp1 = icc_found_tmp0;
+				localizer_tmp1 = localizer_tmp0;
+				//
+				if (is_elscint(ds))
 				{
-					skip_volume = true;
+					elscint = true;
 				}
+				//
+				images.push_back(filenames.at(x));
+				++count_images;
 			}
-			images.push_back(filenames.at(x));
-			++count_images;
-			sop_tmp1 = sop_tmp0;
-			rows_tmp1 = rows_tmp0;
-			columns_tmp1 = columns_tmp0;
-			ba_tmp1 = ba_tmp0;
-			photometric_tmp1 = photometric_tmp0;
-			pspacing_tmp1 = pspacing_tmp0;
-			icc_found_tmp1 = icc_found_tmp0;
-			localizer_tmp1 = localizer_tmp0;
 		}
 	}
 #ifdef ALIZA_LINUX_DEBUG_MEM
