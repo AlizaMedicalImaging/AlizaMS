@@ -13205,9 +13205,9 @@ QString DicomUtils::read_dicom(
 					for (unsigned int j = 0; j < size1; ++j)
 					{
 						const unsigned int id__ = image_ids.at(k+j);
-						if (id__<static_cast<unsigned int>(images.size()))
+						if (id__<static_cast<unsigned int>(filenames.size()))
 						{
-							images_tmp.push_back(images.at(id__));
+							images_tmp.push_back(filenames.at(id__));
 						}
 					}
 					if (!(is_not_interleaved(images_tmp)))
@@ -13291,9 +13291,9 @@ QString DicomUtils::read_dicom(
 									{
 										const unsigned int id_1_ =
 											slices_instance_map[slices_.at(k).at(j)];
-										if (id_1_<static_cast<unsigned int>(images.size()))
+										if (id_1_<static_cast<unsigned int>(filenames.size()))
 										{
-											images_tmp.push_back(images.at(id_1_));
+											images_tmp.push_back(filenames.at(id_1_));
 										}
 										else
 										{
