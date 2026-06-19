@@ -2,6 +2,7 @@
 //#define ENHANCED_PRINT_INFO
 //#define ENHANCED_PRINT_GROUPS
 //#define TMP_ALWAYS_GEOM_FROM_IMAGE
+#define ALIZA_DEBUG_MULTISERIES
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -72,6 +73,7 @@
 #include <random>
 #include <chrono>
 #include <atomic>
+#include <iterator>
 #include "vectormath/scalar/vectormath.h"
 #ifdef ALIZA_USE_SYSTEM_LCMS2
 #include <lcms2.h>
@@ -86,6 +88,168 @@ namespace
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
+
+class TmpIPP
+{
+private:
+	// Snap double to the nearest 0.001 grid block,
+	// this guarantees strict weak ordering and robust grouping.
+	std::tuple<long long, long long, long long> get_quantized() const
+	{
+		return
+		{
+			static_cast<long long>(std::round(z * 1000.0)),
+			static_cast<long long>(std::round(y * 1000.0)),
+			static_cast<long long>(std::round(x * 1000.0))
+		};
+	}
+public:
+	double x{};
+	double y{};
+	double z{};
+
+	bool operator==(const TmpIPP & o) const
+	{
+		return get_quantized() == o.get_quantized();
+	}
+
+	bool operator<(const TmpIPP & o) const
+	{
+		return get_quantized() < o.get_quantized();
+	}
+
+	bool operator!=(const TmpIPP & o) const
+	{
+		return !(*this == o);
+	}
+};
+
+bool read_TmpIPP(const mdcm::DataSet & ds, TmpIPP & ipp)
+{
+	std::vector<double> r;
+	if (DicomUtils::get_ds_values(ds, mdcm::Tag(0x0020,0x0032), r))
+	{
+		if (r.size() == 3)
+		{
+			ipp.x  = r.at(0);
+			ipp.y  = r.at(1);
+			ipp.z  = r.at(2);
+			return true;
+		}
+	}
+	return false;
+}
+
+class TmpIOP
+{
+private:
+	// Snap double to the nearest 0.0001 grid block.
+	std::tuple<long long, long long, long long, long long, long long, long long> get_quantized() const
+	{
+		return
+		{
+			static_cast<long long>(std::round(d1 * 10000.0)),
+			static_cast<long long>(std::round(d2 * 10000.0)),
+			static_cast<long long>(std::round(d3 * 10000.0)),
+			static_cast<long long>(std::round(d4 * 10000.0)),
+			static_cast<long long>(std::round(d5 * 10000.0)),
+			static_cast<long long>(std::round(d6 * 10000.0))
+		};
+	}
+public:
+	double d1{};
+	double d2{};
+	double d3{};
+	double d4{};
+	double d5{};
+	double d6{};
+
+	bool operator==(const TmpIOP & o) const
+	{
+		return get_quantized() == o.get_quantized();
+	}
+
+	bool operator!=(const TmpIOP & o) const
+	{
+		return !(*this == o);
+	}
+};
+
+bool read_TmpIOP(const mdcm::DataSet & ds, TmpIOP & iop)
+{
+	std::vector<double> r;
+	if (DicomUtils::get_ds_values(ds, mdcm::Tag(0x0020,0x0037), r))
+	{
+		if (r.size() == 6)
+		{
+			iop.d1 = r.at(0);
+			iop.d2 = r.at(1);
+			iop.d3 = r.at(2);
+			iop.d4 = r.at(3);
+			iop.d5 = r.at(4);
+			iop.d6 = r.at(5);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool all_identical_TmpIOP(const std::list<TmpIOP> & l)
+{
+	if (l.empty())
+	{
+		return false;
+	}
+	// Compares every element against the very first element by reference
+	const auto & first = l.front();
+	return std::all_of(std::next(l.cbegin()), l.cend(), [&first](const TmpIOP & item)
+	{
+		return item == first;
+	});
+	return true;
+}
+
+template<typename T>
+bool verify_sequential_groups(const std::list<T> & l, size_t group_size)
+{
+	if (group_size == 0 || l.empty() || l.size() % group_size != 0)
+	{
+		return false;
+	}
+	auto it = l.cbegin();
+	T current_value = *it;
+	size_t current_run_length{};
+	while (it != l.cend())
+	{
+		if (*it == current_value)
+		{
+			current_run_length++;
+		}
+		else
+		{
+			// A new group started. Check if the previous group was exactly the right size.
+			if (current_run_length != group_size)
+			{
+				return false;
+			}
+			// Reset for the new group
+			current_value = *it;
+			current_run_length = 1;
+		}
+		++it;
+	}
+	// Check the final group at the end of the list
+	return current_run_length == group_size;
+}
+
+class SliceInstanceCommon
+{
+public:
+	int file_idx{-1};
+	TmpIPP ipp;
+	TmpIOP iop;
+	long long slice_location{std::numeric_limits<long long>::min()};
+};
 
 struct MixedDicomSeriesInfo
 {
@@ -3101,24 +3265,6 @@ void DicomUtils::load_contour(
 #ifdef TMP_PRINT_LOAD_CONTOUR
 #undef TMP_PRINT_LOAD_CONTOUR
 #endif
-
-int DicomUtils::read_instance_number(
-	const mdcm::DataSet & ds)
-{
-	if (ds.IsEmpty()) return -1;
-	const mdcm::Tag tInstanceNumber(0x0020, 0x0013);
-	const mdcm::DataElement & e = ds.GetDataElement(tInstanceNumber);
-	if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
-	{
-		const QString s = QString::fromLatin1(
-			e.GetByteValue()->GetPointer(),
-			e.GetByteValue()->GetLength());
-		bool ok;
-		const int tmp0 = QVariant(s.trimmed().remove(QChar('\0'))).toInt(&ok);
-		if (ok) return tmp0;
-	}
-	return -1;
-}
 
 QString DicomUtils::read_instance_uid(const mdcm::DataSet & ds)
 {
@@ -7918,8 +8064,15 @@ QString DicomUtils::read_series(
 				//
 				if (!min_load && images_ipp.size() == 1)
 				{
-					const int inst_num = read_instance_number(ds);
-					if (inst_num >= 0) ivariant->instance_number = inst_num;
+					// Instance Number (type 3)
+					int instance_number_tmp;
+					if (get_is_value(ds, mdcm::Tag(0x0020, 0x0013), &instance_number_tmp))
+					{
+						if (instance_number_tmp >= 0)
+						{
+							ivariant->instance_number = instance_number_tmp;
+						}
+					}
 				}
 				//
 				if (!min_load && !mosaic && !uihgrid)
@@ -10311,7 +10464,16 @@ QString DicomUtils::read_enhanced_common(
 					read_ivariant_info_tags(ds, ivariant);
 					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
 					instance_uid = read_instance_uid(ds);
-					instance_number = read_instance_number(ds);
+					{
+						int instance_number_tmp;
+						if (get_is_value(ds, mdcm::Tag(0x0020, 0x0013), &instance_number_tmp))
+						{
+							if (instance_number_tmp >= 0)
+							{
+								instance_number = instance_number_tmp;
+							}
+						}
+					}
 					if (ref_segment_num > -1)
 					{
 						const mdcm::Tag tSegmentSequence(0x0062,0x0002);
@@ -11265,54 +11427,6 @@ QString DicomUtils::read_enhanced_3d_8d(
 		use_icc,
 		tolerance);
 	return message_;
-}
-
-bool DicomUtils::is_not_interleaved(const QStringList & images)
-{
-	mdcm::Tag tSlicePosition(0x0020,0x1041);
-	std::set<mdcm::Tag> tags;
-	tags.insert(tSlicePosition);
-	long long tmp0{};
-	for (int x = 0; x < images.size(); ++x)
-	{
-		mdcm::Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-		reader.SetFileName(QDir::toNativeSeparators(images.at(x)).toUtf8().constData());
-#else
-		reader.SetFileName(QDir::toNativeSeparators(images.at(x)).toLocal8Bit().constData());
-#endif
-#else
-		reader.SetFileName(images.at(x).toLocal8Bit().constData());
-#endif
-		const bool f_ok = reader.ReadSelectedTags(tags);
-		if (!f_ok) return false;
-#ifndef ALIZA_LOAD_DCM_THREAD
-		QApplication::processEvents();
-#endif
-		const mdcm::File & file = reader.GetFile();
-		const mdcm::DataSet & ds = file.GetDataSet();
-		if (ds.IsEmpty()) return false;
-		const mdcm::DataElement & sp_ = ds.GetDataElement(tSlicePosition);
-		if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
-		{
-			bool sp_ok{};
-			long long tmp1{};
-			QString sp = QString::fromLatin1(
-				sp_.GetByteValue()->GetPointer(), sp_.GetByteValue()->GetLength());
-			if (sp.contains(QString(",")))
-			{
-				// Workaround invalid VR
-				sp.replace(QString(","), QString("."));
-			}
-			const double spvd = QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
-			if (sp_ok) tmp1 = 1000 * CommonUtils::set_digits(spvd, 3);
-			else return false;
-			if (x > 0 && tmp0 > tmp1 - 10 && tmp0 < tmp1 + 10) return false;
-			tmp0 = tmp1;
-		}
-	}
-	return true;
 }
 
 bool DicomUtils::is_mosaic(const mdcm::DataSet & ds)
@@ -12716,8 +12830,7 @@ QString DicomUtils::read_dicom(
 	double pspacing_y_tmp1{};
 	const SettingsWidget * const wsettings =
 		static_cast<const SettingsWidget * const>(settings);
-	std::map<unsigned int, SliceInstance> slice_pos_map;
-	std::list<long long> slice_pos_list;
+	std::map<unsigned int, SliceInstanceCommon> slice_pos_map;
 	const float tolerance{0.01f};
 	int count_images{};
 	int count_uid_errors{};
@@ -13028,30 +13141,46 @@ QString DicomUtils::read_dicom(
 					//
 					if (!(mosaic || uihgrid || multiframe))
 					{
-						// for possible multiseries
-						const mdcm::DataElement & sp_ = ds.GetDataElement(tSlicePosition);
-						if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
+						int image_index_tmp{-1};
 						{
-							bool sp_ok{};
-							QString sp = QString::fromLatin1(
-								sp_.GetByteValue()->GetPointer(),
-								sp_.GetByteValue()->GetLength());
-							if (sp.contains(QString(",")))
+							// Try Image Index (type 1), only PET
+							unsigned short image_index_tmp2;
+							if (get_us_value(ds, mdcm::Tag(0x0054,0x1330), &image_index_tmp2))
 							{
-								// Workaround invalid VR
-								sp.replace(QString(","), QString("."));
+								image_index_tmp = static_cast<int>(image_index_tmp2);
 							}
-							const double spvd =
-								QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
-							if (sp_ok)
+						}
+						if (image_index_tmp == -1)
+						{
+							// Try Instance Number (type 3)
+							int image_index_tmp2;
+							if (get_is_value(ds, mdcm::Tag(0x0020, 0x0013), &image_index_tmp2))
 							{
-								const long long spvl = 1000 * CommonUtils::set_digits(spvd, 3);
-								SliceInstance si;
-								si.id = x;
-								si.slice_position = spvl;
-								si.instance_number = read_instance_number(ds);
-								slice_pos_map[x] = si;
-								slice_pos_list.push_back(spvl);
+								image_index_tmp = image_index_tmp2;
+							}
+						}
+						if (image_index_tmp >= 0)
+						{
+							TmpIPP ipp;
+							TmpIOP iop;
+							if (read_TmpIPP(ds, ipp) && read_TmpIOP(ds, iop))
+							{
+								SliceInstanceCommon si;
+								si.file_idx = x;
+								si.ipp = ipp;
+								si.iop = iop;
+								{
+									std::vector<double> slice_location;
+									if (get_ds_values(ds, mdcm::Tag(0x0020,0x1041), slice_location))
+									{
+										if (slice_location.size() == 1)
+										{
+											si.slice_location =
+												static_cast<long long>(std::round(slice_location.at(0) * 1000));
+										}
+									}
+								}
+								slice_pos_map[image_index_tmp] = si;
 							}
 						}
 					}
@@ -13111,197 +13240,415 @@ QString DicomUtils::read_dicom(
 		!mosaic &&
 		!uihgrid)
 	{
-		const size_t size0 = slice_pos_list.size();
-		slice_pos_list.sort();
-		slice_pos_list.unique();
-		const size_t size1 = slice_pos_list.size();
-		if (size0 != size1 &&
-			size0 == static_cast<size_t>(images.size()) &&
-			images.size()%size1 == 0)
+		const size_t number_of_files = static_cast<size_t>(images.size());
+		std::list<TmpIPP> slice_pos_list1;
+		std::list<TmpIPP> slice_pos_list2;
+		std::vector<int> file_ids;
+		std::list<TmpIOP> all_orientations;
+		std::list<long long> slice_locations_list1;
+		std::list<long long> slice_locations_list2;
+		std::map<TmpIPP, unsigned int> count_ipps;
+		std::map<long long, unsigned int> count_slice_locations;
+		for (auto it = slice_pos_map.cbegin();
+			it != slice_pos_map.cend();
+			++it)
 		{
-			multiseries = true;
+			const SliceInstanceCommon & si = it->second;
+			slice_pos_list1.push_back(si.ipp);
+			slice_pos_list2.push_back(si.ipp);
+			file_ids.push_back(si.file_idx);
+			all_orientations.push_back(si.iop);
+			slice_locations_list1.push_back(si.slice_location);
+			slice_locations_list2.push_back(si.slice_location);
+			count_ipps[si.ipp]++;
+			count_slice_locations[si.slice_location]++;
 		}
-		slice_pos_list.clear();
-		if (multiseries)
+		//
+		bool same_size_ipp_groups{};
+		unsigned int num_ipps_in_group{};
+		if (!count_ipps.empty())
 		{
-			// does every image have unique instance id?
-			bool unique_instance_nums{};
-			std::list<int> slices_instance_nums;
-			{
-				for (std::map<unsigned int, SliceInstance>::const_iterator it =
-						slice_pos_map.cbegin();
-					it != slice_pos_map.cend();
-					++it)
-				{
-					const SliceInstance & si = it->second;
-					if (si.instance_number > 0)
+			num_ipps_in_group = count_ipps.begin()->second;
+			same_size_ipp_groups =
+				std::all_of(count_ipps.begin(), count_ipps.end(),
+					[num_ipps_in_group](const auto & pair)
 					{
-						slices_instance_nums.push_back(si.instance_number);
-					}
-				}
-				const size_t inst_size0 = slices_instance_nums.size();
-				slices_instance_nums.sort();
-				slices_instance_nums.unique();
-				const size_t inst_size1 = slices_instance_nums.size();
-				if (inst_size0 == inst_size1 &&
-					inst_size0 == static_cast<size_t>(images.size()))
-				{
-					unique_instance_nums = true;
-				}
-				slices_instance_nums.clear();
-			}
-			std::map<unsigned int, unsigned int> slices_instance_map;
-			if (unique_instance_nums)
+						return pair.second == num_ipps_in_group;
+					});
+
+		}
+#ifdef ALIZA_DEBUG_MULTISERIES
+		std::cout << "All IPPs:\n";
+		for (auto it = slice_pos_list1.cbegin();
+			it != slice_pos_list1.cend();
+			++it)
+		{
+			const TmpIPP & ipp = *it;
+			std::cout << ipp.x << ' ' << ipp.y << ' ' << ipp.z << '\n';
+		}
+		std::cout << "\nCount IPP (size = " << count_ipps.size() << "):\n";
+		for (auto it = count_ipps.cbegin();
+			it != count_ipps.cend();
+			++it)
+		{
+			const TmpIPP & ipp = it->first;
+			std::cout
+				<< it->second << " times: "
+				<< ipp.x << ' ' << ipp.y << ' ' << ipp.z << '\n';
+		}
+		std::cout << std::endl;
+#endif
+		count_ipps.clear();
+		const bool validate_IOPs = all_identical_TmpIOP(all_orientations);
+		all_orientations.clear();
+		if (same_size_ipp_groups && (num_ipps_in_group > 1 || !validate_IOPs))
+		{
+			const bool seq1 =
+				verify_sequential_groups<TmpIPP>(slice_pos_list1, num_ipps_in_group);
+#ifdef ALIZA_DEBUG_MULTISERIES
+			std::cout << "verify_sequential_groups (IPP): " << (seq1 ? "true\n" : "false\n");
+#endif
+			//
+			const size_t number_of_all_slices = slice_pos_list1.size();
+			// remove all duplicate elements
+			slice_pos_list1.sort();
+			slice_pos_list1.unique();
+			const size_t number_of_slices_per_image = slice_pos_list1.size();
+#ifdef ALIZA_DEBUG_MULTISERIES
+			std::cout
+				<< "number of all slices = " << number_of_all_slices
+				<< "\nnumber of slices in image = " << number_of_slices_per_image
+				<< "\nnumber of files = " << number_of_files
+				<< "\nnumber of images = " << (number_of_all_slices / number_of_slices_per_image)
+				<< std::endl;
+#endif
+			if (number_of_slices_per_image > 0 &&
+				number_of_all_slices == number_of_files &&
+				number_of_all_slices == file_ids.size() &&
+				number_of_all_slices % number_of_slices_per_image == 0)
 			{
-				for (std::map<unsigned int, SliceInstance>::const_iterator it =
-						slice_pos_map.cbegin();
-					it != slice_pos_map.cend();
-					++it)
+				// Examine all orientation, they must be equal. If they are,
+				// the images will be uniform or parallel. If not prefer Slice Position,
+				// s. comment in the 'else' block.
+				if (validate_IOPs)
 				{
-					slices_instance_map[it->second.instance_number] = it->second.id;
-				}
-				std::vector<unsigned int> image_ids;
-				for (std::map<unsigned int, unsigned int>::const_iterator it =
-						slices_instance_map.cbegin();
-					it != slices_instance_map.cend();
-					++it)
-				{
-					image_ids.push_back(it->second);
-				}
-				// is sequential or interleaved?
-				bool interleaved{};
-				for (unsigned int k = 0; k < image_ids.size(); k += size1)
-				{
-					QStringList images_tmp;
-					for (unsigned int j = 0; j < size1; ++j)
+#ifdef ALIZA_DEBUG_MULTISERIES
+					std::cout << "All IOPs are the same" << std::endl;
+#endif
+					// remove all consecutive duplicate elements
+					slice_pos_list2.unique();
+					//
+					const size_t slice_pos_list2_size = slice_pos_list2.size();
+					if (slice_pos_list2_size == number_of_slices_per_image && seq1)
 					{
-						const unsigned int id__ = image_ids.at(k+j);
-						if (id__<static_cast<unsigned int>(filenames.size()))
+						// sequential (slices: 1 1 1 2 2 2 3 3 3)
+#ifdef ALIZA_DEBUG_MULTISERIES
+						std::cout << "sequential (IPP)" << std::endl;
+#endif
+						bool multiseries_error{};
+						// assign id for every unique IPP
+						unsigned int g{};
+						std::map<unsigned int, TmpIPP> slices_pos_ids;
+						for (auto it = slice_pos_list1.cbegin();
+							it != slice_pos_list1.cend();
+							++it)
 						{
-							images_tmp.push_back(filenames.at(id__));
+							slices_pos_ids[g]=*it;
+							++g;
 						}
-					}
-					if (!(is_not_interleaved(images_tmp)))
-					{
-						interleaved = true;
-						break;
-					}
-					extracted_images.push_back(images_tmp);
-				}
-				image_ids.clear();
-				if (interleaved)
-				{
-					for (int k = 0; k < extracted_images.size(); ++k)
-					{
-						extracted_images[k].clear();
-					}
-					extracted_images.clear();
-					// map: key - unique instance number, value - slice position
-					std::map<unsigned int, long long> slices_pos_map2;
-					// list of all slice positions
-					std::list<long long> slices_pos_list2;
-					for (std::map<unsigned int, SliceInstance>::const_iterator it =
-							slice_pos_map.cbegin();
-						it != slice_pos_map.cend();
-						++it)
-					{
-						slices_pos_map2[it->second.instance_number] =
-							it->second.slice_position;
-						slices_pos_list2.push_back(it->second.slice_position);
-					}
-					// find unique slice positions
-					slices_pos_list2.sort();
-					slices_pos_list2.unique();
-					const size_t unique_slice_pos_size =
-						slices_pos_list2.size();
-					unsigned int g{};
-					// assign id for every unique slice postion
-					std::map<unsigned int, long long> slices_pos_ids;
-					for (std::list<long long>::const_iterator it =
-							slices_pos_list2.cbegin();
-						it != slices_pos_list2.cend(); ++it)
-					{
-						slices_pos_ids[g]=*it;
-						++g;
-					}
-					// find instance numbers for every unique slice postion
-					std::vector< std::vector<unsigned int> > slices_;
-					for (std::map<unsigned int, long long>::const_iterator it =
-						slices_pos_ids.cbegin();
-						it != slices_pos_ids.cend();
-						++it)
-					{
-						std::vector<unsigned int> tmp_list;
-						for (std::map<unsigned int, long long>::const_iterator it2 =
-								slices_pos_map2.cbegin();
-							it2 != slices_pos_map2.cend();
-							++it2)
+						// find instance numbers for every unique IPP
+						std::vector< std::vector<unsigned int> > slices_;
+						for (auto it = slices_pos_ids.cbegin();
+							it != slices_pos_ids.cend();
+							++it)
 						{
-							if (it->second == it2->second)
+							std::vector<unsigned int> tmp_list;
+							for (auto it2 = slice_pos_map.cbegin();
+								it2 != slice_pos_map.cend();
+								++it2)
 							{
-								tmp_list.push_back(it2->first);
+								if (it->second == it2->second.ipp)
+								{
+									tmp_list.push_back(it2->first);
+								}
 							}
+							slices_.push_back(std::move(tmp_list));
 						}
-						slices_.push_back(std::move(tmp_list));
-					}
-					if (images.size() % unique_slice_pos_size != 0)
-					{
-						multiseries = false;
-					}
-					else
-					{
-						for (unsigned int j = 0; j < images.size() / unique_slice_pos_size; ++j)
+						for (size_t j = 0; j < number_of_files / number_of_slices_per_image; ++j)
 						{
 							QStringList images_tmp;
-							for (unsigned int k = 0; k < unique_slice_pos_size; ++k)
+							for (unsigned int k = 0; k < number_of_slices_per_image; ++k)
 							{
+								// Error 'if false'.
 								if (k < slices_.size() && j < slices_.at(k).size())
 								{
 									const unsigned int id_0_ = slices_.at(k).at(j);
-									if (slices_instance_map.count(id_0_) > 0)
+									const unsigned int id_1_ = slice_pos_map[slices_.at(k).at(j)].file_idx;
+									if (id_1_ < static_cast<unsigned int>(filenames.size()))
 									{
-										const unsigned int id_1_ =
-											slices_instance_map[slices_.at(k).at(j)];
-										if (id_1_<static_cast<unsigned int>(filenames.size()))
-										{
-											images_tmp.push_back(filenames.at(id_1_));
-										}
-										else
-										{
-											multiseries = false;
-											break;
-										}
+										images_tmp.push_back(filenames.at(id_1_));
 									}
 									else
 									{
-										multiseries = false;
+										multiseries_error = true;
 										break;
 									}
 								}
 								else
 								{
-									multiseries = false;
+									multiseries_error = true;
 									break;
 								}
 							}
-							extracted_images.push_back(images_tmp);
+							if (multiseries_error)
+							{
+								break;
+							}
+							else
+							{
+								extracted_images.push_back(std::move(images_tmp));
+							}
+						}
+						if (!multiseries_error)
+						{
+							multiseries = true;
 						}
 					}
-					slices_pos_map2.clear();
-					slices_pos_list2.clear();
-					for (unsigned int j = 0; j < slices_.size(); ++j)
+					else if (slice_pos_list2_size == number_of_all_slices)
 					{
-						slices_[j].clear();
+						// interleaved (slices: 1 2 3 1 2 3 1 2 3)
+#ifdef ALIZA_DEBUG_MULTISERIES
+						std::cout << "interleaved (IPP)" << std::endl;
+#endif
+						bool multiseries_error{};
+						for (size_t k = 0; k < number_of_all_slices; k += number_of_slices_per_image)
+						{
+							QStringList images_tmp;
+							for (size_t j = 0; j < number_of_slices_per_image; ++j)
+							{
+								const size_t k_j = k + j;
+								if (k_j < file_ids.size())
+								{
+									// 'file_ids' is sorted from 'slice_pos_map'
+									const int id__ = file_ids.at(k_j);
+									if (id__ >= 0 && id__ < filenames.size())
+									{
+										images_tmp.push_back(filenames.at(id__));
+									}
+									else
+									{
+										multiseries_error = true;
+									}
+								}
+								else
+								{
+									multiseries_error = true;
+								}
+							}
+							if (multiseries_error)
+							{
+								break;
+							}
+							else
+							{
+								extracted_images.push_back(std::move(images_tmp));
+							}
+						}
+						if (!multiseries_error)
+						{
+							multiseries = true;
+						}
 					}
-					slices_.clear();
 				}
-				slices_instance_nums.clear();
-				slices_instance_map.clear();
-			}
-			else
-			{
-				// can not process without instance ids
-				multiseries = false;
+				else
+				{
+					// Try Slice Location (if available), all previous checks of the IPPs are still
+					// applicable and must pass. The Slice Locations will be used for sorting
+					// of slices, because IOPs are different and sorting by IPP is not possible.
+					// We assume Slice Location are more reliable, there are in fact real
+					// dataset with e.g. circular slices,they work much better with sorting
+					// by Slice Location. Even if we will try to use combination of IPP and IOP
+					// for sorting, we can not know which slice  is assumed to be the first one,
+					// here we will take Slice Location "0" and rely on the creator of the dataset.
+					// This doesn't change much, images will anyway be not uniform with different IOP,
+					// it is only about sorting of slices in the image.
+					slice_pos_list1.clear();
+					slice_pos_list2.clear();
+					bool same_size_slice_location_groups{};
+					unsigned int num_slice_location_in_group{};
+					if (!count_slice_locations.empty())
+					{
+						num_slice_location_in_group = count_slice_locations.begin()->second;
+						same_size_slice_location_groups =
+							std::all_of(count_slice_locations.begin(), count_slice_locations.end(),
+								[num_slice_location_in_group](const auto & pair)
+								{
+									return pair.second == num_slice_location_in_group;
+								});
+
+					}
+#ifdef ALIZA_DEBUG_MULTISERIES
+					std::cout << "All slice locations:\n";
+					for (std::list<long long>::const_iterator it = slice_locations_list1.cbegin();
+						it != slice_locations_list1.cend();
+						++it)
+					{
+						std::cout << *it << '\n';
+					}
+					std::cout << "\nCount Slice Location (size = " << count_slice_locations.size() << "):\n";
+					for (auto it = count_slice_locations.cbegin();
+						it != count_slice_locations.cend();
+						++it)
+					{
+						const long long & sl = it->first;
+						std::cout << it->second << " times: " << sl << '\n';
+					}
+					std::cout << std::endl;
+#endif
+					count_slice_locations.clear();
+					bool seq2{};
+					if (!count_slice_locations.empty() && num_slice_location_in_group > 0)
+					{
+						seq2 =
+							verify_sequential_groups<long long>(slice_locations_list1, num_slice_location_in_group);
+					}
+#ifdef ALIZA_DEBUG_MULTISERIES
+					std::cout << "verify_sequential_groups (Slice Location) = " << (seq2 ? "true\n" : "false\n");
+#endif
+					const size_t number_of_all_slices2 = slice_locations_list1.size();
+					// remove all duplicate elements
+					slice_locations_list1.sort();
+					slice_locations_list1.unique();
+					const size_t number_of_slices_in_image2 = slice_locations_list1.size();
+					//
+					// Check Slice Locations are initialized, they can be not available.
+					if (number_of_all_slices2 == number_of_all_slices)
+					{
+						slice_locations_list2.unique();
+						const size_t slice_locations_list2_size = slice_locations_list2.size();
+						if (slice_locations_list2_size == number_of_slices_in_image2  && seq2)
+						{
+							// sequential (slices: 1 1 1 2 2 2 3 3 3)
+#ifdef ALIZA_DEBUG_MULTISERIES
+							std::cout << "sequential (Slice Location)" << std::endl;
+#endif
+							bool multiseries_error{};
+							// assign id for every unique Slice Location
+							unsigned int g{};
+							std::map<unsigned int, long long> slices_location_ids;
+							for (auto it = slice_locations_list1.cbegin();
+								it != slice_locations_list1.cend();
+								++it)
+							{
+								slices_location_ids[g]=*it;
+								++g;
+							}
+							// find instance numbers for every unique Slice Lostion
+							std::vector< std::vector<unsigned int> > slices_;
+							for (auto it = slices_location_ids.cbegin();
+								it != slices_location_ids.cend();
+								++it)
+							{
+								std::vector<unsigned int> tmp_list;
+								for (auto it2 = slice_pos_map.cbegin();
+									it2 != slice_pos_map.cend();
+									++it2)
+								{
+									if (it->second == it2->second.slice_location)
+									{
+										tmp_list.push_back(it2->first);
+									}
+								}
+								slices_.push_back(std::move(tmp_list));
+							}
+							for (size_t j = 0; j < number_of_files / number_of_slices_per_image; ++j)
+							{
+								QStringList images_tmp;
+								for (unsigned int k = 0; k < number_of_slices_per_image; ++k)
+								{
+									if (k < slices_.size() && j < slices_.at(k).size())
+									{
+										const unsigned int id_0_ = slices_.at(k).at(j);
+										const unsigned int id_1_ = slice_pos_map[slices_.at(k).at(j)].file_idx;
+										if (id_1_ < static_cast<unsigned int>(filenames.size()))
+										{
+											images_tmp.push_back(filenames.at(id_1_));
+										}
+										else
+										{
+											multiseries_error = true;
+											break;
+										}
+									}
+									else
+									{
+										multiseries_error = true;
+										break;
+									}
+								}
+								if (multiseries_error)
+								{
+									break;
+								}
+								else
+								{
+									extracted_images.push_back(std::move(images_tmp));
+								}
+							}
+							if (!multiseries_error)
+							{
+								multiseries = true;
+							}
+						}
+						else if (slice_locations_list2_size == number_of_all_slices2)
+						{
+							// interleaved (slices: 1 2 3 1 2 3 1 2 3)
+#ifdef ALIZA_DEBUG_MULTISERIES
+							std::cout << "interleaved (Slice Location)" << std::endl;
+#endif
+							bool multiseries_error{};
+							for (size_t k = 0; k < number_of_all_slices; k += number_of_slices_per_image)
+							{
+								QStringList images_tmp;
+								for (size_t j = 0; j < number_of_slices_per_image; ++j)
+								{
+									const size_t k_j = k + j;
+									if (k_j < file_ids.size())
+									{
+										// 'file_ids' is sorted from 'slice_pos_map'
+										const int id__ = file_ids.at(k_j);
+										if (id__ >= 0 && id__ < filenames.size())
+										{
+											images_tmp.push_back(filenames.at(id__));
+										}
+										else
+										{
+											multiseries_error = true;
+										}
+									}
+									else
+									{
+										multiseries_error = true;
+									}
+								}
+								if (multiseries_error)
+								{
+									break;
+								}
+								else
+								{
+									extracted_images.push_back(std::move(images_tmp));
+								}
+							}
+							if (!multiseries_error)
+							{
+								multiseries = true;
+							}
+						}
+					}
+					slice_locations_list1.clear();
+					slice_locations_list2.clear();
+				}
 			}
 		}
 	}

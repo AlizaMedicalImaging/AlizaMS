@@ -228,7 +228,6 @@ public:
 		std::vector<double> &);
 	static void load_contour(
 		const mdcm::DataSet&, ImageVariant*);
-	static int read_instance_number(const mdcm::DataSet&);
 	static QString read_instance_uid(const mdcm::DataSet&);
 	static void read_window(
 		const mdcm::DataSet&, double*, double*, short*);
@@ -441,7 +440,6 @@ public:
 		const bool,
 		const float,
 		const short);
-	static bool is_not_interleaved(const QStringList&);
 	static bool is_mosaic(const mdcm::DataSet&);
 	static bool is_uih_grid(const mdcm::DataSet&);
 	static bool is_elscint(const mdcm::DataSet&);
