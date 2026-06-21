@@ -12841,9 +12841,6 @@ QString DicomUtils::read_dicom(
 	const QString filenames_num = QString(" / ") + QString::number(filenames_size);
 	for (int x = 0; x < filenames_size; ++x)
 	{
-#ifndef ALIZA_LOAD_DCM_THREAD
-		QApplication::processEvents();
-#endif
 		const QFileInfo fi(filenames.at(x));
 		mdcm::Reader reader;
 #ifdef _WIN32
@@ -13106,7 +13103,7 @@ QString DicomUtils::read_dicom(
 					enhanced = true;
 					if (force_suppllut == 0)
 					{
-						if ((load_type == 0||load_type == 2) && has_supp_palette(ds))
+						if ((load_type == 0 || load_type == 2) && has_supp_palette(ds))
 						{
 							supp_palette = wsettings->get_apply_supplemental_lut();
 						}
