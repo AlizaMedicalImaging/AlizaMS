@@ -13304,7 +13304,7 @@ QString DicomUtils::read_dicom(
 #endif
 			//
 			const size_t number_of_all_slices = slice_pos_list1.size();
-			// remove all duplicate elements
+			// Remove all duplicate elements.
 			slice_pos_list1.sort();
 			slice_pos_list1.unique();
 			const size_t number_of_slices_per_image = slice_pos_list1.size();
@@ -13322,25 +13322,25 @@ QString DicomUtils::read_dicom(
 				number_of_all_slices % number_of_slices_per_image == 0)
 			{
 				// Examine all orientation, they must be equal. If they are,
-				// the images will be uniform or parallel. If not prefer Slice Position,
+				// the images will be uniform or parallel. If not, prefer Slice Position,
 				// s. comment in the 'else' block.
 				if (validate_IOPs)
 				{
 #ifdef ALIZA_DEBUG_MULTISERIES
 					std::cout << "All IOPs are the same" << std::endl;
 #endif
-					// remove all consecutive duplicate elements
+					// Remove all consecutive duplicate elements.
 					slice_pos_list2.unique();
 					//
 					const size_t slice_pos_list2_size = slice_pos_list2.size();
 					if (slice_pos_list2_size == number_of_slices_per_image && seq1)
 					{
-						// sequential (slices: 1 1 1 2 2 2 3 3 3)
+						// Sequential (slices: 1 1 1 2 2 2 3 3 3).
 #ifdef ALIZA_DEBUG_MULTISERIES
 						std::cout << "sequential (IPP)" << std::endl;
 #endif
 						bool multiseries_error{};
-						// assign id for every unique IPP
+						// Assign id for every unique IPP.
 						unsigned int g{};
 						std::map<unsigned int, TmpIPP> slices_pos_ids;
 						for (auto it = slice_pos_list1.cbegin();
@@ -13350,7 +13350,7 @@ QString DicomUtils::read_dicom(
 							slices_pos_ids[g]=*it;
 							++g;
 						}
-						// find instance numbers for every unique IPP
+						// Find instance numbers for every unique IPP.
 						std::vector< std::vector<unsigned int> > slices_;
 						for (auto it = slices_pos_ids.cbegin();
 							it != slices_pos_ids.cend();
@@ -13410,7 +13410,7 @@ QString DicomUtils::read_dicom(
 					}
 					else if (slice_pos_list2_size == number_of_all_slices)
 					{
-						// interleaved (slices: 1 2 3 1 2 3 1 2 3)
+						// Interleaved (slices: 1 2 3 1 2 3 1 2 3).
 #ifdef ALIZA_DEBUG_MULTISERIES
 						std::cout << "interleaved (IPP)" << std::endl;
 #endif
@@ -13423,7 +13423,7 @@ QString DicomUtils::read_dicom(
 								const size_t k_j = k + j;
 								if (k_j < file_ids.size())
 								{
-									// 'file_ids' is sorted from 'slice_pos_map'
+									// 'file_ids' is sorted from 'slice_pos_map'.
 									const int id__ = file_ids.at(k_j);
 									if (id__ >= 0 && id__ < filenames.size())
 									{
@@ -13459,13 +13459,13 @@ QString DicomUtils::read_dicom(
 					// Try Slice Location (if available), all previous checks of the IPPs are still
 					// applicable and must pass. The Slice Locations will be used for sorting
 					// of slices, because IOPs are different and sorting by IPP is not possible.
-					// We assume Slice Location are more reliable, there are in fact real
-					// dataset with e.g. circular slices,they work much better with sorting
+					// We assume Slice Location is more reliable, there are in fact real
+					// datasets with e.g. circular slices, they work much better with sorting
 					// by Slice Location. Even if we will try to use combination of IPP and IOP
-					// for sorting, we can not know which slice  is assumed to be the first one,
+					// for sorting, we can not know which slice is assumed to be the first one,
 					// here we will take Slice Location "0" and rely on the creator of the dataset.
-					// This doesn't change much, images will anyway be not uniform with different IOP,
-					// it is only about sorting of slices in the image.
+					// This doesn't change much, images will anyway be not uniform with different
+					// IOPs, it is only about sorting of slices in the image.
 					slice_pos_list1.clear();
 					slice_pos_list2.clear();
 					bool same_size_slice_location_groups{};
@@ -13510,7 +13510,7 @@ QString DicomUtils::read_dicom(
 					std::cout << "verify_sequential_groups (Slice Location) = " << (seq2 ? "true\n" : "false\n");
 #endif
 					const size_t number_of_all_slices2 = slice_locations_list1.size();
-					// remove all duplicate elements
+					// Remove all duplicate elements.
 					slice_locations_list1.sort();
 					slice_locations_list1.unique();
 					const size_t number_of_slices_in_image2 = slice_locations_list1.size();
@@ -13522,12 +13522,12 @@ QString DicomUtils::read_dicom(
 						const size_t slice_locations_list2_size = slice_locations_list2.size();
 						if (slice_locations_list2_size == number_of_slices_in_image2  && seq2)
 						{
-							// sequential (slices: 1 1 1 2 2 2 3 3 3)
+							// Sequential (slices: 1 1 1 2 2 2 3 3 3).
 #ifdef ALIZA_DEBUG_MULTISERIES
 							std::cout << "sequential (Slice Location)" << std::endl;
 #endif
 							bool multiseries_error{};
-							// assign id for every unique Slice Location
+							// Assign id for every unique Slice Location.
 							unsigned int g{};
 							std::map<unsigned int, long long> slices_location_ids;
 							for (auto it = slice_locations_list1.cbegin();
@@ -13537,7 +13537,7 @@ QString DicomUtils::read_dicom(
 								slices_location_ids[g]=*it;
 								++g;
 							}
-							// find instance numbers for every unique Slice Lostion
+							// Find instance numbers for every unique Slice Lostion.
 							std::vector< std::vector<unsigned int> > slices_;
 							for (auto it = slices_location_ids.cbegin();
 								it != slices_location_ids.cend();
@@ -13596,7 +13596,7 @@ QString DicomUtils::read_dicom(
 						}
 						else if (slice_locations_list2_size == number_of_all_slices2)
 						{
-							// interleaved (slices: 1 2 3 1 2 3 1 2 3)
+							// Interleaved (slices: 1 2 3 1 2 3 1 2 3).
 #ifdef ALIZA_DEBUG_MULTISERIES
 							std::cout << "interleaved (Slice Location)" << std::endl;
 #endif
@@ -13609,7 +13609,7 @@ QString DicomUtils::read_dicom(
 									const size_t k_j = k + j;
 									if (k_j < file_ids.size())
 									{
-										// 'file_ids' is sorted from 'slice_pos_map'
+										// 'file_ids' is sorted from 'slice_pos_map'.
 										const int id__ = file_ids.at(k_j);
 										if (id__ >= 0 && id__ < filenames.size())
 										{
