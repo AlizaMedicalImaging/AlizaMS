@@ -12828,9 +12828,9 @@ QString DicomUtils::read_dicom(
 	double pspacing_y_tmp0{};
 	double pspacing_x_tmp1{};
 	double pspacing_y_tmp1{};
+	std::map<unsigned int, SliceInstanceCommon> slice_pos_map;
 	const SettingsWidget * const wsettings =
 		static_cast<const SettingsWidget * const>(settings);
-	std::map<unsigned int, SliceInstanceCommon> slice_pos_map;
 	const float tolerance{0.01f};
 	int count_images{};
 	int count_uid_errors{};
@@ -13220,9 +13220,6 @@ QString DicomUtils::read_dicom(
 	}
 #ifdef ALIZA_LINUX_DEBUG_MEM
 	CommonUtils::linux_print_memusage("read_dicom() 1");
-#endif
-#ifndef ALIZA_LOAD_DCM_THREAD
-	QApplication::processEvents();
 #endif
 	//
 	//
@@ -13653,10 +13650,10 @@ QString DicomUtils::read_dicom(
 #ifndef ALIZA_LOAD_DCM_THREAD
 	QApplication::processEvents();
 #endif
-	//
 #ifdef ALIZA_LINUX_DEBUG_MEM
 	CommonUtils::linux_print_memusage("read_dicom() 2");
 #endif
+	//
 	if (ultrasound)
 	{
 		// TODO check PR
@@ -13723,7 +13720,6 @@ QString DicomUtils::read_dicom(
 			QStringList images_tmp;
 			images_tmp << images.at(x);
 			{
-				// don't load OpenGL
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
 					false,
@@ -13813,9 +13809,9 @@ QString DicomUtils::read_dicom(
 	{
 		for (int x = 0; x < images.size(); ++x)
 		{
-			if (load_type == 0||load_type == 2)
+			if (load_type == 0 || load_type == 2)
 			{
-				bool supp_palette_failed = false;
+				bool supp_palette_failed{};
 				if (supp_palette)
 				{
 					std::vector<ImageVariant*> supp_color_images;
@@ -14038,7 +14034,6 @@ QString DicomUtils::read_dicom(
 	}
 	else if (uihgrid && (load_type == 0))
 	{
-		// TODO
 		for (int x = 0; x < images.size(); ++x)
 		{
 			QStringList images_tmp;
@@ -14079,7 +14074,7 @@ QString DicomUtils::read_dicom(
 		{
 			QStringList images_tmp;
 			images_tmp << images.at(x);
-			if (load_type == 0||load_type == 2)
+			if (load_type == 0 || load_type == 2)
 			{
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
@@ -14112,7 +14107,6 @@ QString DicomUtils::read_dicom(
 			}
 			else
 			{
-				// don't load OpenGL for intermediate image
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
 					false,
@@ -14247,6 +14241,9 @@ QString DicomUtils::read_dicom(
 					QString("-") + i.photometric + QString("-") +
 					QString("-") + i.spacing + QString("-") +
 					(i.icc ? QString("icc") : QString(""));
+#if 0
+				std::cout << k1.toStdString() << std::endl;
+#endif
 				l0.insert(k1, i.file);
 			}
 		}
@@ -14339,7 +14336,6 @@ QString DicomUtils::read_dicom(
 			}
 			else
 			{
-				// don't load OpenGL for intermediate image
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
 					false,
@@ -14418,16 +14414,14 @@ QString DicomUtils::read_dicom(
 				{
 					ivariant->filenames = std::move(images_tmp);
 					{
-						QList<QString> l_uids =
-							ivariant->image_instance_uids.values();
+						QList<QString> l_uids = ivariant->image_instance_uids.values();
 						if (!l_uids.empty())
 						{
 							const size_t l_size = l_uids.size();
 							if (l_size > 1)
 							{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-								QSet<QString> s_uids =
-									QSet<QString>(l_uids.begin(), l_uids.end());
+								QSet<QString> s_uids = QSet<QString>(l_uids.begin(), l_uids.end());
 #else
 								QSet<QString> s_uids = l_uids.toSet();
 #endif
@@ -14445,7 +14439,6 @@ QString DicomUtils::read_dicom(
 			}
 			else
 			{
-				// don't load OpenGL for intermediate image
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
 					false,
@@ -14467,18 +14460,15 @@ QString DicomUtils::read_dicom(
 				if (ok)
 				{
 					ivariant->filenames = std::move(images_tmp);
-					//
 					{
-						QList<QString> l_uids =
-							ivariant->image_instance_uids.values();
+						QList<QString> l_uids = ivariant->image_instance_uids.values();
 						if (!l_uids.empty())
 						{
 							const size_t l_size = l_uids.size();
 							if (l_size > 1)
 							{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-								QSet<QString> s_uids =
-									QSet<QString>(l_uids.begin(), l_uids.end());
+								QSet<QString> s_uids = QSet<QString>(l_uids.begin(), l_uids.end());
 #else
 								QSet<QString> s_uids = l_uids.toSet();
 #endif
@@ -14487,7 +14477,6 @@ QString DicomUtils::read_dicom(
 							}
 						}
 					}
-					//
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -14662,6 +14651,7 @@ QString DicomUtils::read_dicom(
 				"folder containing both the GSPS series and the referenced series."));
 		}
 	}
+	//
 	if (!color_softcopy_pr_files.empty()        ||
 		!pseudo_color_softcopy_pr_files.empty() ||
 		!blending_softcopy_pr_files.empty()     ||
