@@ -300,13 +300,6 @@ typedef QMap<int,QString> SOPInstanceUids;
 
 typedef QList<UltrasoundRegionData> USRegions;
 
-struct SliceInstance
-{
-	unsigned int id;
-	int instance_number;
-	long long slice_position;
-};
-
 typedef std::vector<double> FrameTimes;
 
 typedef QMap<int, QString> LabelsMap;
