@@ -1087,6 +1087,8 @@ if(MDCM_USE_SYSTEM_CHARLS)
   if(CHARLS_LOW)
     target_compile_definitions(alizams PRIVATE MDCM_CHARLS_LOW)
   endif()
+else()
+  target_compile_definitions(alizams PUBLIC CHARLS_NO_DEPRECATED_WARNING)
 endif()
 
 # tmp
