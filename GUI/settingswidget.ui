@@ -63,10 +63,10 @@
               <bool>false</bool>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Recommended.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Try to process multidimensional series, e.g. PET series using the &lt;span style=&quot; font-style:italic;&quot;&gt;Image Index&lt;/span&gt; attribute, or other series using the &lt;span style=&quot; font-style:italic;&quot;&gt;Instance Number&lt;/span&gt; attribute, (provided it is available and verified as unique). Sorting is performed based on the &lt;span style=&quot; font-style:italic;&quot;&gt;Image Position (Patient)&lt;/span&gt; attribute; if sorting by IPP is not possible (e.g., due to differences in I&lt;span style=&quot; font-style:italic;&quot;&gt;mage Orientation (Patient)&lt;/span&gt; attributes within the series), a fallback method—sorting by the &lt;span style=&quot; font-style:italic;&quot;&gt;Slice Location&lt;/span&gt; attribute — is used.&lt;/p&gt;&lt;p&gt;This approach can also help improve the sorting of certain non-uniform non-parallel series.&lt;/p&gt;&lt;p&gt;If this option is not enabled, simple IPP/IOP sorting will be used, which is sufficient for standard uniform 3D series.&lt;/p&gt;&lt;p&gt;This option does not apply to 'enhaced' multi-frame datasets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Recommended.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Enable advanced sorting for multidimensional (e.g. 3D+t PET and other 3D+ series) and non-uniform/non-parallel series.&lt;/p&gt;&lt;p&gt;If this option is not enabled, simple IPP/IOP sorting will always be used.&lt;/p&gt;&lt;p&gt;This option does not apply to 'enhaced' multi-frame datasets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Processing of multidimensional series</string>
+              <string>Enable advanced sorting</string>
              </property>
              <property name="checked">
               <bool>true</bool>
