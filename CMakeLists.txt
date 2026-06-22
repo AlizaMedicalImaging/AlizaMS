@@ -268,48 +268,14 @@ else()
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
-if(UNIX AND NOT APPLE)
-  if(ALIZA_QT5_6_PLATFORM_XCB)
-    add_definitions(-DFORCE_PLATFORM_XCB)
-  endif()
-endif()
-
-if(ALIZA_DISABLE_SIMDMATH)
-  add_definitions(-DDISABLE_SIMDMATH)
-else()
-  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-    add_definitions(-DDISABLE_SIMDMATH)
-  elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
-    add_definitions(-DDISABLE_SIMDMATH)
-  endif()
-endif()
-
-if(ALIZA_VERBOSE)
-  add_definitions(-DALIZA_VERBOSE)
-endif()
-
-if(WIN32)
-  if(MDCM_USE_WIN32_UNC)
-    add_definitions(-DMDCM_WIN32_UNC)
-  endif()
-endif()
-
-if(MDCM_NO_MESSAGES)
-  add_definitions(-DMDCM_NO_MESSAGES)
-endif()
-
 set(MDCM_LJPEG_LIBRARIES mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
 
 if(MDCM_USE_SYSTEM_CHARLS)
   find_package(CharLS REQUIRED)
   set(MDCM_CHARLS_LIBRARIES ${CHARLS_LIBRARIES})
-  if(CHARLS_LOW)
-    add_definitions(-DMDCM_CHARLS_LOW)
-  endif()
 else()
   set(MDCM_CHARLS_LIBRARIES mdcmcharls)
 endif()
-add_definitions(-DCHARLS_NO_DEPRECATED_WARNING)
 
 if(MDCM_USE_SYSTEM_OPENJPEG)
   find_package(OpenJPEG 2.0.0 REQUIRED)
@@ -596,13 +562,6 @@ endif()
 #
 #
 find_package(OpenGL REQUIRED)
-if(APPLE)
-  add_definitions(-DALIZA_GL_3_2_CORE -DGL_SILENCE_DEPRECATION)
-else()
-  if(ALIZA_COREGL)
-    add_definitions(-DALIZA_GL_3_2_CORE)
-  endif()
-endif()
 #
 #
 #
@@ -657,15 +616,10 @@ elseif(USE_QT_V_4)
     set(LOCAL_GLEW_PATH "")
   else()
     set(LOCAL_GLEW_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CG/glew")
-    add_definitions(-DGLEW_STATIC)
   endif()
   set(USE_QT_V_4 TRUE)
 else()
   message(FATAL_ERROR "Can not determine Qt version to use")
-endif()
-
-if(NOT ALIZA_MEDIASTORAGE_MODE)
-  add_definitions(-DUSE_WORKSTATION_MODE)
 endif()
 
 if(WIN32)
@@ -805,7 +759,6 @@ endif()
 #
 if(ALIZA_USE_SYSTEM_LCMS2)
   find_package(LCMS2 REQUIRED)
-  add_definitions(-DALIZA_USE_SYSTEM_LCMS2)
   message(STATUS "LCMS2: ${LCMS2_LIBRARIES}")
 else()
   add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/alizalcms")
@@ -1043,10 +996,6 @@ if(MDCM_USE_SYSTEM_OPENSSL)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${OPENSSL_LIBRARIES})
 endif()
 
-if(TMP_USE_53_SPATIAL_ENUMS)
-  add_definitions(-DTMP_USE_53_SPATIAL_ENUMS)
-endif()
-
 link_directories("${CMAKE_CURRENT_BINARY_DIR}/bin")
 
 if(WIN32)
@@ -1096,7 +1045,75 @@ else()
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/man" DESTINATION "share")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/alizams" DESTINATION "share")
 endif()
+
 # Safely add NDEBUG
 target_compile_definitions(alizams PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
+
+if(TMP_USE_53_SPATIAL_ENUMS)
+  target_compile_definitions(alizams PRIVATE TMP_USE_53_SPATIAL_ENUMS)
+endif()
+
+if(UNIX AND NOT APPLE)
+  if(ALIZA_QT5_6_PLATFORM_XCB)
+    target_compile_definitions(alizams PRIVATE FORCE_PLATFORM_XCB)
+  endif()
+endif()
+
+if(ALIZA_DISABLE_SIMDMATH)
+  target_compile_definitions(alizams PRIVATE DISABLE_SIMDMATH)
+else()
+  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+    target_compile_definitions(alizams PRIVATE DISABLE_SIMDMATH)
+  elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
+    target_compile_definitions(alizams PRIVATE DISABLE_SIMDMATH)
+  endif()
+endif()
+
+if(ALIZA_VERBOSE)
+  target_compile_definitions(alizams PRIVATE ALIZA_VERBOSE)
+endif()
+
+if(WIN32)
+  if(MDCM_USE_WIN32_UNC)
+    target_compile_definitions(alizams PRIVATE MDCM_WIN32_UNC)
+  endif()
+endif()
+
+if(MDCM_NO_MESSAGES)
+  target_compile_definitions(alizams PRIVATE MDCM_NO_MESSAGES)
+endif()
+
+if(MDCM_USE_SYSTEM_CHARLS)
+  if(CHARLS_LOW)
+    target_compile_definitions(alizams PRIVATE MDCM_CHARLS_LOW)
+  endif()
+endif()
+
+# tmp
+target_compile_definitions(alizams PRIVATE ALIZA_LOAD_DCM_THREAD)
+
+if(APPLE)
+  target_compile_definitions(alizams PRIVATE ALIZA_GL_3_2_CORE)
+  target_compile_definitions(alizams PUBLIC GL_SILENCE_DEPRECATION)
+else()
+  if(ALIZA_COREGL)
+    target_compile_definitions(alizams PRIVATE ALIZA_GL_3_2_CORE)
+  endif()
+endif()
+
+if(USE_QT_V_4)
+  if(NOT ALIZA_QT4_SYSTEM_GLEW)
+    target_compile_definitions(alizams PUBLIC GLEW_STATIC)
+  endif()
+endif()
+
+if(NOT ALIZA_MEDIASTORAGE_MODE)
+  target_compile_definitions(alizams PRIVATE USE_WORKSTATION_MODE)
+endif()
+
+if(ALIZA_USE_SYSTEM_LCMS2)
+  target_compile_definitions(alizams PRIVATE ALIZA_USE_SYSTEM_LCMS2)
+endif()
+
 target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
 
