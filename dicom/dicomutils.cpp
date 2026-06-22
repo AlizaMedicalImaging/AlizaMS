@@ -5061,7 +5061,7 @@ bool DicomUtils::get_pixel_spacing(
 }
 
 bool DicomUtils::generate_geometry(
-		std::vector<ImageSlice*> & cubeslices,
+		std::vector<ImageSlice*> & imageslices,
 		const std::vector<double*> & values,
 		const unsigned int rows_, const unsigned int columns_,
 		const double spacing_x, const double spacing_y, double * spacing_z,
@@ -5161,8 +5161,8 @@ bool DicomUtils::generate_geometry(
 			last = sVector3(x0, y0, z0);
 			v1 = (p0.getXYZ()+p3.getXYZ()) * 0.5f;
 		}
-		CommonUtils::generate_cubeslice(
-			cubeslices,
+		CommonUtils::generate_imageslice(
+			imageslices,
 			orientation_string,
 			size_, i,
 			x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
@@ -5306,10 +5306,10 @@ bool DicomUtils::generate_geometry(
 	*up_dir_z = up.getZ();
 	if (*equi_ == true)
 	{
-		const sVector3 cube_center = 0.5f * (v0 + v1);
-		*center_x = cube_center.getX();
-		*center_y = cube_center.getY();
-		*center_z = cube_center.getZ();
+		const sVector3 image_center = 0.5f * (v0 + v1);
+		*center_x = image_center.getX();
+		*center_y = image_center.getY();
+		*center_z = image_center.getZ();
 		*one_direction_ = true;
 	}
 	else

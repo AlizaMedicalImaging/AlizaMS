@@ -112,21 +112,21 @@ template<typename T> void calculate_min_max(
 		MinMaxCalculator::New();
 	typename UpdateQtCommand::Pointer update_qt_command =
 		UpdateQtCommand::New();
-	double cubemin{};
-	double cubemax{};
+	double imagemin{};
+	double imagemax{};
 	try
 	{
 		min_max_calculator->AddObserver(itk::ProgressEvent(), update_qt_command);
 		min_max_calculator->SetImage(image);
 		min_max_calculator->SetRegion(image->GetLargestPossibleRegion());
 		min_max_calculator->Compute();
-		const double cubemin_tmp = static_cast<double>(min_max_calculator->GetMinimum());
-		const double cubemax_tmp = static_cast<double>(min_max_calculator->GetMaximum());
+		const double imagemin_tmp = static_cast<double>(min_max_calculator->GetMinimum());
+		const double imagemax_tmp = static_cast<double>(min_max_calculator->GetMaximum());
 		// Default values of the filter are 'min > max' for e.g. an empty image.
-		if (!(cubemin_tmp > cubemax_tmp))
+		if (!(imagemin_tmp > imagemax_tmp))
 		{
-			cubemin = cubemin_tmp;
-			cubemax = cubemax_tmp;
+			imagemin = imagemin_tmp;
+			imagemax = imagemax_tmp;
 		}
 	}
 	catch (const itk::ExceptionObject & ex)
@@ -150,11 +150,11 @@ template<typename T> void calculate_min_max(
 					const double tmp0 = pow(2.0, static_cast<double>(iv->di->bits_stored - 1));
 					iv->di->rmin = -tmp0;
 					iv->di->rmax = tmp0 - 1.0;
-					if (cubemin < iv->di->rmin || cubemax > iv->di->rmax)
+					if (imagemin < iv->di->rmin || imagemax > iv->di->rmax)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
-							<< " (ignored), min = " << cubemin << ", max = " << cubemax << std::endl;
+							<< " (ignored), min = " << imagemin << ", max = " << imagemax << std::endl;
 #endif
 						iv->di->rmin = SHRT_MIN;
 						iv->di->rmax = SHRT_MAX;
@@ -176,11 +176,11 @@ template<typename T> void calculate_min_max(
 				{
 					iv->di->rmin = 0.0;
 					iv->di->rmax = pow(2.0, static_cast<double>(iv->di->bits_stored)) - 1.0;
-					if (cubemax > iv->di->rmax)
+					if (imagemax > iv->di->rmax)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
-							<< " (ignored), min = 0, max = " << cubemax << std::endl;
+							<< " (ignored), min = 0, max = " << imagemax << std::endl;
 #endif
 						iv->di->rmax = USHRT_MAX;
 						iv->di->bits_stored = iv->di->bits_allocated;
@@ -201,11 +201,11 @@ template<typename T> void calculate_min_max(
 				{
 					iv->di->rmin = 0.0;
 					iv->di->rmax = pow(2.0, static_cast<double>(iv->di->bits_stored)) - 1.0;
-					if (cubemax > iv->di->rmax)
+					if (imagemax > iv->di->rmax)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
-							<< " (ignored), min = 0, max = " << cubemax << std::endl;
+							<< " (ignored), min = 0, max = " << imagemax << std::endl;
 #endif
 						iv->di->rmax = UCHAR_MAX;
 						iv->di->bits_stored = iv->di->bits_allocated;
@@ -226,15 +226,15 @@ template<typename T> void calculate_min_max(
 		case 7:
 		case 8:
 			{
-				iv->di->rmin = cubemin;
-				iv->di->rmax = cubemax;
+				iv->di->rmin = imagemin;
+				iv->di->rmax = imagemax;
 			}
 			break;
 		default:
 			return;
 		}
-		iv->di->vmin = cubemin;
-		iv->di->vmax = cubemax;
+		iv->di->vmin = imagemin;
+		iv->di->vmax = imagemax;
 	}
 	else
 	{
@@ -248,11 +248,11 @@ template<typename T> void calculate_min_max(
 					const double tmp0 = pow(2.0, static_cast<double>(iv->di->bits_stored - 1));
 					const double rmin = -tmp0;
 					const double rmax = tmp0 - 1.0;
-					if (cubemin < rmin || cubemax > rmax)
+					if (imagemin < rmin || imagemax > rmax)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
-							<< " (ignored), min = " << cubemin << ", max = " << cubemax << std::endl;
+							<< " (ignored), min = " << imagemin << ", max = " << imagemax << std::endl;
 #endif
 						iv->di->bits_stored = iv->di->bits_allocated;
 						iv->di->high_bit = iv->di->bits_stored - 1;
@@ -266,11 +266,11 @@ template<typename T> void calculate_min_max(
 					(iv->di->bits_stored < iv->di->bits_allocated))
 				{
 					const double rmax = pow(2.0, static_cast<double>(iv->di->bits_stored)) - 1.0;
-					if (cubemax > rmax)
+					if (imagemax > rmax)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
-							<< " (ignored), min = 0, max = " << cubemax << std::endl;
+							<< " (ignored), min = 0, max = " << imagemax << std::endl;
 #endif
 						iv->di->bits_stored = iv->di->bits_allocated;
 						iv->di->high_bit = iv->di->bits_stored - 1;
@@ -284,11 +284,11 @@ template<typename T> void calculate_min_max(
 					(iv->di->bits_stored < iv->di->bits_allocated))
 				{
 					const double rmax = pow(2.0, static_cast<double>(iv->di->bits_stored)) - 1.0;
-					if (cubemax > rmax)
+					if (imagemax > rmax)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
-							<< " (ignored), min = 0, max = " << cubemax << std::endl;
+							<< " (ignored), min = 0, max = " << imagemax << std::endl;
 #endif
 						iv->di->bits_stored = iv->di->bits_allocated;
 						iv->di->high_bit = iv->di->bits_stored - 1;
@@ -306,8 +306,8 @@ template<typename T> void calculate_min_max(
 		default:
 			return;
 		}
-		iv->di->rmin = iv->di->vmin = cubemin;
-		iv->di->rmax = iv->di->vmax = cubemax;
+		iv->di->rmin = iv->di->vmin = imagemin;
+		iv->di->rmax = iv->di->vmax = imagemax;
 	}
 	const double vmax_minus_vmin = iv->di->vmax - iv->di->vmin;
 	const double rmax_minus_rmin = iv->di->rmax - iv->di->rmin;
@@ -838,8 +838,8 @@ template<typename T> int generate_tex3d(
 	}
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	gl->glGenTextures(1, &(ivariant->di->cube_3dtex));
-	gl->glBindTexture(GL_TEXTURE_3D, ivariant->di->cube_3dtex);
+	gl->glGenTextures(1, &(ivariant->di->image_3dtex));
+	gl->glBindTexture(GL_TEXTURE_3D, ivariant->di->image_3dtex);
 	switch (ivariant->di->filtering)
 	{
 	case 1: // bilinear
@@ -865,8 +865,8 @@ template<typename T> int generate_tex3d(
 	gl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	gl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 #else
-	glGenTextures(1, &(ivariant->di->cube_3dtex));
-	glBindTexture(GL_TEXTURE_3D, ivariant->di->cube_3dtex);
+	glGenTextures(1, &(ivariant->di->image_3dtex));
+	glBindTexture(GL_TEXTURE_3D, ivariant->di->image_3dtex);
 	switch (ivariant->di->filtering)
 	{
 	case 1: // bilinear
@@ -982,12 +982,12 @@ template<typename T> int generate_tex3d(
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		gl->glBindTexture(GL_TEXTURE_3D, 0);
-		gl->glDeleteTextures(1, &(ivariant->di->cube_3dtex));
+		gl->glDeleteTextures(1, &(ivariant->di->image_3dtex));
 #else
 		glBindTexture(GL_TEXTURE_3D, 0);
-		glDeleteTextures(1, &(ivariant->di->cube_3dtex));
+		glDeleteTextures(1, &(ivariant->di->image_3dtex));
 #endif
-		ivariant->di->cube_3dtex = 0;
+		ivariant->di->image_3dtex = 0;
 		ivariant->di->tex_info = -1;
 		error__ = 3;
 		goto quit__;
@@ -1037,10 +1037,10 @@ template<typename T> void calc_center_from_image(
 		static_cast<float>(origin[1]),
 		static_cast<float>(origin[2]));
 	sVector3 v1 = sVector3(p[0], p[1], p[2]);
-	sVector3 cube_center = sVector3((v0 + v1) * 0.5f);
-	ivariant->di->default_center_x = ivariant->di->center_x = cube_center.getX();
-	ivariant->di->default_center_y = ivariant->di->center_y = cube_center.getY();
-	ivariant->di->default_center_z = ivariant->di->center_z = cube_center.getZ();
+	sVector3 image_center = sVector3((v0 + v1) * 0.5f);
+	ivariant->di->default_center_x = ivariant->di->center_x = image_center.getX();
+	ivariant->di->default_center_y = ivariant->di->center_y = image_center.getY();
+	ivariant->di->default_center_z = ivariant->di->center_z = image_center.getZ();
 }
 
 template<typename T> void read_geometry_from_image(
@@ -1113,7 +1113,7 @@ template<typename T> void read_geometry_from_image(
 			static_cast<double>(y1),
 			static_cast<double>(z1),
 			d1, d2, d3, d4, d5, d6 };
-		CommonUtils::generate_cubeslice(
+		CommonUtils::generate_imageslice(
 			ivariant->di->image_slices,
 			QString(""),
 			size[2], z,
@@ -2519,7 +2519,7 @@ void CommonUtils::calculate_center_notuniform(
 	}
 }
 
-void CommonUtils::generate_cubeslice(
+void CommonUtils::generate_imageslice(
 			std::vector<ImageSlice*> & slices,
 			const QString & orient,
 			const unsigned int dimz, const unsigned int z,

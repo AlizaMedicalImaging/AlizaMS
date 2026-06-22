@@ -2042,7 +2042,7 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, frontface_tex);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
+	glBindTexture(GL_TEXTURE_3D, di->image_3dtex);
 	if (di->lut_function == 2)
 	{
 		if (di->selected_lut == 0 || di->selected_lut > 7)
@@ -2655,7 +2655,7 @@ void GLWidget::paint_volume()
 #endif
 		//
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
+		glBindTexture(GL_TEXTURE_3D, di->image_3dtex);
 		if (di->selected_lut == 0 || di->selected_lut > 7)
 		{
 			if (rect_selection)

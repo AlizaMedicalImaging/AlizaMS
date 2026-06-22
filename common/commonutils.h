@@ -41,7 +41,7 @@ public:
 		const std::vector<ImageSlice*> &,float*,float*,float*);
 	static void calculate_center_notuniform(
 		const std::vector<SpectroscopySlice*> &,float*,float*,float*);
-	static void generate_cubeslice(
+	static void generate_imageslice(
 		std::vector<ImageSlice*> &,
 		const QString &,
 		const unsigned int, const unsigned int,
