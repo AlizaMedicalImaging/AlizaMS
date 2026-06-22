@@ -44,13 +44,35 @@
             <x>0</x>
             <y>0</y>
             <width>973</width>
-            <height>924</height>
+            <height>960</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
            <property name="margin">
             <number>6</number>
            </property>
+           <item>
+            <widget class="QCheckBox" name="multiseries_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="mouseTracking">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Try to process multidimensional series, e.g. PET series using the &lt;span style=&quot; font-style:italic;&quot;&gt;Image Index&lt;/span&gt; attribute, or other series using the &lt;span style=&quot; font-style:italic;&quot;&gt;Instance Number&lt;/span&gt; attribute, (provided it is available and verified as unique). Sorting is performed based on the &lt;span style=&quot; font-style:italic;&quot;&gt;Image Position (Patient)&lt;/span&gt; attribute; if sorting by IPP is not possible (e.g., due to differences in I&lt;span style=&quot; font-style:italic;&quot;&gt;mage Orientation (Patient)&lt;/span&gt; attributes within the series), a fallback method—sorting by the Slice Location attribute — is used.&lt;/p&gt;&lt;p&gt;This approach can also help improve the sorting of certain non-uniform non-parallel series.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Recommended.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Processing of multidimensional series</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QCheckBox" name="overlays_checkBox">
              <property name="sizePolicy">
@@ -1278,6 +1300,7 @@ p, li { white-space: pre-wrap; }
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>scrollArea_3</tabstop>
+  <tabstop>multiseries_checkBox</tabstop>
   <tabstop>overlays_checkBox</tabstop>
   <tabstop>mosaic_checkBox</tabstop>
   <tabstop>icc_checkBox</tabstop>

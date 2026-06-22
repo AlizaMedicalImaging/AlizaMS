@@ -39,6 +39,7 @@ public:
 	bool   get_apply_supplemental_lut() const;
 	bool   get_skip_too_large() const;
 	bool   get_dcm_thread() const;
+	bool   get_process_multiseries() const;
 
 private:
 	int   saved_idx{};

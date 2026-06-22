@@ -12831,6 +12831,7 @@ QString DicomUtils::read_dicom(
 	std::map<unsigned int, SliceInstanceCommon> slice_pos_map;
 	const SettingsWidget * const wsettings =
 		static_cast<const SettingsWidget * const>(settings);
+	const bool process_multiseries = wsettings->get_process_multiseries();
 	const float tolerance{0.01f};
 	int count_images{};
 	int count_uid_errors{};
@@ -13136,7 +13137,7 @@ QString DicomUtils::read_dicom(
 						}
 					}
 					//
-					if (!(mosaic || uihgrid || multiframe))
+					if (!(mosaic || uihgrid || multiframe) && process_multiseries && (load_type == 0))
 					{
 						int image_index_tmp{-1};
 						{
@@ -13225,7 +13226,8 @@ QString DicomUtils::read_dicom(
 	//
 	//
 	// is multiseries?
-	if (!ultrasound &&
+	if (process_multiseries && (load_type == 0) &&
+		!ultrasound &&
 		!nuclear &&
 		!multiframe &&
 		!enhanced &&

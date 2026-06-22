@@ -176,6 +176,7 @@ void SettingsWidget::set_default()
 	mvsep_checkBox->setChecked(false);
 	dcmthread_checkBox->setChecked(true);
 	adjust_spinBox->setValue(14);
+	multiseries_checkBox->setChecked(true);
 #if defined(Q_OS_LINUX) && QT_VERSION >= QT_VERSION_CHECK(5,11,0)
 	if (QApplication::platformName() == QString("wayland"))
 	{
@@ -285,7 +286,8 @@ void SettingsWidget::readSettings()
 	const int tmp18 = settings.value(QString("adj_fps2"), 0).toInt();
 #endif
 	const int tmp19 = settings.value(QString("adj_fps_value"), 14).toInt();
-	const int tmp20 = settings.value(QString("filtering"),     0).toInt();
+	const int tmp20 = settings.value(QString("filtering"),      0).toInt();
+	const int tmp21 = settings.value(QString("multiseries"),    1).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -358,6 +360,7 @@ void SettingsWidget::readSettings()
 	dcmthread_checkBox->setChecked((tmp17 == 1));
 	adjust_spinBox->setValue(tmp19);
 	adjust_checkBox->setChecked((tmp18 == 1));
+	multiseries_checkBox->setChecked((tmp21 == 1));
 	if (tmp20 == 2)
 	{
 		f_no_radioButton->setChecked(false);
@@ -401,6 +404,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("dcm_thread2"),   QVariant(dcmthread_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("adj_fps2"),      QVariant(adjust_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("adj_fps_value"), QVariant(adjust_spinBox->value()));
+	s.setValue(QString("multiseries"),   QVariant(multiseries_checkBox->isChecked() ? 1 : 0));
 	if (enh_dim_skip_radioButton->isChecked())
 	{
 		s.setValue(QString("enh_strategy"), QVariant(4));
@@ -520,4 +524,9 @@ bool SettingsWidget::get_skip_too_large() const
 bool SettingsWidget::get_dcm_thread() const
 {
 	return dcmthread_checkBox->isChecked();
+}
+
+bool SettingsWidget::get_process_multiseries() const
+{
+	return multiseries_checkBox->isChecked();
 }
