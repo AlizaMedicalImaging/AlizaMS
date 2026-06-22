@@ -40,17 +40,17 @@ void DisplayInterface::set_glwidget(GLWidget * w)
 void DisplayInterface::close(bool clear_geometry)
 {
 	if (opengl_ok && gl) gl->makeCurrent();
-	if (cube_3dtex > 0)
+	if (image_3dtex > 0)
 	{
 		if (opengl_ok && gl)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			gl->glDeleteTextures(1, &cube_3dtex);
+			gl->glDeleteTextures(1, &image_3dtex);
 #else
-			glDeleteTextures(1, &cube_3dtex);
+			glDeleteTextures(1, &image_3dtex);
 #endif
 		}
-		cube_3dtex =  0;
+		image_3dtex =  0;
 	}
 	tex_info = -1;
 	x_spacing = y_spacing = 0.0;

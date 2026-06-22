@@ -30,6 +30,9 @@ SettingsWidget::SettingsWidget(float si) : scale_icons(si)
 	f_trilinear_radioButton->setEnabled(false);
 	f_trilinear_radioButton->hide();
 #endif
+#ifdef ALIZA_LOAD_DCM_THREAD
+	dcmthread_checkBox->hide();
+#endif
 	x_comboBox->addItem(QString("256"));
 	x_comboBox->addItem(QString("128"));
 	x_comboBox->addItem(QString("64"));
@@ -174,7 +177,9 @@ void SettingsWidget::set_default()
 	set_force_cp1251(false);
 	cp1251_checkBox->blockSignals(false);
 	mvsep_checkBox->setChecked(false);
+#ifndef ALIZA_LOAD_DCM_THREAD
 	dcmthread_checkBox->setChecked(true);
+#endif
 	adjust_spinBox->setValue(14);
 	multiseries_checkBox->setChecked(true);
 #if defined(Q_OS_LINUX) && QT_VERSION >= QT_VERSION_CHECK(5,11,0)
@@ -357,7 +362,9 @@ void SettingsWidget::readSettings()
 	CodecUtils::set_force_cp1251(force_cp1251);
 	cp1251_checkBox->blockSignals(false);
 	mvsep_checkBox->setChecked((tmp16 == 1));
+#ifndef ALIZA_LOAD_DCM_THREAD
 	dcmthread_checkBox->setChecked((tmp17 == 1));
+#endif
 	adjust_spinBox->setValue(tmp19);
 	adjust_checkBox->setChecked((tmp18 == 1));
 	multiseries_checkBox->setChecked((tmp21 == 1));
@@ -401,7 +408,9 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("clean_unused"),  QVariant(clean_unused_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("force_cp1251"),  QVariant(cp1251_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("mvsep"),         QVariant(mvsep_checkBox->isChecked() ? 1 : 0));
+#ifndef ALIZA_LOAD_DCM_THREAD
 	s.setValue(QString("dcm_thread2"),   QVariant(dcmthread_checkBox->isChecked() ? 1 : 0));
+#endif
 	s.setValue(QString("adj_fps2"),      QVariant(adjust_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("adj_fps_value"), QVariant(adjust_spinBox->value()));
 	s.setValue(QString("multiseries"),   QVariant(multiseries_checkBox->isChecked() ? 1 : 0));
@@ -523,7 +532,11 @@ bool SettingsWidget::get_skip_too_large() const
 
 bool SettingsWidget::get_dcm_thread() const
 {
+#ifdef ALIZA_LOAD_DCM_THREAD
+	return true;
+#else
 	return dcmthread_checkBox->isChecked();
+#endif
 }
 
 bool SettingsWidget::get_process_multiseries() const

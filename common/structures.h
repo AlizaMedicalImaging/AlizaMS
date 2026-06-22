@@ -492,7 +492,7 @@ public:
 	bool lock_2Dview{};
 	bool lock_single{};
 	bool lock_level2D{};
-	quint32 cube_3dtex{};
+	quint32 image_3dtex{};
 	float origin[3]{};
 	bool origin_ok{};
 	short tex_info{-1};
