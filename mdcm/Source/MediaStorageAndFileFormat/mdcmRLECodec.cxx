@@ -454,6 +454,7 @@ RLECodec::Code(const DataElement & in, DataElement & out)
     }
     catch (const std::bad_alloc &)
     {
+      delete[] buffer;
       return false;
     }
   }
@@ -720,9 +721,9 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
   size_t numSegments = frame.header.GetNumSegments();
   size_t length = Length;
   assert(length);
-  if (!(GetPixelFormat().GetBitsAllocated() == 32 ||
+  if (!(GetPixelFormat().GetBitsAllocated() == 8  ||
         GetPixelFormat().GetBitsAllocated() == 16 ||
-        GetPixelFormat().GetBitsAllocated() == 8))
+        GetPixelFormat().GetBitsAllocated() == 32))
   {
     mdcmWarningMacro("RLECodec: BitsAllocated "
                      << GetPixelFormat().GetBitsAllocated() << " is not supported");
