@@ -63,7 +63,7 @@
               <bool>false</bool>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Recommended.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Enable advanced sorting for multidimensional (e.g. 3D+t and other 3D+ series) and non-parallel series.&lt;/p&gt;&lt;p&gt;If this option is not enabled, simple IPP/IOP sorting will always be used.&lt;/p&gt;&lt;p&gt;This option does not apply to 'enhaced' multi-frame datasets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Recommended.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Enable advanced sorting for multidimensional (3D+ series) and non-parallel series.&lt;/p&gt;&lt;p&gt;If this option is not enabled, IPP/IOP sorting will always be used (ascending along the slice normal direction).&lt;/p&gt;&lt;p&gt;This option does not apply to 'enhaced' multi-frame datasets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>Enable advanced sorting</string>
