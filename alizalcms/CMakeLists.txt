@@ -34,8 +34,8 @@ set(LCMS2_SRCS
 
 set(ALIZALCMS_LIBRARY_PROPERTIES VERSION "2.13.2")
 
-include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
 add_library(alizalcms2 ${LCMS2_SRCS})
+target_include_directories(alizalcms2 BEFORE PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 # Safely add NDEBUG
 target_compile_definitions(alizalcms2 PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
 set_target_properties(alizalcms2 PROPERTIES ${ALIZALCMS_LIBRARY_PROPERTIES})

@@ -32,39 +32,13 @@ set(OPENJPEG_LIBRARY_PROPERTIES
 
 # Path to CMake modules
 set(CMAKE_MODULE_PATH
-    ${${OPENJPEG_NAMESPACE}_SOURCE_DIR}/cmake
+    "${${OPENJPEG_NAMESPACE}_SOURCE_DIR}/cmake"
     ${CMAKE_MODULE_PATH})
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(MANGLE_PREFIX ${MDCM_OPENJPEG_LIBRARIES})
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/openjpeg_mangle.h.in
-               ${CMAKE_CURRENT_BINARY_DIR}/openjpeg_mangle.h
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/openjpeg_mangle.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/src/lib/openjp2/openjpeg_mangle.h"
                @ONLY)
-
-# This removes MSVC warnings
-if(WIN32)
-  if(NOT BORLAND)
-    if(NOT CYGWIN)
-      if(NOT MINGW)
-        add_definitions(
-          -D_CRT_FAR_MAPPINGS_NO_DEPRECATE
-          -D_CRT_IS_WCTYPE_NO_DEPRECATE
-          -D_CRT_MANAGED_FP_NO_DEPRECATE
-          -D_CRT_NONSTDC_NO_DEPRECATE
-          -D_CRT_SECURE_NO_DEPRECATE
-          -D_CRT_SECURE_NO_DEPRECATE_GLOBALS
-          -D_CRT_SETERRORMODE_BEEP_SLEEP_NO_DEPRECATE
-          -D_CRT_TIME_FUNCTIONS_NO_DEPRECATE
-          -D_CRT_VCCLRIT_NO_DEPRECATE
-          -D_SCL_SECURE_NO_DEPRECATE
-          )
-      endif()
-    endif()
-  endif()
-endif()
-
-string(TOLOWER ${PROJECT_NAME} projectname)
 
 # Big endian test
 include(${CMAKE_ROOT}/Modules/TestBigEndian.cmake)
@@ -74,8 +48,6 @@ TEST_BIG_ENDIAN(OPJ_BIG_ENDIAN)
 set(EXECUTABLE_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all executables.")
 set(LIBRARY_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all libraries.")
 mark_as_advanced(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
-
-# opj_config.h generation (1/2)
 
 # Check if some include files are provided by the system
 include(EnsureFileInclude)
@@ -119,14 +91,13 @@ check_symbol_exists(memalign malloc.h OPJ_HAVE_MEMALIGN)
 
 add_subdirectory(src/lib)
 
-# opj_config.h generation (2/2)
 configure_file(
- ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/opj_config.h.cmake.in
- ${CMAKE_CURRENT_BINARY_DIR}/src/lib/openjp2/opj_config.h
+ "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/opj_config.h.cmake.in"
+ "${CMAKE_CURRENT_BINARY_DIR}/src/lib/openjp2/opj_config.h"
  @ONLY)
 
- configure_file(
- ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/opj_config_private.h.cmake.in
- ${CMAKE_CURRENT_BINARY_DIR}/src/lib/openjp2/opj_config_private.h
+configure_file(
+ "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/opj_config_private.h.cmake.in"
+ "${CMAKE_CURRENT_BINARY_DIR}/src/lib/openjp2/opj_config_private.h"
  @ONLY)
 

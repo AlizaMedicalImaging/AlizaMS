@@ -17,10 +17,6 @@ uuid_time.c
 uuid.h
 uuidP.h)
 
-if(CMAKE_CXX_VISIBILITY_PRESET STREQUAL "hidden")
-  add_definitions(-DUUID_HIDDEN)
-endif()
-
 if(COMMAND CHECK_INCLUDE_FILE_CONCAT)
 else()
 include (${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
@@ -64,8 +60,7 @@ set(UUID_HAVES_ALL
   HAVE_NETINET_IN_H
   HAVE_NET_IF_DL_H
   HAVE_NET_IF_ARP_H
-  HAVE_WINSOCK_H
-)
+  HAVE_WINSOCK_H)
 
 set(UUID_HAVES)
 foreach(have ${UUID_HAVES_ALL})
@@ -84,15 +79,22 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/uuid_mangle.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/uuid_mangle.h
                @ONLY )
 
-# for uuid_mangle.h
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 add_library(${UUID_LIBRARY_NAME} ${UUID_SRCS})
+
+# for uuid_mangle.h
+target_include_directories(${UUID_LIBRARY_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
+if(CMAKE_CXX_VISIBILITY_PRESET STREQUAL "hidden")
+  target_compile_definitions(${UUID_LIBRARY_NAME} PRIVATE UUID_HIDDEN)
+endif()
+
 # Safely add NDEBUG
 target_compile_definitions(${UUID_LIBRARY_NAME} PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
+
 if(MDCM_LIBRARY_PROPERTIES)
-set_target_properties(${UUID_LIBRARY_NAME} PROPERTIES ${MDCM_LIBRARY_PROPERTIES})
+  set_target_properties(${UUID_LIBRARY_NAME} PROPERTIES ${MDCM_LIBRARY_PROPERTIES})
 endif()
+
 if(WIN32 AND NOT CYGWIN)
   target_link_libraries(${UUID_LIBRARY_NAME} iphlpapi)
 endif()

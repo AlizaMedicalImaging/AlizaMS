@@ -1,7 +1,5 @@
 include_regular_expression("^.*$")
 
-include_directories(BEFORE ${${OPENJPEG_NAMESPACE}_BINARY_DIR}/src/lib/openjp2)
-
 set(OPENJPEG_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/thread.c
   ${CMAKE_CURRENT_SOURCE_DIR}/thread.h
@@ -63,11 +61,39 @@ if(NOT WIN32 AND CMAKE_COMPILER_IS_GNUCC AND CMAKE_C_COMPILER MATCHES ".*mingw32
   set(WIN32 YES)
 endif()
 
+message(STATUS "OpenJPEG current bin. dir: ${CMAKE_CURRENT_BINARY_DIR}")
+
 add_library(${OPENJPEG_LIBRARY_NAME} ${OPENJPEG_SRCS})
+target_include_directories(${OPENJPEG_LIBRARY_NAME} BEFORE PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(${OPENJPEG_LIBRARY_NAME} BEFORE PRIVATE "${${OPENJPEG_NAMESPACE}_BINARY_DIR}/src/lib/openjp2")
+
 # Safely add NDEBUG
 target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
 # Only static libs here
 target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE OPJ_STATIC)
+
+# This removes MSVC warnings
+if(WIN32)
+  if(NOT BORLAND)
+    if(NOT CYGWIN)
+      if(NOT MINGW)
+        target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE
+          _CRT_FAR_MAPPINGS_NO_DEPRECATE
+          _CRT_IS_WCTYPE_NO_DEPRECATE
+          _CRT_MANAGED_FP_NO_DEPRECATE
+          _CRT_NONSTDC_NO_DEPRECATE
+          _CRT_SECURE_NO_DEPRECATE
+          _CRT_SECURE_NO_DEPRECATE_GLOBALS
+          _CRT_SETERRORMODE_BEEP_SLEEP_NO_DEPRECATE
+          _CRT_TIME_FUNCTIONS_NO_DEPRECATE
+          _CRT_VCCLRIT_NO_DEPRECATE
+          _SCL_SECURE_NO_DEPRECATE)
+      endif()
+    endif()
+  endif()
+endif()
+
+
 if(UNIX)
   target_link_libraries(${OPENJPEG_LIBRARY_NAME} m)
 endif()
@@ -81,22 +107,22 @@ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 option(OPJ_USE_THREAD "Build with thread/mutex support " ON)
 mark_as_advanced(OPJ_USE_THREAD)
 if(NOT OPJ_USE_THREAD)
-  add_definitions(-DMUTEX_stub)
+  target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE MUTEX_stub)
 endif()
 
 find_package(Threads QUIET)
 
 if(OPJ_USE_THREAD AND WIN32 AND NOT Threads_FOUND)
-  add_definitions(-DMUTEX_win32)
+  target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE MUTEX_win32)
   set(Threads_FOUND YES)
 endif()
 
 if(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_WIN32_THREADS_INIT)
-  add_definitions(-DMUTEX_win32)
+  target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE MUTEX_win32)
 endif()
 
 if(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
-  add_definitions(-DMUTEX_pthread)
+  target_compile_definitions(${OPENJPEG_LIBRARY_NAME} PRIVATE MUTEX_pthread)
 endif()
 
 if(OPJ_USE_THREAD AND NOT Threads_FOUND)

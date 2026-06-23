@@ -67,6 +67,15 @@ endif()
 
 project(ALIZAMS)
 
+if(NOT EXECUTABLE_OUTPUT_PATH)
+  set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin" CACHE PATH "Output directory for executables")
+  mark_as_advanced(EXECUTABLE_OUTPUT_PATH)
+endif()
+if(NOT LIBRARY_OUTPUT_PATH)
+  set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin" CACHE PATH "Output directory for libraries")
+  mark_as_advanced(LIBRARY_OUTPUT_PATH)
+endif()
+
 ##########################################################################
 #
 #
@@ -151,6 +160,12 @@ endif()
 #
 ##########################################################################
 
+if(APPLE)
+  set(ALIZAMS_TARGET AlizaMS)
+else()
+  set(ALIZAMS_TARGET alizams)
+endif()
+
 # Required for x86 32 bit GCC build only.
 if(NOT WIN32)
   if(CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -225,15 +240,6 @@ message(STATUS "System name:      ${CMAKE_SYSTEM_NAME}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-if(NOT EXECUTABLE_OUTPUT_PATH)
-  set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin" CACHE PATH "Output directory for executables")
-  mark_as_advanced(EXECUTABLE_OUTPUT_PATH)
-endif()
-if(NOT LIBRARY_OUTPUT_PATH)
-  set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin" CACHE PATH "Output directory for libraries")
-  mark_as_advanced(LIBRARY_OUTPUT_PATH)
-endif()
-
 if(ALIZA_QT_VERSION STREQUAL "4")
   set(USE_QT_V_4 TRUE)
   message(STATUS "Using Qt4")
@@ -286,7 +292,6 @@ endif()
 
 if(MDCM_USE_SYSTEM_ZLIB)
   find_package(ZLIB REQUIRED)
-  include_directories(${ZLIB_INCLUDE_DIR})
   set(MDCM_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
 else()
   set(MDCM_ZLIB_LIBRARIES mdcmzlib)
@@ -356,48 +361,6 @@ if(MDCM_USE_SYSTEM_OPENSSL)
   check_cxx_source_compiles("#include <openssl/cms.h>\nint main(){CMS_add0_recipient_password(0,0,0,0,0,0,0);return 0;}" MDCM_HAVE_CMS_RECIPIENT_PASSWORD)
 endif()
 
-include_directories(
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common"
-  "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/Common"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat"
-  "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities")
-
-if(MDCM_USE_SYSTEM_CHARLS)
-  include_directories(${CHARLS_INCLUDE_DIRS})
-else()
-  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmcharls")
-endif()
-
-if(MDCM_USE_SYSTEM_OPENJPEG)
-  include_directories(${OPENJPEG_INCLUDE_DIRS})
-else()
-  include_directories(BEFORE
-    "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmopenjpeg"
-    "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmopenjpeg/src/lib/openjp2"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmopenjpeg/src/lib/openjp2")
-endif()
-
-if(NOT MDCM_USE_SYSTEM_ZLIB)
-  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmzlib")
-  include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmzlib")
-endif()
-
-if(MDCM_USE_SYSTEM_OPENSSL)
-  include_directories(${OPENSSL_INCLUDE_DIR})
-endif()
-
-if(MDCM_USE_SYSTEM_UUID)
-  include_directories(${UUID_INCLUDE_DIR})
-  set(MDCMUUID ${UUID_LIBRARIES})
-else()
-  include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmuuid")
-  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmuuid")
-  set(MDCMUUID mdcmuuid)
-endif()
-
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmConfigure.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/Common/mdcmConfigure.h")
@@ -443,10 +406,6 @@ if(MDCM_USE_SYSTEM_OPENSSL AND MDCM_HAVE_CMS_RECIPIENT_PASSWORD)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
     "mdcm/Source/Common/mdcmOpenSSLCryptoFactory.cxx"
     "mdcm/Source/Common/mdcmOpenSSLCryptographicMessageSyntax.cxx")
-endif()
-
-if(MDCM_USE_SYSTEM_OPENSSL)
-  include_directories(${OPENSSL_INCLUDE_DIR})
 endif()
 
 set(MDCM_DICT_SRCS
@@ -590,7 +549,6 @@ if(USE_QT_V_6)
   if(NOT ALIZA_MEDIASTORAGE_MODE)
     find_package(Qt6 COMPONENTS Sql REQUIRED)
   endif()
-  include_directories(${Qt6Core5Compat_INCLUDE_DIRS})
 elseif(USE_QT_V_5)
   find_package(Qt5Core REQUIRED)
   find_package(Qt5Gui REQUIRED)
@@ -622,24 +580,9 @@ else()
   message(FATAL_ERROR "Can not determine Qt version to use")
 endif()
 
-if(WIN32)
-  if(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400)
-    add_definitions(
-     -D_CRT_SECURE_NO_DEPRECATE
-     -D_CRT_NONSTDC_NO_DEPRECATE
-     -D_CRT_SECURE_NO_WARNINGS
-     -D_SCL_SECURE_NO_DEPRECATE
-     -D_SCL_SECURE_NO_WARNINGS)
-  endif()
-endif()
-
-set(ALIZAMS_SRCS
-  "common/mmath.cpp"
-  "common/structures.cpp"
-  "main.cpp")
+set(ALIZAMS_SRCS "common/mmath.cpp" "common/structures.cpp" "main.cpp")
 
 if(NOT ALIZA_USE_SYSTEM_BULLET)
-  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/b")
   set(BULLET_SRCS
     "b/LinearMath/btAlignedAllocator.cpp"
     "b/LinearMath/btConvexHull.cpp"
@@ -749,7 +692,6 @@ else()
   message(STATUS "Bullet libraries:   ${BULLET_LIBRARIES}")
   message(STATUS "Bullet definitions: ${BULLET_DEFINITIONS}")
   add_definitions(${BULLET_DEFINITIONS})
-  include_directories(${BULLET_INCLUDE_DIR})
 endif()
 
 #
@@ -761,7 +703,7 @@ if(ALIZA_USE_SYSTEM_LCMS2)
   find_package(LCMS2 REQUIRED)
   message(STATUS "LCMS2: ${LCMS2_LIBRARIES}")
 else()
-  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/alizalcms")
+  add_subdirectory(alizalcms)
   message(STATUS "LCMS2: alizalcms2")
 endif()
 #
@@ -929,17 +871,6 @@ if(NOT ALIZA_MEDIASTORAGE_MODE)
   set(ALIZAMS_UIS ${ALIZAMS_UIS} "browser/ctkdialog.ui")
 endif()
 
-include_directories(
-  "${CMAKE_CURRENT_SOURCE_DIR}"
-  "${CMAKE_CURRENT_SOURCE_DIR}/common"
-  "${CMAKE_CURRENT_SOURCE_DIR}/GUI"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dicom"
-  "${CMAKE_CURRENT_BINARY_DIR}")
-
-if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-  link_directories("/usr/local/lib")
-endif()
-
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${MDCM_COMMON_SRCS} ${MDCM_DICT_SRCS} ${MDCM_DSED_SRCS} ${MDCM_MSFF_SRCS})
 
 set(ALIZAMS_LINK_LIBRARIES ${MDCM_LIBRARIES} ${ITK_LIBRARIES})
@@ -986,7 +917,6 @@ if(ALIZA_USE_SYSTEM_BULLET)
 endif()
 
 if(ALIZA_USE_SYSTEM_LCMS2)
-  include_directories(${LCMS2_INCLUDE_DIRS})
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${LCMS2_LIBRARIES})
 else()
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} alizalcms2)
@@ -996,13 +926,11 @@ if(MDCM_USE_SYSTEM_OPENSSL)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${OPENSSL_LIBRARIES})
 endif()
 
-link_directories("${CMAKE_CURRENT_BINARY_DIR}/bin")
-
 if(WIN32)
   if(USE_QT_V_4)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} OpenGL::GL)
   endif()
-  add_executable(alizams WIN32
+  add_executable(${ALIZAMS_TARGET} WIN32
     ${ALIZAMS_SRCS}
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
@@ -1014,13 +942,13 @@ elseif(APPLE)
   set(ALIZAMS_OSX_ICON_NAME "AlizaMS.icns")
   set(ALIZAMS_OSX_ICON "${CMAKE_CURRENT_SOURCE_DIR}/${ALIZAMS_OSX_ICON_NAME}")
   set_source_files_properties(${ALIZAMS_OSX_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-  add_executable(AlizaMS MACOSX_BUNDLE
+  add_executable(${ALIZAMS_TARGET} MACOSX_BUNDLE
     ${ALIZAMS_SRCS}
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC}
     ${ALIZAMS_OSX_ICON})
-  set_target_properties(AlizaMS PROPERTIES
+  set_target_properties(${ALIZAMS_TARGET} PROPERTIES
     MACOSX_BUNDLE_BUNDLE_NAME "AlizaMS"
     MACOSX_BUNDLE_BUNDLE_VERSION ${ALIZAMS_OSX_BUNDLE_VERSION}
     MACOSX_BUNDLE_GUI_IDENTIFIER "com.aliza.alizams"
@@ -1033,12 +961,12 @@ else()
       set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
     endif()
   endif()
-  add_executable(alizams
+  add_executable(${ALIZAMS_TARGET}
     ${ALIZAMS_SRCS}
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC})
-  install(TARGETS alizams RUNTIME DESTINATION "bin")
+  install(TARGETS ${ALIZAMS_TARGET} RUNTIME DESTINATION "bin")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/icons" DESTINATION "share")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/applications" DESTINATION "share")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/metainfo" DESTINATION "share")
@@ -1046,76 +974,153 @@ else()
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/alizams" DESTINATION "share")
 endif()
 
+target_include_directories(${ALIZAMS_TARGET} PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/common"
+  "${CMAKE_CURRENT_SOURCE_DIR}/GUI"
+  "${CMAKE_CURRENT_SOURCE_DIR}/dicom"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common"
+  "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/Common"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat"
+  "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities")
+ 
+if(ALIZA_USE_SYSTEM_LCMS2)
+  target_include_directories(${ALIZAMS_TARGET} SYSTEM PRIVATE ${LCMS2_INCLUDE_DIRS})
+endif()
+
+if(USE_QT_V_6)
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE ${Qt6Core5Compat_INCLUDE_DIRS})
+endif()
+
+if(MDCM_USE_SYSTEM_CHARLS)
+  target_include_directories(${ALIZAMS_TARGET} SYSTEM PRIVATE ${CHARLS_INCLUDE_DIRS})
+else()
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmcharls")
+endif()
+
+if(MDCM_USE_SYSTEM_OPENJPEG)
+  target_include_directories(${ALIZAMS_TARGET} SYSTEM PRIVATE ${OPENJPEG_INCLUDE_DIRS})
+else()
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmopenjpeg")
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmopenjpeg/src/lib/openjp2")
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmopenjpeg/src/lib/openjp2")
+endif()
+
+if(MDCM_USE_SYSTEM_OPENSSL)
+  target_include_directories(${ALIZAMS_TARGET} SYSTEM PRIVATE ${OPENSSL_INCLUDE_DIR})
+endif()
+
+if(MDCM_USE_SYSTEM_ZLIB)
+  target_include_directories(${ALIZAMS_TARGET} SYSTEM PRIVATE ${ZLIB_INCLUDE_DIR})
+else()
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmzlib")
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmzlib")
+endif()
+
+if(MDCM_USE_SYSTEM_UUID)
+  target_include_directories(${ALIZAMS_TARGET} SYSTEM PRIVATE ${UUID_INCLUDE_DIR})
+else()
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmuuid")
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmuuid")
+endif()
+
+if(ALIZA_USE_SYSTEM_BULLET)
+  target_include_directories(${ALIZAMS_TARGET} SYSTEM PRIVATE ${BULLET_INCLUDE_DIR})
+else()
+  target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/b")
+endif()
+
 # Safely add NDEBUG
-target_compile_definitions(alizams PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
+target_compile_definitions(${ALIZAMS_TARGET} PRIVATE $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
+
+if(WIN32)
+  if(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400)
+    target_compile_definitions(${ALIZAMS_TARGET} PUBLIC
+     _CRT_SECURE_NO_DEPRECATE
+     _CRT_NONSTDC_NO_DEPRECATE
+     _CRT_SECURE_NO_WARNINGS
+     _SCL_SECURE_NO_DEPRECATE
+     _SCL_SECURE_NO_WARNINGS)
+  endif()
+endif()
 
 if(TMP_USE_53_SPATIAL_ENUMS)
-  target_compile_definitions(alizams PRIVATE TMP_USE_53_SPATIAL_ENUMS)
+  target_compile_definitions(${ALIZAMS_TARGET} PRIVATE TMP_USE_53_SPATIAL_ENUMS)
 endif()
 
 if(UNIX AND NOT APPLE)
   if(ALIZA_QT5_6_PLATFORM_XCB)
-    target_compile_definitions(alizams PRIVATE FORCE_PLATFORM_XCB)
+    target_compile_definitions(${ALIZAMS_TARGET} PRIVATE FORCE_PLATFORM_XCB)
   endif()
 endif()
 
 if(ALIZA_DISABLE_SIMDMATH)
-  target_compile_definitions(alizams PRIVATE DISABLE_SIMDMATH)
+  target_compile_definitions(${ALIZAMS_TARGET} PRIVATE DISABLE_SIMDMATH)
 else()
   if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-    target_compile_definitions(alizams PRIVATE DISABLE_SIMDMATH)
+    target_compile_definitions(${ALIZAMS_TARGET} PRIVATE DISABLE_SIMDMATH)
   elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
-    target_compile_definitions(alizams PRIVATE DISABLE_SIMDMATH)
+    target_compile_definitions(${ALIZAMS_TARGET} PRIVATE DISABLE_SIMDMATH)
   endif()
 endif()
 
 if(ALIZA_VERBOSE)
-  target_compile_definitions(alizams PRIVATE ALIZA_VERBOSE)
+  target_compile_definitions(${ALIZAMS_TARGET} PRIVATE ALIZA_VERBOSE)
 endif()
 
 if(WIN32)
   if(MDCM_USE_WIN32_UNC)
-    target_compile_definitions(alizams PRIVATE MDCM_WIN32_UNC)
+    target_compile_definitions(${ALIZAMS_TARGET} PRIVATE MDCM_WIN32_UNC)
   endif()
 endif()
 
 if(MDCM_NO_MESSAGES)
-  target_compile_definitions(alizams PRIVATE MDCM_NO_MESSAGES)
+  target_compile_definitions(${ALIZAMS_TARGET} PRIVATE MDCM_NO_MESSAGES)
 endif()
 
 if(MDCM_USE_SYSTEM_CHARLS)
   if(CHARLS_LOW)
-    target_compile_definitions(alizams PRIVATE MDCM_CHARLS_LOW)
+    target_compile_definitions(${ALIZAMS_TARGET} PRIVATE MDCM_CHARLS_LOW)
   endif()
-else()
-  target_compile_definitions(alizams PUBLIC CHARLS_NO_DEPRECATED_WARNING)
 endif()
+target_compile_definitions(${ALIZAMS_TARGET} PUBLIC CHARLS_NO_DEPRECATED_WARNING)
 
-# tmp
-target_compile_definitions(alizams PRIVATE ALIZA_LOAD_DCM_THREAD)
+# The ability to load dcm in the main thread has not be removed from the
+# source code, may be used for tests later. If ALIZA_LOAD_DCM_THREAD
+# is NOT set, there will the option in the Settings widget.
+target_compile_definitions(${ALIZAMS_TARGET} PRIVATE ALIZA_LOAD_DCM_THREAD)
 
 if(APPLE)
-  target_compile_definitions(alizams PRIVATE ALIZA_GL_3_2_CORE)
-  target_compile_definitions(alizams PUBLIC GL_SILENCE_DEPRECATION)
+  target_compile_definitions(${ALIZAMS_TARGET} PRIVATE ALIZA_GL_3_2_CORE)
+  target_compile_definitions(${ALIZAMS_TARGET} PUBLIC GL_SILENCE_DEPRECATION)
 else()
   if(ALIZA_COREGL)
-    target_compile_definitions(alizams PRIVATE ALIZA_GL_3_2_CORE)
+    target_compile_definitions(${ALIZAMS_TARGET} PRIVATE ALIZA_GL_3_2_CORE)
   endif()
 endif()
 
 if(USE_QT_V_4)
   if(NOT ALIZA_QT4_SYSTEM_GLEW)
-    target_compile_definitions(alizams PUBLIC GLEW_STATIC)
+    target_compile_definitions(${ALIZAMS_TARGET} PUBLIC GLEW_STATIC)
   endif()
 endif()
 
 if(NOT ALIZA_MEDIASTORAGE_MODE)
-  target_compile_definitions(alizams PRIVATE USE_WORKSTATION_MODE)
+  target_compile_definitions(${ALIZAMS_TARGET} PRIVATE USE_WORKSTATION_MODE)
 endif()
 
 if(ALIZA_USE_SYSTEM_LCMS2)
-  target_compile_definitions(alizams PRIVATE ALIZA_USE_SYSTEM_LCMS2)
+  target_compile_definitions(${ALIZAMS_TARGET} PRIVATE ALIZA_USE_SYSTEM_LCMS2)
 endif()
 
-target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
+target_link_directories(${ALIZAMS_TARGET} PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/bin")
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+  target_link_directories(${ALIZAMS_TARGET} PUBLIC "/usr/local/lib")
+endif()
+
+target_link_libraries(${ALIZAMS_TARGET} ${ALIZAMS_LINK_LIBRARIES})
 
