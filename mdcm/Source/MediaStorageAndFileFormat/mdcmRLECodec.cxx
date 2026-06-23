@@ -378,7 +378,12 @@ RLECodec::Decode(const DataElement & in, DataElement & out)
     {
       const Fragment &         frag = sf->GetFragment(i);
       const unsigned long long check = DecodeFragment(frag, buffer + pos, llen);
-      if (check != llen)
+      if (check == 0)
+      {
+        delete[] buffer;
+        return false;
+      }
+      else if (check != llen)
       {
         mdcmDebugMacro("RLE pb with frag: " << i);
         corruption = true;
@@ -715,10 +720,14 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
   size_t numSegments = frame.header.GetNumSegments();
   size_t length = Length;
   assert(length);
-  // Special case
-  assert(GetPixelFormat().GetBitsAllocated() == 32 ||
-         GetPixelFormat().GetBitsAllocated() == 16 ||
-         GetPixelFormat().GetBitsAllocated() == 8);
+  if (!(GetPixelFormat().GetBitsAllocated() == 32 ||
+        GetPixelFormat().GetBitsAllocated() == 16 ||
+        GetPixelFormat().GetBitsAllocated() == 8))
+  {
+    mdcmWarningMacro("RLECodec: BitsAllocated "
+                     << GetPixelFormat().GetBitsAllocated() << " is not supported");
+    return false;
+  }
   if (GetPixelFormat().GetBitsAllocated() > 8)
   {
     RequestPaddedCompositePixelCode = true;
@@ -889,7 +898,7 @@ RLECodec::DecodeFragment(const Fragment & frag, char * buffer, size_t llen)
   }
   catch (const std::bad_alloc &)
   {
-    return false;
+    return 0;
   }
   bv.GetBuffer(mybuffer, bv.GetLength());
   is.write(mybuffer, bv.GetLength());
