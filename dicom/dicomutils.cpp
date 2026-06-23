@@ -13642,8 +13642,6 @@ QString DicomUtils::read_dicom(
 							}
 						}
 					}
-					slice_locations_list1.clear();
-					slice_locations_list2.clear();
 				}
 			}
 		}
