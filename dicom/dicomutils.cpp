@@ -4972,13 +4972,10 @@ bool DicomUtils::get_patient_position(
 	{
 		bool ok{};
 		pp[0] = list.at(0).toDouble(&ok);
-		if (!ok) pp[0] = list.at(0).toInt(&ok);
 		if (!ok) return false;
 		pp[1] = list.at(1).toDouble(&ok);
-		if (!ok) pp[1] = list.at(1).toInt(&ok);
 		if (!ok) return false;
 		pp[2] = list.at(2).toDouble(&ok);
-		if (!ok) pp[2] = list.at(2).toInt(&ok);
 		if (!ok) return false;
 		return true;
 	}
@@ -5005,22 +5002,16 @@ bool DicomUtils::get_patient_orientation(
 	{
 		bool ok{};
 		po[0] = list.at(0).toDouble(&ok);
-		if (!ok) po[0] = list.at(0).toInt(&ok);
 		if (!ok) return false;
 		po[1] = list.at(1).toDouble(&ok);
-		if (!ok) po[1] = list.at(1).toInt(&ok);
 		if (!ok) return false;
 		po[2] = list.at(2).toDouble(&ok);
-		if (!ok) po[2] = list.at(2).toInt(&ok);
 		if (!ok) return false;
 		po[3] = list.at(3).toDouble(&ok);
-		if (!ok) po[3] = list.at(3).toInt(&ok);
 		if (!ok) return false;
 		po[4] = list.at(4).toDouble(&ok);
-		if (!ok) po[4] = list.at(4).toInt(&ok);
 		if (!ok) return false;
 		po[5] = list.at(5).toDouble(&ok);
-		if (!ok) po[5] = list.at(5).toInt(&ok);
 		if (!ok) return false;
 		return true;
 	}
@@ -5043,17 +5034,14 @@ bool DicomUtils::get_pixel_spacing(
 	if (list.size() == 1)
 	{
 		ps[0] = ps[1] = list.at(0).toDouble(&ok);
-		if (!ok) ps[0] = ps[1] = list.at(0).toInt(&ok);
 		if (!ok) return false;
 		return true;
 	}
 	else if (list.size() == 2)
 	{
 		ps[0] = list.at(0).toDouble(&ok);
-		if (!ok) ps[0] = list.at(0).toInt(&ok);
 		if (!ok) return false;
 		ps[1] = list.at(1).toDouble(&ok);
-		if (!ok) ps[1] = list.at(1).toInt(&ok);
 		if (!ok) return false;
 		return true;
 	}
