@@ -582,7 +582,12 @@ endif()
 
 set(ALIZAMS_SRCS "common/mmath.cpp" "common/structures.cpp" "main.cpp")
 
-if(NOT ALIZA_USE_SYSTEM_BULLET)
+if(ALIZA_USE_SYSTEM_BULLET)
+  find_package(Bullet REQUIRED COMPONENTS LinearMath BulletCollision)
+  message(STATUS "Bullet include dir: ${BULLET_INCLUDE_DIR}")
+  message(STATUS "Bullet libraries:   ${BULLET_LIBRARIES}")
+  message(STATUS "Bullet definitions: ${BULLET_DEFINITIONS}")
+else()
   set(BULLET_SRCS
     "b/LinearMath/btAlignedAllocator.cpp"
     "b/LinearMath/btConvexHull.cpp"
@@ -686,12 +691,6 @@ if(NOT ALIZA_USE_SYSTEM_BULLET)
     "b/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.cpp"
     "b/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp")
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${BULLET_SRCS})
-else()
-  find_package(Bullet REQUIRED COMPONENTS LinearMath BulletCollision)
-  message(STATUS "Bullet include dir: ${BULLET_INCLUDE_DIR}")
-  message(STATUS "Bullet libraries:   ${BULLET_LIBRARIES}")
-  message(STATUS "Bullet definitions: ${BULLET_DEFINITIONS}")
-  add_definitions(${BULLET_DEFINITIONS})
 endif()
 
 #
@@ -1066,6 +1065,10 @@ else()
   elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
     target_compile_definitions(${ALIZAMS_TARGET} PRIVATE DISABLE_SIMDMATH)
   endif()
+endif()
+
+if(ALIZA_USE_SYSTEM_BULLET)
+  target_compile_definitions(${ALIZAMS_TARGET} PRIVATE ${BULLET_DEFINITIONS})
 endif()
 
 if(ALIZA_VERBOSE)
