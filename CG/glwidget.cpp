@@ -778,6 +778,7 @@ void GLWidget::init_()
 	gradient5 = 0;
 	gradient6 = 0;
 	gradient7 = 0;
+	gradient8 = 0;
 	x_rotation = 0;
 	y_rotation = 0;
 	z_rotation = 0;
@@ -854,6 +855,7 @@ void GLWidget::close_()
 	if (gradient5 > 0) { glDeleteTextures(1, &gradient5); gradient5 = 0; }
 	if (gradient6 > 0) { glDeleteTextures(1, &gradient6); gradient6 = 0; }
 	if (gradient7 > 0) { glDeleteTextures(1, &gradient7); gradient7 = 0; }
+	if (gradient8 > 0) { glDeleteTextures(1, &gradient8); gradient8 = 0; }
 	for (unsigned int x = 0; x < shaders.size(); ++x)
 	{
 		if (shaders.at(x)->program != 0)
@@ -1320,6 +1322,7 @@ void GLWidget::init_opengl(int w, int h)
 	gen_lut_tex(hot_metal_blue, hot_metal_blue_size, &gradient5);
 	gen_lut_tex(pet_dicom_lut, pet_dicom_lut_size, &gradient6);
 	gen_lut_tex(pet20_dicom_lut, pet20_dicom_lut_size, &gradient7);
+	gen_lut_tex(labels_lut, labels_lut_size, &gradient8);
 	//
 	bool ok = create_fbos0(FBO_SIZE__0, FBO_SIZE__0, &framebuffer, &fbo_tex, &fbo_depth);
 #ifdef ALIZA_VERBOSE
@@ -2045,7 +2048,7 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 	glBindTexture(GL_TEXTURE_3D, di->image_3dtex);
 	if (di->lut_function == 2)
 	{
-		if (di->selected_lut == 0 || di->selected_lut > 7)
+		if (di->selected_lut == 0 || di->selected_lut > 8)
 		{
 			if (rect_selection)
 			{
@@ -2126,6 +2129,9 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 			case 7:
 				glBindTexture(GL_TEXTURE_1D, gradient7);
 				break;
+			case 8:
+				glBindTexture(GL_TEXTURE_1D, gradient8);
+				break;
 			default:
 				break;
 			}
@@ -2189,7 +2195,7 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 	}
 	else
 	{
-		if (di->selected_lut == 0 || di->selected_lut > 7)
+		if (di->selected_lut == 0 || di->selected_lut > 8)
 		{
 			if (rect_selection)
 			{
@@ -2269,6 +2275,9 @@ void GLWidget::paint_raycaster(int mode) // 0 -- intensity, 1 -- MIP
 				break;
 			case 7:
 				glBindTexture(GL_TEXTURE_1D, gradient7);
+				break;
+			case 8:
+				glBindTexture(GL_TEXTURE_1D, gradient8);
 				break;
 			default:
 				break;
@@ -2656,7 +2665,7 @@ void GLWidget::paint_volume()
 		//
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_3D, di->image_3dtex);
-		if (di->selected_lut == 0 || di->selected_lut > 7)
+		if (di->selected_lut == 0 || di->selected_lut > 8)
 		{
 			if (rect_selection)
 			{
@@ -2902,6 +2911,9 @@ void GLWidget::paint_volume()
 				break;
 			case 7:
 				glBindTexture(GL_TEXTURE_1D, gradient7);
+				break;
+			case 8:
+				glBindTexture(GL_TEXTURE_1D, gradient8);
 				break;
 			default:
 				break;

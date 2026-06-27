@@ -184,6 +184,7 @@ public:
 	GLuint gradient5;
 	GLuint gradient6;
 	GLuint gradient7;
+	GLuint gradient8;
 	void gen_lut_tex(const unsigned char*, const int, GLuint*);
 	bool ortho_proj;
 	float fov;
