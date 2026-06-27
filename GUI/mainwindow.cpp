@@ -873,11 +873,11 @@ void MainWindow::createActions()
 		QString("Z - double-slicer below 2D view"), this);
 	setLevelAct = new QAction(QString("Set level/window"), this);
 	zlockAct = new QAction(anchor2_icon,
-		QString("Anchor selected slice"), this);
+		QString("Lock to the slice selected in the 2D view"), this);
 	zlockAct->setCheckable(true);
 	zlockAct->setChecked(false);
 	oneAct = new QAction(QIcon(QString(":/bitmaps/one.svg")),
-		QString("Single slice"), this);
+		QString("Lock to the slice selected in the 2D view, single slice"), this);
 	oneAct->setCheckable(true);
 	oneAct->setChecked(false);
 	oneAct->setEnabled(false);

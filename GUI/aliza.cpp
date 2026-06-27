@@ -3884,6 +3884,7 @@ void Aliza::toggle_zlock(bool t)
 				}
 				else
 				{
+					if (v->equi) v->di->transparency = true;
 					v2->di->from_slice = 0;
 					v2->di->to_slice = v2->di->idimz > 1 ? v2->di->idimz - 1 : 0;
 				}
@@ -3900,6 +3901,7 @@ void Aliza::toggle_zlock(bool t)
 		}
 		else
 		{
+			if (v->equi) v->di->transparency = true;
 			v->di->from_slice = 0;
 			v->di->to_slice = v->di->idimz > 1 ? v->di->idimz - 1 : 0;
 		}
