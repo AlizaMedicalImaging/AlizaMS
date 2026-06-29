@@ -13489,13 +13489,13 @@ QString DicomUtils::read_dicom(
 					}
 					std::cout << std::endl;
 #endif
-					count_slice_locations.clear();
 					bool seq2{};
 					if (!count_slice_locations.empty() && num_slice_location_in_group > 0)
 					{
 						seq2 =
 							verify_sequential_groups<long long>(slice_locations_list1, num_slice_location_in_group);
 					}
+					count_slice_locations.clear();
 #ifdef ALIZA_DEBUG_MULTISERIES
 					std::cout << "verify_sequential_groups (Slice Location) = " << (seq2 ? "true\n" : "false\n");
 #endif
