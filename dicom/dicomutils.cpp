@@ -1579,8 +1579,10 @@ bool get_vm1_bin_value(
 	T * result)
 {
 	const mdcm::DataElement & v = ds.GetDataElement(t);
-	if (v.IsEmpty() || v.IsUndefinedLength() || !v.GetByteValue())
+	if (v.IsEmpty() || v.IsUndefinedLength())
+	{
 		return false;
+	}
 #if 0
 	const mdcm::VR vr = v.GetVR();
 	const long long tvr_ = TVR;
@@ -1591,12 +1593,15 @@ bool get_vm1_bin_value(
 		std::cout << "unexpected VR " << vr << std::endl;
 	}
 #endif
-	if (v.GetByteValue()->GetLength() != sizeof(T))
-		return false;
-	mdcm::Element<TVR, mdcm::VM::VM1> e;
-	e.SetFromDataElement(v);
-	*result = static_cast<T>(e.GetValue());
-	return true;
+	const mdcm::ByteValue * bv = v.GetByteValue();
+	if (bv && bv->GetLength() == sizeof(T))
+	{
+		mdcm::Element<TVR, mdcm::VM::VM1> e;
+		e.SetFromDataElement(v);
+		*result = static_cast<T>(e.GetValue());
+		return true;
+	}
+	return false;
 }
 
 template <typename T, long long TVR>
@@ -1606,8 +1611,10 @@ bool get_priv_vm1_bin_value(
 	T * result)
 {
 	const mdcm::DataElement & v = ds.GetDataElement(t);
-	if (v.IsEmpty() || v.IsUndefinedLength() || !v.GetByteValue())
+	if (v.IsEmpty() || v.IsUndefinedLength())
+	{
 		return false;
+	}
 #if 0
 	const mdcm::VR vr = v.GetVR();
 	const long long tvr_ = TVR;
@@ -1618,12 +1625,15 @@ bool get_priv_vm1_bin_value(
 		std::cout << "unexpected VR " << vr << std::endl;
 	}
 #endif
-	if (v.GetByteValue()->GetLength() != sizeof(T))
-		return false;
-	mdcm::Element<TVR, mdcm::VM::VM1> e;
-	e.SetFromDataElement(v);
-	*result = static_cast<T>(e.GetValue());
-	return true;
+	const mdcm::ByteValue * bv = v.GetByteValue();
+	if (bv && bv->GetLength() == sizeof(T))
+	{
+		mdcm::Element<TVR, mdcm::VM::VM1> e;
+		e.SetFromDataElement(v);
+		*result = static_cast<T>(e.GetValue());
+		return true;
+	}
+	return false;
 }
 
 template <typename T, long long TVR>
@@ -1633,8 +1643,10 @@ bool get_vm1_n_bin_values(
 	std::vector<T> & result)
 {
 	const mdcm::DataElement & v = ds.GetDataElement(t);
-	if (v.IsEmpty() || v.IsUndefinedLength() || !v.GetByteValue())
+	if (v.IsEmpty() || v.IsUndefinedLength())
+	{
 		return false;
+	}
 #if 0
 	const mdcm::VR vr = v.GetVR();
 	const long long tvr_ = TVR;
@@ -1645,18 +1657,27 @@ bool get_vm1_n_bin_values(
 		std::cout << "unexpected VR " << vr << std::endl;
 	}
 #endif
-	if ((v.GetByteValue()->GetLength() < sizeof(T)) ||
-		((v.GetByteValue()->GetLength() % sizeof(T)) != 0))
-		return false;
-	mdcm::Element<TVR, mdcm::VM::VM1_n> e;
-	e.SetFromDataElement(v);
-	const unsigned int l = e.GetLength();
-	if (l < 1) return false;
-	for (unsigned int x = 0; x < l; ++x)
+	const mdcm::ByteValue * bv = v.GetByteValue();
+	if (bv)
 	{
-		result.push_back(static_cast<T>(e.GetValue(x)));
+		if (bv->GetLength() < sizeof(T) || (bv->GetLength() % sizeof(T) != 0))
+		{
+			return false;
+		}
+		mdcm::Element<TVR, mdcm::VM::VM1_n> e;
+		e.SetFromDataElement(v);
+		const unsigned int l = e.GetLength();
+		if (l < 1)
+		{
+			return false;
+		}
+		for (unsigned int x = 0; x < l; ++x)
+		{
+			result.push_back(static_cast<T>(e.GetValue(x)));
+		}
+		return true;
 	}
-	return true;
+	return false;
 }
 
 template <typename T, long long TVR>
@@ -1666,8 +1687,10 @@ bool get_priv_vm1_n_bin_values(
 	std::vector<T> & result)
 {
 	const mdcm::DataElement & v = ds.GetDataElement(t);
-	if (v.IsEmpty() || v.IsUndefinedLength() || !v.GetByteValue())
+	if (v.IsEmpty() || v.IsUndefinedLength())
+	{
 		return false;
+	}
 #if 0
 	const mdcm::VR vr = v.GetVR();
 	const long long tvr_ = TVR;
@@ -1678,18 +1701,27 @@ bool get_priv_vm1_n_bin_values(
 		std::cout << "unexpected VR " << vr << std::endl;
 	}
 #endif
-	if ((v.GetByteValue()->GetLength() < sizeof(T)) ||
-		((v.GetByteValue()->GetLength() % sizeof(T)) != 0))
-		return false;
-	mdcm::Element<TVR, mdcm::VM::VM1_n> e;
-	e.SetFromDataElement(v);
-	const unsigned int l = e.GetLength();
-	if (l < 1) return false;
-	for (unsigned int x = 0; x < l; ++x)
+	const mdcm::ByteValue * bv = v.GetByteValue();
+	if (bv)
 	{
-		result.push_back(static_cast<T>(e.GetValue(x)));
+		if (bv->GetLength() < sizeof(T) || (bv->GetLength() % sizeof(T) != 0))
+		{
+			return false;
+		}
+		mdcm::Element<TVR, mdcm::VM::VM1_n> e;
+		e.SetFromDataElement(v);
+		const unsigned int l = e.GetLength();
+		if (l < 1)
+		{
+			return false;
+		}
+		for (unsigned int x = 0; x < l; ++x)
+		{
+			result.push_back(static_cast<T>(e.GetValue(x)));
+		}
+		return true;
 	}
-	return true;
+	return false;
 }
 
 #if 1 // no example file
@@ -2390,8 +2422,7 @@ bool DicomUtils::get_us_value(
 	const mdcm::Tag & t,
 	unsigned short * result)
 {
-	const bool ok = get_vm1_bin_value<unsigned short, mdcm::VR::US>(ds, t, result);
-	return ok;
+	return get_vm1_bin_value<unsigned short, mdcm::VR::US>(ds, t, result);
 }
 
 bool DicomUtils::get_ss_value(
@@ -2399,8 +2430,7 @@ bool DicomUtils::get_ss_value(
 	const mdcm::Tag & t,
 	signed short * result)
 {
-	const bool ok = get_vm1_bin_value<signed short, mdcm::VR::SS>(ds, t, result);
-	return ok;
+	return get_vm1_bin_value<signed short, mdcm::VR::SS>(ds, t, result);
 }
 
 bool DicomUtils::get_sl_value(
@@ -2408,8 +2438,7 @@ bool DicomUtils::get_sl_value(
 	const mdcm::Tag & t,
 	int * result)
 {
-	const bool ok = get_vm1_bin_value<int, mdcm::VR::SL>(ds, t, result);
-	return ok;
+	return get_vm1_bin_value<int, mdcm::VR::SL>(ds, t, result);
 }
 
 bool DicomUtils::get_ul_value(
@@ -2417,8 +2446,7 @@ bool DicomUtils::get_ul_value(
 	const mdcm::Tag & t,
 	unsigned int * result)
 {
-	const bool ok = get_vm1_bin_value<unsigned int, mdcm::VR::UL>(ds, t, result);
-	return ok;
+	return get_vm1_bin_value<unsigned int, mdcm::VR::UL>(ds, t, result);
 }
 
 bool DicomUtils::get_fd_value(
@@ -2426,8 +2454,7 @@ bool DicomUtils::get_fd_value(
 	const mdcm::Tag & t,
 	double * result)
 {
-	const bool ok = get_vm1_bin_value<double, mdcm::VR::FD>(ds, t, result);
-	return ok;
+	return get_vm1_bin_value<double, mdcm::VR::FD>(ds, t, result);
 }
 
 bool DicomUtils::priv_get_fd_value(
@@ -2435,8 +2462,7 @@ bool DicomUtils::priv_get_fd_value(
 	const mdcm::PrivateTag & t,
 	double * result)
 {
-	const bool ok = get_priv_vm1_bin_value<double, mdcm::VR::FD>(ds, t, result);
-	return ok;
+	return get_priv_vm1_bin_value<double, mdcm::VR::FD>(ds, t, result);
 }
 
 bool DicomUtils::get_fl_value(
@@ -2444,8 +2470,7 @@ bool DicomUtils::get_fl_value(
 	const mdcm::Tag & t,
 	float * result)
 {
-	const bool ok = get_vm1_bin_value<float, mdcm::VR::FL>(ds, t, result);
-	return ok;
+	return get_vm1_bin_value<float, mdcm::VR::FL>(ds, t, result);
 }
 
 bool DicomUtils::priv_get_fl_value(
@@ -2453,8 +2478,7 @@ bool DicomUtils::priv_get_fl_value(
 	const mdcm::PrivateTag & t,
 	float * result)
 {
-	const bool ok = get_priv_vm1_bin_value<float, mdcm::VR::FL>(ds, t, result);
-	return ok;
+	return get_priv_vm1_bin_value<float, mdcm::VR::FL>(ds, t, result);
 }
 
 bool DicomUtils::get_us_values(
@@ -2462,8 +2486,7 @@ bool DicomUtils::get_us_values(
 	const mdcm::Tag & t,
 	std::vector<unsigned short> & result)
 {
-	const bool ok = get_vm1_n_bin_values<unsigned short, mdcm::VR::US>(ds, t, result);
-	return ok;
+	return get_vm1_n_bin_values<unsigned short, mdcm::VR::US>(ds, t, result);
 }
 
 bool DicomUtils::get_ss_values(
@@ -2471,8 +2494,7 @@ bool DicomUtils::get_ss_values(
 	const mdcm::Tag & t,
 	std::vector<signed short> & result)
 {
-	const bool ok = get_vm1_n_bin_values<signed short, mdcm::VR::SS>(ds, t, result);
-	return ok;
+	return get_vm1_n_bin_values<signed short, mdcm::VR::SS>(ds, t, result);
 }
 
 bool DicomUtils::get_sl_values(
@@ -2480,8 +2502,7 @@ bool DicomUtils::get_sl_values(
 	const mdcm::Tag & t,
 	std::vector<int> & result)
 {
-	const bool ok = get_vm1_n_bin_values<int, mdcm::VR::SL>(ds, t, result);
-	return ok;
+	return get_vm1_n_bin_values<int, mdcm::VR::SL>(ds, t, result);
 }
 
 bool DicomUtils::get_ul_values(
@@ -2489,8 +2510,7 @@ bool DicomUtils::get_ul_values(
 	const mdcm::Tag & t,
 	std::vector<unsigned int> & result)
 {
-	const bool ok = get_vm1_n_bin_values<unsigned int, mdcm::VR::UL>(ds, t, result);
-	return ok;
+	return get_vm1_n_bin_values<unsigned int, mdcm::VR::UL>(ds, t, result);
 }
 
 bool DicomUtils::get_fd_values(
@@ -2498,8 +2518,7 @@ bool DicomUtils::get_fd_values(
 	const mdcm::Tag & t,
 	std::vector<double> & result)
 {
-	const bool ok = get_vm1_n_bin_values<double, mdcm::VR::FD>(ds, t, result);
-	return ok;
+	return get_vm1_n_bin_values<double, mdcm::VR::FD>(ds, t, result);
 }
 
 bool DicomUtils::priv_get_fd_values(
@@ -2507,8 +2526,7 @@ bool DicomUtils::priv_get_fd_values(
 	const mdcm::PrivateTag & t,
 	std::vector<double> & result)
 {
-	const bool ok = get_priv_vm1_n_bin_values<double, mdcm::VR::FD>(ds, t, result);
-	return ok;
+	return get_priv_vm1_n_bin_values<double, mdcm::VR::FD>(ds, t, result);
 }
 
 bool DicomUtils::get_fl_values(
@@ -2516,8 +2534,7 @@ bool DicomUtils::get_fl_values(
 	const mdcm::Tag & t,
 	std::vector<float> & result)
 {
-	const bool ok = get_vm1_n_bin_values<float, mdcm::VR::FL>(ds, t, result);
-	return ok;
+	return get_vm1_n_bin_values<float, mdcm::VR::FL>(ds, t, result);
 }
 
 bool DicomUtils::get_ds_values(
