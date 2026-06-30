@@ -142,7 +142,8 @@ template<typename Tin, typename Tout> void extract_icon(
 	{
 		return;
 	}
-	const int num_threads = QThread::idealThreadCount();
+	int num_threads = qMax(1, QThread::idealThreadCount());
+	num_threads = qMin(num_threads, static_cast<int>(size_y)); // don't create more threads than rows
 	const int tmp99 = size_y % num_threads;
 	std::vector<ProcessImageThread_*> icon_threads;
 	if (tmp99 == 0)
@@ -152,6 +153,7 @@ template<typename Tin, typename Tout> void extract_icon(
 		{
 			const int size_0 = size_x;
 			const int size_1 = size_y / num_threads;
+			if (size_1 <= 0) break; // defensive
 			const int index_0 = 0;
 			const int index_1 = i * size_1;
 			ProcessImageThread_ * t__ = new ProcessImageThread_(tmp1,
