@@ -766,7 +766,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 				0,
 				settingswidget->get_enh_strategy());
 			QEventLoop loop;
-			connect(lt, SIGNAL(finished()), &loop, SLOT(quit()));
+			connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
 			lt->start();
 			loop.exec();
 			process_load_dicom_results_t(
@@ -914,7 +914,7 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	if (pb) pb->setLabelText(QString("Calculating histogram"));
 	HistogramGen * t = new HistogramGen(v);
 	QEventLoop loop;
-	connect(t, SIGNAL(finished()), &loop, SLOT(quit()));
+	connect(t, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
 	t->start();
 	loop.exec();
 	t->gen_pixmap();
@@ -4196,7 +4196,7 @@ QString Aliza::load_dicom_file(
 			0,
 			settingswidget->get_enh_strategy());
 		QEventLoop loop;
-		connect(lt, SIGNAL(finished()), &loop, SLOT(quit()));
+		connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
 		lt->start();
 		loop.exec();
 		process_load_dicom_results_t(
