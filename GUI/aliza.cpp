@@ -83,12 +83,18 @@ struct ClosestRayResultCallback1 : public btCollisionWorld::ClosestRayResultCall
 	ClosestRayResultCallback1 (const btVector3 & rayFrom,const btVector3 & rayTo)
 		: btCollisionWorld::ClosestRayResultCallback(rayFrom, rayTo) {}
 	virtual ~ClosestRayResultCallback1() {}
+	// Caution: the "user pointer" is hardcoded as int[3]!
 	bool needsCollision(btBroadphaseProxy * proxy0) const
 	{
-		btCollisionObject * b =
-			static_cast<btCollisionObject *>(proxy0->m_clientObject);
-		const int * p = static_cast<int*>(b->getUserPointer());
-		if (p && (p[2] == 2)) return true;
+		if (proxy0 && proxy0->m_clientObject)
+		{
+			btCollisionObject * b = static_cast<btCollisionObject *>(proxy0->m_clientObject);
+			if (b)
+			{
+				const int * p = static_cast<int*>(b->getUserPointer());
+				if (p && (p[2] == 2)) return true;
+			}
+		}
 		return false;
 	}
 };
@@ -278,6 +284,7 @@ void add_slice_collision_plane(
 	btAlignedObjectArray<btStaticPlaneShape*> & tmp_shapes,
 	btAlignedObjectArray<btCollisionObject*> & tmp_objects)
 {
+	if (!g_collisionWorld) return;
 	btTransform t;
 	t.setIdentity();
 	const float px = v->di->image_slices.at(z)->v[0];
