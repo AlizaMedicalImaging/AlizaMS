@@ -108,7 +108,8 @@ template<typename T> SRImage li3(
 	}
 	//
 	std::vector<QThread*> threadsLUT_;
-	const int num_threads = QThread::idealThreadCount();
+	int num_threads = qMax(1, QThread::idealThreadCount());
+	num_threads = qMin(num_threads, static_cast<int>(size[1])); // don't create more threads than rows
 	const int tmp99 = size[1] % num_threads;
 	const double center = ivariant->di->us_window_center;
 	const double width = ivariant->di->us_window_width;
@@ -120,6 +121,7 @@ template<typename T> SRImage li3(
 		{
 			const int size_0 = size[0];
 			const int size_1 = size[1] / num_threads;
+			if (size_1 <= 0) break; // defensive
 			const int index_0{};
 			const int index_1 = i * size_1;
 			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(

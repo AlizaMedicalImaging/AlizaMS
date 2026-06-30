@@ -41,6 +41,11 @@
 #include <QTableWidgetItem>
 #include "dicomutils.h"
 
+class LoadDicom_T;
+#ifndef ALIZA_LOAD_DCM_THREAD
+class LoadDicom;
+#endif
+
 class Aliza : public QObject
 {
 Q_OBJECT
@@ -129,6 +134,28 @@ public:
 	void trigger_studyview();
 	void trigger_studyview_checked();
 	void trigger_studyview_empty();
+	void process_load_dicom_results_t(
+		LoadDicom_T *,
+		const QStringList &,
+		QString&,
+		std::vector<ImageVariant*> &,
+		QStringList&,
+		QStringList&,
+		QStringList&,
+		QStringList&,
+		QStringList&);
+#ifndef ALIZA_LOAD_DCM_THREAD
+	void process_load_dicom_results(
+		LoadDicom *,
+		const QStringList &,
+		QString&,
+		std::vector<ImageVariant*> &,
+		QStringList&,
+		QStringList&,
+		QStringList&,
+		QStringList&,
+		QStringList&);
+#endif
 
 public slots:
 	void delete_image();
@@ -180,23 +207,23 @@ private:
 	bool lock2{}; // 2D animation
 	bool lock3{}; // 3D animation
 	//
-	GLWidget       * glwidget{};
-	ImagesBox      * imagesbox{};
-	ToolBox        * toolbox{};
-	ToolBox2D      * toolbox2D{};
-	BrowserWidget2 * browser2{};
-	SettingsWidget * settingswidget{};
-	GraphicsWidget * graphicswidget_m{};
-	GraphicsWidget * graphicswidget_y{};
-	GraphicsWidget * graphicswidget_x{};
-	SliderWidget   * slider_m{};
-	SliderWidget   * slider_y{};
-	SliderWidget   * slider_x{};
-	ZRangeWidget   * zrangewidget{};
-	LUTWidget      * lutwidget2{};
-	HistogramView  * histogramview{};
-	AnimWidget     * anim3Dwidget{};
-	AnimWidget     * anim2Dwidget{};
+	GLWidget        * glwidget{};
+	ImagesBox       * imagesbox{};
+	ToolBox         * toolbox{};
+	ToolBox2D       * toolbox2D{};
+	BrowserWidget2  * browser2{};
+	SettingsWidget  * settingswidget{};
+	GraphicsWidget  * graphicswidget_m{};
+	GraphicsWidget  * graphicswidget_y{};
+	GraphicsWidget  * graphicswidget_x{};
+	SliderWidget    * slider_m{};
+	SliderWidget    * slider_y{};
+	SliderWidget    * slider_x{};
+	ZRangeWidget    * zrangewidget{};
+	LUTWidget       * lutwidget2{};
+	HistogramView   * histogramview{};
+	AnimWidget      * anim3Dwidget{};
+	AnimWidget      * anim2Dwidget{};
 	StudyViewWidget * studyview{};
 	QAction * graphicsAct_Z{};
 	QAction * graphicsAct_Y{};
