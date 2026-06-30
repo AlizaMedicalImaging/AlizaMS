@@ -161,15 +161,15 @@ void g_close_physics()
 {
 	if (g_collisionWorld)
 	{
-		for (int x = g_collisionWorld->getNumCollisionObjects() - 1; x >= 0; --x)
+		while (g_collisionWorld->getNumCollisionObjects() > 0)
 		{
-			btCollisionObject * o = g_collisionWorld->getCollisionObjectArray()[x];
+			btCollisionObject * o = g_collisionWorld->getCollisionObjectArray()[0];
 			if (o)
 			{
-				if (o->getUserPointer())
+				// Caution: the "user pointer" is hardcoded as int*
+				if (void * ptr = o->getUserPointer())
 				{
-					int * p = static_cast<int*>(o->getUserPointer());
-					delete [] p;
+					delete [] static_cast<int*>(ptr);
 				}
 				g_collisionWorld->removeCollisionObject(o);
 				delete o;
@@ -177,34 +177,32 @@ void g_close_physics()
 			}
 		}
 	}
-	const int g_collision_shapes_size = g_collision_shapes.size();
-	if (g_collision_shapes_size > 0)
+	//
+	for (int x = 0; x < g_collision_shapes.size(); ++x)
 	{
-		for (int x = 0; x < g_collision_shapes_size; ++x)
+		btCollisionShape * s = static_cast<btCollisionShape*>(g_collision_shapes[x]);
+		if (s)
 		{
-			btCollisionShape * s = g_collision_shapes[x];
-			if (s)
+			if (s->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
 			{
-				if (s->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
+				btCompoundShape * c = static_cast<btCompoundShape*>(s);
+				for (int z = 0; z < c->getNumChildShapes(); ++z)
 				{
-					btCompoundShape * c = static_cast<btCompoundShape*>(s);
-					for (int z = 0; z < c->getNumChildShapes(); ++z)
+					btCollisionShape * ch = static_cast<btCollisionShape*>(c->getChildShape(z));
+					if (ch)
 					{
-						btCollisionShape * ch = c->getChildShape(z);
-						if (ch)
-						{
-							c->removeChildShape(ch);
-							delete ch;
-							ch = nullptr;
-						}
+						c->removeChildShape(ch);
+						delete ch;
+						ch = nullptr;
 					}
 				}
-				delete s;
-				s = nullptr;
 			}
+			delete s;
+			s = nullptr;
 		}
-		g_collision_shapes.clear();
 	}
+	g_collision_shapes.clear();
+	//
 	if (g_collisionWorld)
 	{
 		delete g_collisionWorld;
@@ -3955,7 +3953,7 @@ void Aliza::toggle_collisions(bool t)
 	check_slice_collisions(get_selected_image_const(), graphicswidget_m);
 }
 
-void Aliza::trigger_image_color() 
+void Aliza::trigger_image_color()
 {
 	if (lock0) return;
 	lock0 = true;
