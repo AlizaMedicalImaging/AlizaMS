@@ -1294,7 +1294,8 @@ template<typename T> void load_image(
 	//
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
-	const int num_threads = QThread::idealThreadCount();
+	int num_threads = qMax(1, QThread::idealThreadCount());
+	num_threads = qMin(num_threads, static_cast<int>(size[1])); // don't create more threads than rows
 	const int tmp99 = size[1] % num_threads;
 	std::vector<QThread*> threadsLUT_;
 #ifdef A_TMP_BENCHMARK
@@ -1312,6 +1313,7 @@ template<typename T> void load_image(
 		{
 			const int size_0 = size[0];
 			const int size_1 = size[1] / num_threads;
+			if (size_1 <= 0) break; // defensive
 			const int index_0 = 0;
 			const int index_1 = i * size_1;
 			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(

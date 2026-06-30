@@ -14,7 +14,6 @@
 #include <QThread>
 #include <QPointF>
 #include <QPen>
-#include <QTimer>
 #include <QMouseEvent>
 #include <QEvent>
 #include <QCloseEvent>
