@@ -768,7 +768,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 			lt->start();
 			while (!lt->isFinished())
 			{
-				QThread::msleep(100);
+				QThread::msleep(100UL);
 				qApp->processEvents();
 			}
 			process_load_dicom_results_t(
@@ -916,7 +916,7 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb)
 	t->start();
 	while (!t->isFinished())
 	{
-		QThread::msleep(100);
+		QThread::msleep(100UL);
 		qApp->processEvents();
 		if (pb && pb->wasCanceled())
 		{
@@ -3678,7 +3678,7 @@ void Aliza::toggle_maxwindow(bool i)
 		t->start();
 		while (!t->isFinished())
 		{
-			QThread::msleep(100);
+			QThread::msleep(100UL);
 			qApp->processEvents();
 		}
 		t->gen_pixmap();
@@ -4283,7 +4283,7 @@ QString Aliza::load_dicom_file(
 		lt->start();
 		while (!lt->isFinished())
 		{
-			QThread::msleep(100);
+			QThread::msleep(100UL);
 			qApp->processEvents();
 		}
 		process_load_dicom_results_t(
