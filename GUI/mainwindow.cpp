@@ -622,7 +622,7 @@ void MainWindow::open_args(const QStringList & l)
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	if (dcm_thread)
 	{
-		connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
+		connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	}
 	pb->setMinimumWidth(256);
 	pb->setRange(0, 0);
@@ -672,7 +672,7 @@ void MainWindow::open_args(const QStringList & l)
 	}
 	if (dcm_thread)
 	{
-		disconnect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
+		disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	}
 	pb->close();
 	delete pb;

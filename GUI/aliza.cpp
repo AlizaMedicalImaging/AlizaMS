@@ -3638,6 +3638,28 @@ void Aliza::toggle_maxwindow(bool i)
 {
 	if (lock0) return;
 	lock0 = true;
+	QProgressDialog * pb =
+		new QProgressDialog(
+			QString("Processing. Please wait."),
+			QString("Exit"),
+			0,
+			0);
+	QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
+	for (int x = 0; x < lb.size(); ++x) // one button
+	{
+		lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+	}
+	pb->setModal(true);
+	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
+	pb->setMinimumWidth(256);
+	pb->setRange(0, 0);
+	pb->setMinimumDuration(0);
+	pb->setValue(0);
+	connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	pb->show();
+#endif
+	qApp->processEvents();
 	ImageVariant * v{};
 	const bool ok3d = check_3d();
 	if (ok3d) glwidget->set_skip_draw(true);
@@ -3648,13 +3670,19 @@ void Aliza::toggle_maxwindow(bool i)
 		// maxwin_pushButton must be disabled for other types
 		goto quit__;
 	}
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	qApp->processEvents();
 	v->di->maxwindow = i;
-	load_3d(v, true, true, false, true);
+	load_3d(v, false, false, true, true);
 	if (!v->histogram.isNull())
 	{
-		add_histogram(v, nullptr);
+		HistogramGen * t = new HistogramGen(v);
+		t->start();
+		while (!t->isFinished())
+		{
+			QThread::msleep(100);
+			qApp->processEvents();
+		}
+		t->gen_pixmap();
+		delete t;
 	}
 	histogramview->update__(v);
 	disconnect_tools();
@@ -3686,11 +3714,16 @@ void Aliza::toggle_maxwindow(bool i)
 	connect_tools();
 	graphicswidget_m->set_slice_2D(v, 0, true);
 	check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
-	if (multiview) graphicswidget_y->set_slice_2D(v, 0, false);
-	if (multiview) graphicswidget_x->set_slice_2D(v, 0, false);
-	QApplication::restoreOverrideCursor();
+	if (multiview)
+	{
+		graphicswidget_y->set_slice_2D(v, 0, false);
+		graphicswidget_x->set_slice_2D(v, 0, false);
+	}
 quit__:
 	if (ok3d) glwidget->set_skip_draw(false);
+	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
+	pb->close();
+	delete pb;
 	lock0 = false;
 }
 
