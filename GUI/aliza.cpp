@@ -768,8 +768,8 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 			lt->start();
 			while (!lt->isFinished())
 			{
-				qApp->processEvents();
 				QThread::msleep(100);
+				qApp->processEvents();
 			}
 			process_load_dicom_results_t(
 				lt,
@@ -907,30 +907,38 @@ void Aliza::process_load_dicom_results(
 }
 #endif
 
-void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_settings)
+void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb)
 {
 	if (!v) return;
-	if (v->image_type <  0) return;
-	if (v->image_type > 16) return;
-	if (check_settings) return; // always 'false'
-	if (pb) pb->setLabelText(QString("Calculating histogram"));
+	if (v->image_type < 0) return;
+	if (v->image_type >= 20) return;
 	HistogramGen * t = new HistogramGen(v);
 	t->start();
 	while (!t->isFinished())
 	{
-		qApp->processEvents();
 		QThread::msleep(100);
-	}
-	t->gen_pixmap();
-	const QString tmp0 = t->get_error();
-#ifdef ALIZA_VERBOSE
-	if (!tmp0.isEmpty())
-	{
-		std::cout << tmp0.toStdString() << std::endl;
-	}
+		qApp->processEvents();
+		if (pb && pb->wasCanceled())
+		{
+#if QT_VERSION < QT_VERSION_CHECK(5,2,0)
+			exit_null();
 #else
-	(void)tmp0;
+			t->requestInterruption();
+			t->wait();
 #endif
+		}
+	}
+	if (pb)
+	{
+		if (!pb->wasCanceled())
+		{
+			t->gen_pixmap();
+		}
+	}
+	else
+	{
+		t->gen_pixmap();
+	}
 	delete t;
 }
 
@@ -2973,15 +2981,51 @@ void Aliza::trigger_reload_histogram()
 {
 	if (lock0) return;
 	lock0 = true;
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	qApp->processEvents();
 	ImageVariant * v = get_selected_image();
-	if (v)
+	if (!v)
 	{
-		add_histogram(v, nullptr, false);
+		lock0 = false;
+		return;
+	}
+#if QT_VERSION < QT_VERSION_CHECK(5,2,0)
+	QProgressDialog * pb = new QProgressDialog(
+		QString("Calculating histogram"),
+		QString("Exit"),
+		0,
+		0);
+	{
+		QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
+		for (int x = 0; x < lb.size(); ++x) // one button
+		{
+			lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+		}
+	}
+#else
+	QProgressDialog * pb = new QProgressDialog(
+		QString("Calculating histogram"),
+		QString("Stop"),
+		0,
+		0);
+#endif
+	pb->setModal(true);
+	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
+	pb->setMinimumWidth(256);
+	pb->setRange(0, 0);
+	pb->setMinimumDuration(0);
+	pb->setValue(0);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	pb->show();
+#endif
+	qApp->processEvents();
+	//
+	add_histogram(v, pb);
+	if (!pb->wasCanceled())
+	{
 		histogramview->update__(v);
 	}
-	QApplication::restoreOverrideCursor();
+	//
+	pb->close();
+	delete pb;
 	lock0 = false;
 }
 
@@ -3608,7 +3652,10 @@ void Aliza::toggle_maxwindow(bool i)
 	qApp->processEvents();
 	v->di->maxwindow = i;
 	load_3d(v, true, true, false, true);
-	if (!v->histogram.isNull()) add_histogram(v, nullptr, false);
+	if (!v->histogram.isNull())
+	{
+		add_histogram(v, nullptr);
+	}
 	histogramview->update__(v);
 	disconnect_tools();
 	toolbox2D->disconnect_sliders();
@@ -4203,8 +4250,8 @@ QString Aliza::load_dicom_file(
 		lt->start();
 		while (!lt->isFinished())
 		{
-			qApp->processEvents();
 			QThread::msleep(100);
+			qApp->processEvents();
 		}
 		process_load_dicom_results_t(
 			lt,
@@ -4742,7 +4789,6 @@ QString Aliza::process_dicom(
 			}
 		}
 #endif
-		add_histogram(ivariants.at(x), pb);
 		IconUtils::icon(ivariants[x]);
 		//
 		if (ivariants.at(x)->di->opengl_ok)

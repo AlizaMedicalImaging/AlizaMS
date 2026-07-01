@@ -278,7 +278,7 @@ private:
 		bool = false,
 		bool = false);
 	void update_center(ImageVariant*);
-	void add_histogram(ImageVariant*, QProgressDialog*, bool = true);
+	void add_histogram(ImageVariant*, QProgressDialog*);
 	void update_group_center(const ImageVariant*);
 	void update_group_width(const ImageVariant*);
 	void set_us_center(ImageVariant*, double);
