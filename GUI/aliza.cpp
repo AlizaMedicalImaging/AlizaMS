@@ -11,7 +11,6 @@
 #include <QDir>
 #include <QColorDialog>
 #include <QDateTime>
-#include <QEventLoop>
 #include <string>
 #include <array>
 #ifdef ALIZA_PERF_COLLISION
@@ -735,6 +734,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		glwidget->set_skip_draw(true);
 	}
 	const bool dcm_thread = settingswidget->get_dcm_thread();
+	const short enh_type = settingswidget->get_enh_strategy();
 	const QModelIndexList selection =
 		browser2->tableWidget->selectionModel()->selectedRows();
 	for (int x = 0; x < selection.count(); ++x)
@@ -764,11 +764,13 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 				ok3d,
 				static_cast<const QWidget * const>(const_cast<const SettingsWidget * const>(settingswidget)),
 				0,
-				settingswidget->get_enh_strategy());
-			QEventLoop loop;
-			connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
+				enh_type);
 			lt->start();
-			loop.exec();
+			while (!lt->isFinished())
+			{
+				qApp->processEvents();
+				QThread::msleep(100);
+			}
 			process_load_dicom_results_t(
 				lt,
 				filenames,
@@ -913,10 +915,12 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	if (check_settings) return; // always 'false'
 	if (pb) pb->setLabelText(QString("Calculating histogram"));
 	HistogramGen * t = new HistogramGen(v);
-	QEventLoop loop;
-	connect(t, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
 	t->start();
-	loop.exec();
+	while (!t->isFinished())
+	{
+		qApp->processEvents();
+		QThread::msleep(100);
+	}
 	t->gen_pixmap();
 	const QString tmp0 = t->get_error();
 #ifdef ALIZA_VERBOSE
@@ -4185,6 +4189,7 @@ QString Aliza::load_dicom_file(
 		glwidget->set_skip_draw(true);
 	}
 	const bool dcm_thread = settingswidget->get_dcm_thread();
+	const short enh_type = settingswidget->get_enh_strategy();
 	if (dcm_thread)
 	{
 		LoadDicom_T * lt = new LoadDicom_T(
@@ -4194,11 +4199,13 @@ QString Aliza::load_dicom_file(
 			static_cast<const QWidget * const>(
 				const_cast<const SettingsWidget * const>(settingswidget)),
 			0,
-			settingswidget->get_enh_strategy());
-		QEventLoop loop;
-		connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
+			enh_type);
 		lt->start();
-		loop.exec();
+		while (!lt->isFinished())
+		{
+			qApp->processEvents();
+			QThread::msleep(100);
+		}
 		process_load_dicom_results_t(
 			lt,
 			filenames,
