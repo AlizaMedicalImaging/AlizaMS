@@ -748,7 +748,6 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		glwidget->set_skip_draw(true);
 	}
 	const bool dcm_thread = settingswidget->get_dcm_thread();
-	const short enh_type = settingswidget->get_enh_strategy();
 	const QModelIndexList selection =
 		browser2->tableWidget->selectionModel()->selectedRows();
 	for (int x = 0; x < selection.count(); ++x)
@@ -814,7 +813,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 				ok3d,
 				settings,
 				0,
-				get_enh_strategy);
+				enh_strategy);
 			lt->run();
 			process_load_dicom_results(
 				lt,
