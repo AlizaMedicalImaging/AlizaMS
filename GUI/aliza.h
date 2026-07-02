@@ -197,6 +197,7 @@ public slots:
 	void update_studyview_intersections();
 	void set_adjust_glwidget(bool);
 	void set_adjust_value_glwidget(int);
+	void exit_null();
 
 signals:
 	void report_load_to_mainwin();

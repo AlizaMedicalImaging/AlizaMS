@@ -733,9 +733,7 @@ void MainWindow::resizeEvent(QResizeEvent * e)
 	QMainWindow::resizeEvent(e);
 }
 
-// It is used only to let a user abort some processes
-// and exit if there is no better way to stop them,
-// bad, should be used only as exception.
+// Bad, should be used only as an exception.
 void MainWindow::exit_null()
 {
 	exit(0);

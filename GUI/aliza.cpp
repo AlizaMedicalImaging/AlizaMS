@@ -41,17 +41,14 @@
 #include "mmath.h"
 #include <itkVersion.h>
 
-// These flags are used only for diagnostic build sometimes
+// For Bullet
 #ifndef _WIN32
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-//#pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 #pragma GCC diagnostic ignored "-Wcast-align"
 #endif
-
 #include "btBulletCollisionCommon.h"
-
 #ifndef _WIN32
 #pragma GCC diagnostic pop
 #endif
@@ -5147,6 +5144,12 @@ void Aliza::set_adjust_value_glwidget(int x)
 	{
 		glwidget->set_adjust(x);
 	}
+}
+
+// Bad, should be used only as an exception.
+void Aliza::exit_null()
+{
+	exit(0);
 }
 
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
