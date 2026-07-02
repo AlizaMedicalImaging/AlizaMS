@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QColorDialog>
 #include <QDateTime>
+#include <QEventLoop>
 #include <string>
 #include <array>
 #ifdef ALIZA_PERF_COLLISION
@@ -152,14 +153,14 @@ void g_init_physics()
 inline void delay1(unsigned int ms)
 {
 #if 1
-	QApplication::processEvents();
-	QThread::msleep(ms);
-#else
 	QEventLoop loop;
 	QTimer t;
 	t.connect(&t, SIGNAL(timeout()), &loop, SLOT(quit()));
 	t.start(ms);
 	loop.exec();
+#else
+	QApplication::processEvents();
+	QThread::msleep(ms);
 #endif
 }
 
@@ -781,16 +782,16 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 				0,
 				enh_strategy);
 #if 1
+			QEventLoop loop;
+			connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
+			lt->start();
+			loop.exec();
+#else
 			lt->start();
 			while (!lt->isFinished())
 			{
 				delay1(100U);
 			}
-#else
-			QEventLoop loop;
-			connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
-			lt->start();
-			loop.exec();
 #endif
 			process_load_dicom_results_t(
 				lt,
@@ -802,6 +803,8 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 				video_files,
 				spectroscopy_files,
 				sr_files);
+			lt->quit();
+			lt->wait();
 			delete lt;
 		}
 #ifndef ALIZA_LOAD_DCM_THREAD
@@ -4300,16 +4303,16 @@ QString Aliza::load_dicom_file(
 			0,
 			enh_strategy);
 #if 1
+		QEventLoop loop;
+		connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
+		lt->start();
+		loop.exec();
+#else
 		lt->start();
 		while (!lt->isFinished())
 		{
 			delay1(100U);
 		}
-#else
-		QEventLoop loop;
-		connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
-		lt->start();
-		loop.exec();
 #endif
 		process_load_dicom_results_t(
 			lt,
@@ -4321,6 +4324,8 @@ QString Aliza::load_dicom_file(
 			video_files,
 			spectroscopy_files,
 			sr_files);
+		lt->quit();
+		lt->wait();
 		delete lt;
 	}
 #ifndef ALIZA_LOAD_DCM_THREAD
