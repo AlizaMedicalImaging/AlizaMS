@@ -2031,15 +2031,13 @@ template<typename T> double get_value(
 int CommonUtils::get_next_id()
 {
 	static std::atomic<int> id___{};
-	++id___;
-	return id___;
+	return ++id___;
 }
 
 int CommonUtils::get_next_group_id()
 {
 	static std::atomic<int> group_id___{};
-	++group_id___;
-	return group_id___;
+	return ++group_id___;
 }
 
 double CommonUtils::random_range(

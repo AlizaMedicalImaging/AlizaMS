@@ -70,6 +70,20 @@ static btCollisionWorld                * g_collisionWorld = nullptr;
 static btAlignedObjectArray<btCollisionShape*> g_collision_shapes;
 static bool show_all_study_collisions = true;
 
+inline void delay1(unsigned int ms)
+{
+#if 1
+	QThread::msleep(ms);
+	QApplication::processEvents();
+#else
+	QEventLoop loop;
+	QTimer t;
+	t.connect(&t, SIGNAL(timeout()), &loop, SLOT(quit()));
+	t.start(ms);
+	loop.exec();
+#endif
+}
+
 struct ClosestRayResultCallback1 : public btCollisionWorld::ClosestRayResultCallback
 {
 	ClosestRayResultCallback1 (const btVector3 & rayFrom,const btVector3 & rayTo)
@@ -765,12 +779,18 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 				static_cast<const QWidget * const>(const_cast<const SettingsWidget * const>(settingswidget)),
 				0,
 				enh_type);
+#if 1
 			lt->start();
 			while (!lt->isFinished())
 			{
-				QThread::msleep(100UL);
-				qApp->processEvents();
+				delay1(100U);
 			}
+#else
+			QEventLoop loop;
+			connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
+			lt->start();
+			loop.exec();
+#endif
 			process_load_dicom_results_t(
 				lt,
 				filenames,
@@ -916,8 +936,7 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb)
 	t->start();
 	while (!t->isFinished())
 	{
-		QThread::msleep(100UL);
-		qApp->processEvents();
+		delay1(100U);
 		if (pb && pb->wasCanceled())
 		{
 #if QT_VERSION < QT_VERSION_CHECK(5,2,0)
@@ -3678,8 +3697,7 @@ void Aliza::toggle_maxwindow(bool i)
 		t->start();
 		while (!t->isFinished())
 		{
-			QThread::msleep(100UL);
-			qApp->processEvents();
+			delay1(100U);
 		}
 		t->gen_pixmap();
 		delete t;
@@ -4280,12 +4298,18 @@ QString Aliza::load_dicom_file(
 				const_cast<const SettingsWidget * const>(settingswidget)),
 			0,
 			enh_type);
+#if 1
 		lt->start();
 		while (!lt->isFinished())
 		{
-			QThread::msleep(100UL);
-			qApp->processEvents();
+			delay1(100U);
 		}
+#else
+		QEventLoop loop;
+		connect(lt, SIGNAL(finished()), &loop, SLOT(quit()), Qt::QueuedConnection);
+		lt->start();
+		loop.exec();
+#endif
 		process_load_dicom_results_t(
 			lt,
 			filenames,
