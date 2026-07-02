@@ -70,20 +70,6 @@ static btCollisionWorld                * g_collisionWorld = nullptr;
 static btAlignedObjectArray<btCollisionShape*> g_collision_shapes;
 static bool show_all_study_collisions = true;
 
-inline void delay1(unsigned int ms)
-{
-#if 1
-	QThread::msleep(ms);
-	QApplication::processEvents();
-#else
-	QEventLoop loop;
-	QTimer t;
-	t.connect(&t, SIGNAL(timeout()), &loop, SLOT(quit()));
-	t.start(ms);
-	loop.exec();
-#endif
-}
-
 struct ClosestRayResultCallback1 : public btCollisionWorld::ClosestRayResultCallback
 {
 	ClosestRayResultCallback1 (const btVector3 & rayFrom,const btVector3 & rayTo)
@@ -160,6 +146,20 @@ void g_init_physics()
 	g_collisionWorld = new btCollisionWorld(g_dispatcher,g_broadphase,g_collisionConfiguration);
 #if 0
 	std::cout << "Bullet " << btGetVersion() << std::endl;
+#endif
+}
+
+inline void delay1(unsigned int ms)
+{
+#if 1
+	QApplication::processEvents();
+	QThread::msleep(ms);
+#else
+	QEventLoop loop;
+	QTimer t;
+	t.connect(&t, SIGNAL(timeout()), &loop, SLOT(quit()));
+	t.start(ms);
+	loop.exec();
 #endif
 }
 
@@ -762,6 +762,8 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		return QString("");
 	}
 	const QString root = browser2->get_root();
+	const short enh_strategy = settingswidget->get_enh_strategy();
+	const CurrentSettings settings = settingswidget->get_current_settings();
 	for (unsigned int x = 0; x < rows.size(); ++x)
 	{
 		const int row = rows.at(x);
@@ -776,9 +778,9 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 				root,
 				filenames,
 				ok3d,
-				static_cast<const QWidget * const>(const_cast<const SettingsWidget * const>(settingswidget)),
+				settings,
 				0,
-				enh_type);
+				enh_strategy);
 #if 1
 			lt->start();
 			while (!lt->isFinished())
@@ -810,9 +812,9 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 				root,
 				filenames,
 				ok3d,
-				static_cast<const QWidget * const>(const_cast<const SettingsWidget * const>(settingswidget)),
+				settings,
 				0,
-				settingswidget->get_enh_strategy());
+				get_enh_strategy);
 			lt->run();
 			process_load_dicom_results(
 				lt,
@@ -4287,17 +4289,17 @@ QString Aliza::load_dicom_file(
 		glwidget->set_skip_draw(true);
 	}
 	const bool dcm_thread = settingswidget->get_dcm_thread();
-	const short enh_type = settingswidget->get_enh_strategy();
+	const short enh_strategy = settingswidget->get_enh_strategy();
+	const CurrentSettings settings = settingswidget->get_current_settings();
 	if (dcm_thread)
 	{
 		LoadDicom_T * lt = new LoadDicom_T(
 			QString(""),
 			filenames,
 			ok3d,
-			static_cast<const QWidget * const>(
-				const_cast<const SettingsWidget * const>(settingswidget)),
+			settings,
 			0,
-			enh_type);
+			enh_strategy);
 #if 1
 		lt->start();
 		while (!lt->isFinished())
@@ -4329,10 +4331,9 @@ QString Aliza::load_dicom_file(
 			QString(""),
 			filenames,
 			ok3d,
-			static_cast<const QWidget * const>(
-				const_cast<const SettingsWidget * const>(settingswidget)),
+			settings,
 			0,
-			settingswidget->get_enh_strategy());
+			enh_strategy);
 		lt->run();
 		process_load_dicom_results(
 			lt,
@@ -4733,6 +4734,7 @@ QString Aliza::process_dicom(
 	QString message;
 	int max_3d_tex_size{};
 	const bool ok3d = check_3d();
+	const CurrentSettings settings = settingswidget->get_current_settings();
 	if (ok3d)
 	{
 		max_3d_tex_size = glwidget->max_3d_texture_size;
@@ -4935,7 +4937,7 @@ QString Aliza::process_dicom(
 						ds,
 						t00080005,
 						fi.absolutePath(),
-						static_cast<QWidget*>(settingswidget),
+						settings,
 						sr->textBrowser,
 						pb,
 						sr->tmpfiles,

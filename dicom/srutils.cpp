@@ -26,7 +26,6 @@
 #include <QBrush>
 #include <QApplication>
 #include "processimagethreadLUT.hxx"
-#include "settingswidget.h"
 #include "findrefdialog.h"
 #include <itkExtractImageFilter.h>
 #include "mmath.h"
@@ -377,15 +376,14 @@ void SRUtils::read_IMAGE(
 	QTextBrowser * textBrowser,
 	const std::vector<SRGraphic> & grobjects,
 	bool info,
-	const QWidget * wsettings,
+	const CurrentSettings & settings,
 	QProgressDialog * pb)
 {
 	QString tmpfile;
 	const mdcm::DataElement & e8 = ds.GetDataElement(mdcm::Tag(0x0008,0x1199));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 = e8.GetValueAsSQ();
 	if (!sq8) return;
-	const SettingsWidget * settings = static_cast<const SettingsWidget*>(wsettings);
-	const bool skip_images = settings->get_sr_skip_images();
+	const bool skip_images = settings.sr_skip_images;
 	const unsigned int nitems8 = sq8->GetNumberOfItems();
 	for (unsigned int i8 = 0; i8 < nitems8; ++i8)
 	{
@@ -476,7 +474,7 @@ void SRUtils::read_IMAGE(
 						"</body></html>");
 					QFileInfo fi22(path + QString("/.."));
 					if (pb) pb->hide();
-					FindRefDialog * d = new FindRefDialog(settings->get_scale_icons());
+					FindRefDialog * d = new FindRefDialog(settings.scale_icons);
 					d->set_text(s22);
 					d->set_path(QDir::toNativeSeparators(fi22.absoluteFilePath()));
 					if (d->exec() == QDialog::Accepted)
@@ -522,7 +520,7 @@ void SRUtils::read_IMAGE(
 				QString(""),
 				QStringList(sf),
 				false,
-				wsettings,
+				settings,
 				3,
 				true);
 			if (e_.isEmpty() && ivariants.size() == 1 && ivariants.at(0))
@@ -818,7 +816,7 @@ endpoints of the minor axis of an ellipse
 								Qt::SmoothTransformation);
 							pm.i = std::move(si);
 						}
-						const int max_width = settings->get_sr_image_width();
+						const int max_width = settings.sr_image_width;
 						if (max_width >= 64 && pm.i.width() > max_width)
 						{
 							QImage si = pm.i.scaledToWidth(max_width, Qt::SmoothTransformation);
@@ -888,11 +886,10 @@ bool SRUtils::read_SCOORD(
 	std::vector<SRImage> & srimages,
 	QTextBrowser * textBrowser,
 	bool info,
-	const QWidget * wsettings,
+	const CurrentSettings & settings,
 	QProgressDialog * pb)
 {
-	const SettingsWidget * settings = static_cast<const SettingsWidget*>(wsettings);
-	const bool skip_images = settings->get_sr_skip_images();
+	const bool skip_images = settings.sr_skip_images;
 	QString GraphicType;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0070,0x0023), GraphicType))
 	{
@@ -966,7 +963,7 @@ bool SRUtils::read_SCOORD(
 						textBrowser,
 						tmp001,
 						info,
-						wsettings,
+						settings,
 						pb);
 				}
 				else
@@ -1406,7 +1403,7 @@ QString SRUtils::read_sr_content_sq(
 	const mdcm::DataSet & ds,
 	const QString & charset,
 	const QString & path,
-	const QWidget * wsettings,
+	const CurrentSettings & settings,
 	QTextBrowser * textBrowser,
 	QProgressDialog * pb,
 	QStringList & tmpfiles,
@@ -1425,8 +1422,7 @@ QString SRUtils::read_sr_content_sq(
 		if (sq)
 		{
 			QString tmp_chapter;
-			const SettingsWidget * settings = static_cast<const SettingsWidget*>(wsettings);
-			const bool print_chapters = settings->get_sr_chapters();
+			const bool print_chapters = settings.sr_chapters;
 			const unsigned int nitems = sq->GetNumberOfItems();
 			for (unsigned int i = 0; i < nitems; ++i)
 			{
@@ -1568,7 +1564,7 @@ QString SRUtils::read_sr_content_sq(
 						srimages,
 						textBrowser,
 						info,
-						wsettings,
+						settings,
 						pb);
 					if (continue_)
 					{
@@ -1594,7 +1590,7 @@ QString SRUtils::read_sr_content_sq(
 						textBrowser,
 						tmp001,
 						info,
-						wsettings,
+						settings,
 						pb);
 				}
 				else if (ValueType == QString("COMPOSITE"))
@@ -1652,7 +1648,7 @@ QString SRUtils::read_sr_content_sq(
 						nds,
 						charset,
 						path,
-						wsettings,
+						settings,
 						textBrowser,
 						pb,
 						tmpfiles,
@@ -1724,7 +1720,7 @@ QString SRUtils::read_sr_content_sq(
 								textBrowser,
 								dummy,
 								info,
-								wsettings,
+								settings,
 								pb);
 						}
 					}

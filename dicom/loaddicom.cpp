@@ -1,4 +1,3 @@
-#include "structures.h"
 #include "loaddicom.h"
 #include "dicomutils.h"
 #include <iostream>
@@ -17,7 +16,7 @@ void LoadDicom::run()
 			root,
 			filenames,
 			ok3d,
-			settingswidget,
+			settings,
 			load_type,
 			enh_type);
 	}

@@ -543,3 +543,35 @@ bool SettingsWidget::get_process_multiseries() const
 {
 	return multiseries_checkBox->isChecked();
 }
+
+CurrentSettings SettingsWidget::get_current_settings()
+{
+	CurrentSettings s;
+	s.filtering = get_filtering();
+	s.resize = get_resize();
+	s.size_x = get_size_x();
+	s.size_y = get_size_y();
+	s.rescale = get_rescale();
+	s.use3d = get_3d();
+	s.time_unit = get_time_unit();
+	s.mosaic = get_mosaic();
+	s.overlays = get_overlays();
+	s.font_pt = get_font_pt();
+	s.level_for_PET = get_level_for_PET();
+	s.clean_unused_bits = get_clean_unused_bits();
+	s.scale_icons = get_scale_icons();
+	s.sr_info = get_sr_info();
+	s.sr_image_width = get_sr_image_width();
+	s.sr_chapters = get_sr_chapters();
+	s.sr_skip_images = get_sr_skip_images();
+	s.predictor_workaround = get_predictor_workaround();
+	s.cornell_workaround = get_cornell_workaround();
+	s.apply_icc = get_apply_icc();
+	s.try_fix_jpeg_prec = get_try_fix_jpeg_prec();
+	s.enh_strategy = get_enh_strategy();
+	s.apply_supplemental_lut = get_apply_supplemental_lut();
+	s.skip_too_large = get_skip_too_large();
+	s.dcm_thread = get_dcm_thread();
+	s.process_multiseries = get_process_multiseries();
+	return s;
+}

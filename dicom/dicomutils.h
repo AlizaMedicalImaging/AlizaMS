@@ -5,7 +5,6 @@
 #include <QString>
 #include <QStringList>
 #include <QList>
-#include <QWidget>
 #include <mdcmTag.h>
 #include <mdcmPrivateTag.h>
 #include <mdcmDataSet.h>
@@ -313,7 +312,7 @@ public:
 		bool,
 		const bool,
 		const short,
-		const QWidget*,
+		const CurrentSettings&,
 		const float,
 		const bool);
 	static QString read_enhanced_supp_palette(
@@ -321,19 +320,19 @@ public:
 		bool,
 		const bool,
 		const short,
-		const QWidget*,
+		const CurrentSettings&,
 		const float);
 	static QString read_ultrasound(
 		bool*, const short,
 		ImageVariant*,
 		const QStringList&,
-		const QWidget*);
+		const CurrentSettings&);
 	static QString read_nuclear(
 		bool*, const short,
 		ImageVariant*,
 		const QStringList&,
 		bool,
-		const QWidget*);
+		const CurrentSettings&);
 	static QString read_series(
 		bool*,
 		const bool,
@@ -342,7 +341,7 @@ public:
 		const bool,
 		ImageVariant*, const QStringList&,
 		bool,
-		const QWidget*,
+		const CurrentSettings&,
 		float,
 		bool);
 	static bool convert_elscint(
@@ -394,7 +393,7 @@ public:
 		const FrameGroupValues&,
 		const bool,
 		const bool,
-		const QWidget*,
+		const CurrentSettings&,
 		double*,
 		const int,
 		const double, const double, const double,
@@ -430,7 +429,7 @@ public:
 		const FrameGroupValues&,
 		const bool,
 		const bool,
-		const QWidget*,
+		const CurrentSettings&,
 		double*,
 		const int,
 		const double, const double, const double,
@@ -457,7 +456,7 @@ public:
 		std::vector<ImageVariant*> &,
 		bool,
 		short,
-		const QWidget*);
+		const CurrentSettings&);
 	static QString find_file_from_uid(
 		const QString&,
 		const QString&);
@@ -511,7 +510,7 @@ public:
 		const QString&,
 		const QStringList&,
 		bool,
-		const QWidget*,
+		const CurrentSettings&,
 		short, // type of object processing
 		short);
 };

@@ -7,7 +7,7 @@
 class PrRefSeries;
 class ImageVariant;
 class PrConfig;
-class SettingsWidget;
+class CurrentSettings;
 
 class PrConfigUtils
 {
@@ -32,13 +32,13 @@ public:
 	static ImageVariant * make_pr_monochrome(
 		const ImageVariant*,
 		const PrRefSeries &,
-		const SettingsWidget*,
+		const CurrentSettings&,
 		bool,
 		bool*);
 	static ImageVariant * make_pr_rgb(
 		const ImageVariant*,
 		const PrRefSeries &,
-		const SettingsWidget*,
+		const CurrentSettings&,
 		bool*);
 };
 

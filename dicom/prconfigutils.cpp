@@ -3207,7 +3207,7 @@ void PrConfigUtils::read_pr(
 ImageVariant * PrConfigUtils::make_pr_monochrome(
 	const ImageVariant * ivariant,
 	const PrRefSeries & ref,
-	const SettingsWidget * w,
+	const CurrentSettings & settings,
 	bool ok3d,
 	bool * spatial_transform)
 {
@@ -3236,10 +3236,10 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	ImageVariant * v = new ImageVariant(
 		CommonUtils::get_next_id(),
 		ok3d,
-		!w->get_3d(),
+		!settings.use3d,
 		nullptr,
 		0);
-	v->di->filtering = w->get_filtering();
+	v->di->filtering = settings.filtering;
 	//
 	// Modality LUT
 	//
@@ -4168,10 +4168,10 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 
 ImageVariant * PrConfigUtils::make_pr_rgb(
-	const ImageVariant * ivariant,
-	const PrRefSeries & ref,
-	const SettingsWidget * w,
-	bool * spatial_transform)
+	const ImageVariant *,
+	const PrRefSeries&,
+	const CurrentSettings &,
+	bool*)
 {
 	// TODO
 	return nullptr;

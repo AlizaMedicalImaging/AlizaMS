@@ -64,7 +64,6 @@
 #ifndef ALIZA_LOAD_DCM_THREAD
 #include <QApplication>
 #endif
-#include "settingswidget.h"
 #include "updateqtcommand.h"
 #include <iostream>
 #include <list>
@@ -2176,13 +2175,12 @@ QString supp_palette_grey_to_rgbUC(
 unsigned int process_gsps(
 	const QStringList & grey_softcopy_pr_files,
 	const QString & p,
-	const QWidget * settings,
+	const CurrentSettings & settings,
 	const bool ok3d,
 	std::vector<ImageVariant*> & ivariants,
 	QString & message_)
 {
 	unsigned int count{};
-	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
 	for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
 	{
 		QList<PrRefSeries> refs;
@@ -2228,7 +2226,7 @@ unsigned int process_gsps(
 					PrConfigUtils::make_pr_monochrome(
 						ref_ivariants.at(z),
 						refs.at(y),
-						wsettings,
+						settings,
 						ok3d,
 						&spatial_transform);
 				if (pr_image)
@@ -2273,9 +2271,9 @@ unsigned int process_gsps(
 						ok3d,
 						nullptr,
 						0,
-						wsettings->get_resize(),
-						wsettings->get_size_x(),
-						wsettings->get_size_y());
+						settings.resize,
+						settings.size_x,
+						settings.size_y);
 					if (pr_load_ok)
 					{
 						if (pr_image->equi)
@@ -6791,7 +6789,7 @@ QString DicomUtils::read_enhanced(
 	bool ok3d,
 	const bool min_load,
 	const short enh_loading_type,
-	const QWidget * settings,
+	const CurrentSettings & settings,
 	const float tolerance,
 	const bool apply_rescale)
 {
@@ -6803,7 +6801,6 @@ QString DicomUtils::read_enhanced(
 #endif
 	*ok = false;
 	QString message_;
-	const SettingsWidget * wsettings = static_cast<const SettingsWidget*>(settings);
 	std::vector<char*> data;
 	DimIndexSq sq;
 	DimIndexValues idx_values;
@@ -6818,12 +6815,12 @@ QString DicomUtils::read_enhanced(
 	bool rows_ok{};
 	bool cols_ok{};
 	bool icc_ok{};
-	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
-	const bool pred6_bug = wsettings->get_predictor_workaround();
-	const bool cornell_bug = wsettings->get_cornell_workaround();
-	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
-	const bool use_icc = wsettings->get_apply_icc();
-	const bool skip_too_large = wsettings->get_skip_too_large();
+	const bool clean_unused_bits = settings.clean_unused_bits;
+	const bool pred6_bug = settings.predictor_workaround;
+	const bool cornell_bug = settings.cornell_workaround;
+	const bool fix_jpeg_prec = settings.try_fix_jpeg_prec;
+	const bool use_icc = settings.apply_icc;
+	const bool skip_too_large = settings.skip_too_large;
 	QString sop;
 	{
 		mdcm::Reader reader;
@@ -7085,7 +7082,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	bool ok3d,
 	const bool min_load,
 	const short enh_loading_type,
-	const QWidget * settings,
+	const CurrentSettings & settings,
 	const float tolerance)
 {
 #ifdef ENHANCED_PRINT_INFO
@@ -7093,7 +7090,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 #endif
 	*ok = false;
 	QString message_;
-	const SettingsWidget * wsettings = static_cast<const SettingsWidget*>(settings);
 	std::vector<char*> data;
 	DimIndexSq sq;
 	DimIndexValues idx_values;
@@ -7110,11 +7106,11 @@ QString DicomUtils::read_enhanced_supp_palette(
 	unsigned short columns_{};
 	bool rows_ok{};
 	bool cols_ok{};
-	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
-	const bool pred6_bug = wsettings->get_predictor_workaround();
-	const bool cornell_bug = wsettings->get_cornell_workaround();
-	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
-	const bool skip_too_large = wsettings->get_skip_too_large();
+	const bool clean_unused_bits = settings.clean_unused_bits;
+	const bool pred6_bug = settings.predictor_workaround;
+	const bool cornell_bug = settings.cornell_workaround;
+	const bool fix_jpeg_prec = settings.try_fix_jpeg_prec;
+	const bool skip_too_large = settings.skip_too_large;
 	{
 		mdcm::Reader reader;
 #ifdef _WIN32
@@ -7381,7 +7377,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 QString DicomUtils::read_ultrasound(
 	bool * ok, const short load_type, ImageVariant * ivariant,
 	const QStringList & images_ipp,
-	const QWidget * settings)
+	const CurrentSettings & settings)
 {
 	if (!ok) return QString("read_ultrasound : error (1)");
 	*ok = false;
@@ -7394,7 +7390,6 @@ QString DicomUtils::read_ultrasound(
 	{
 		return QString("read_ultrasound reads 1 image");
 	}
-	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
 	unsigned int dimx{};
 	unsigned int dimy{};
 	unsigned int dimz{};
@@ -7404,12 +7399,12 @@ QString DicomUtils::read_ultrasound(
 	double spacing_x{};
 	double spacing_y{};
 	double spacing_z{};
-	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
-	const bool pred6_bug = wsettings->get_predictor_workaround();
-	const bool cornell_bug = wsettings->get_cornell_workaround();
-	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
-	const bool use_icc = wsettings->get_apply_icc();
-	const bool skip_too_large = wsettings->get_skip_too_large();
+	const bool clean_unused_bits = settings.clean_unused_bits;
+	const bool pred6_bug = settings.predictor_workaround;
+	const bool cornell_bug = settings.cornell_workaround;
+	const bool fix_jpeg_prec = settings.try_fix_jpeg_prec;
+	const bool use_icc = settings.apply_icc;
+	const bool skip_too_large = settings.skip_too_large;
 	bool icc_ok{};
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
@@ -7418,7 +7413,7 @@ QString DicomUtils::read_ultrasound(
 	const mdcm::Tag tnumframes(0x0028,0x0008);
 	const mdcm::Tag tPixelAspectRatio(0x0028,0x0034);
 	const mdcm::PrivateTag tPhilipsVoxelSpacing(0x200d,0x03,"Philips US Imaging DD 036");
-	const bool overlays_enabled = wsettings->get_overlays();
+	const bool overlays_enabled = settings.overlays;
 	const int overlays_idx = overlays_enabled ? 0 : -2;
 	int number_of_frames{};
 	double tmp_c{-999999.0};
@@ -7552,7 +7547,7 @@ QString DicomUtils::read_ultrasound(
 		ivariant->image_overlays, overlays_idx,
 		ivariant->anatomy, 0, // TODO check
 		images_ipp.at(0),
-		(load_type == 0 || load_type == 2 || load_type == 3) ? wsettings->get_rescale() : false,
+		(load_type == 0 || load_type == 2 || load_type == 3) ? settings.rescale : false,
 		pixelformat, false,
 		pi,
 		&dimx_, &dimy_, &dimz_,
@@ -7625,9 +7620,9 @@ QString DicomUtils::read_ultrasound(
 #else
 		false, false,
 #endif
-		wsettings->get_resize(),
-		wsettings->get_size_x(), wsettings->get_size_y(),
-		wsettings->get_rescale(),
+		settings.resize,
+		settings.size_x, settings.size_y,
+		settings.rescale,
 		(use_icc && icc_ok),
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
@@ -7657,14 +7652,13 @@ QString DicomUtils::read_nuclear(
 	bool * ok, const short load_type, ImageVariant * ivariant,
 	const QStringList & images_ipp,
 	bool /* ok3d */,
-	const QWidget * settings)
+	const CurrentSettings & settings)
 {
 // TODO for image type RECON TOMO volume might be possible
 	if (!ok) return QString("read_nuclear : error (1)");
 	*ok = false;
 	if (!ivariant) return QString("Image is null");
 	if (images_ipp.size() != 1) return QString("read_nuclear reads 1 image");
-	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
 	unsigned int dimx{};
 	unsigned int dimy{};
 	unsigned int dimz{};
@@ -7674,19 +7668,19 @@ QString DicomUtils::read_nuclear(
 	double spacing_x{};
 	double spacing_y{};
 	double spacing_z{};
-	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
-	const bool pred6_bug = wsettings->get_predictor_workaround();
-	const bool cornell_bug = wsettings->get_cornell_workaround();
-	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
-	const bool use_icc = wsettings->get_apply_icc();
-	const bool skip_too_large = wsettings->get_skip_too_large();
+	const bool clean_unused_bits = settings.clean_unused_bits;
+	const bool pred6_bug = settings.predictor_workaround;
+	const bool cornell_bug = settings.cornell_workaround;
+	const bool fix_jpeg_prec = settings.try_fix_jpeg_prec;
+	const bool use_icc = settings.apply_icc;
+	const bool skip_too_large = settings.skip_too_large;
 	bool icc_ok{};
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PhotometricInterpretation pi;
 	const mdcm::Tag tnumframes(0x0028,0x0008);
-	const bool overlays_enabled = wsettings->get_overlays();
+	const bool overlays_enabled = settings.overlays;
 	const int overlays_idx = overlays_enabled ? 0 : -2;
 #if 0
 	int number_of_frames = 0;
@@ -7753,7 +7747,7 @@ QString DicomUtils::read_nuclear(
 		ivariant->image_overlays, overlays_idx,
 		ivariant->anatomy, 0, // TODO check
 		images_ipp.at(0),
-		(load_type == 0 || load_type == 2 || load_type == 3) ? wsettings->get_rescale() : false,
+		(load_type == 0 || load_type == 2 || load_type == 3) ? settings.rescale : false,
 		pixelformat, false,
 		pi,
 		&dimx_, &dimy_, &dimz_,
@@ -7843,9 +7837,9 @@ are stacked in front of the first slice. See Image Orientation
 #else
 		false, false,
 #endif
-		wsettings->get_resize(),
-		wsettings->get_size_x(), wsettings->get_size_y(),
-		wsettings->get_rescale(),
+		settings.resize,
+		settings.size_x, settings.size_y,
+		settings.rescale,
 		(use_icc && icc_ok),
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
@@ -7875,13 +7869,12 @@ QString DicomUtils::read_series(
 	ImageVariant * ivariant,
 	const QStringList & images_ipp,
 	bool ok3d,
-	const QWidget * settings,
+	const CurrentSettings & settings,
 	float tolerance,
 	bool apply_rescale)
 {
 	*ok = false;
 	if (!ivariant) return QString("Image is null");
-	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
 	unsigned int dimx{};
 	unsigned int dimy{};
 	unsigned int dimz{};
@@ -7891,12 +7884,12 @@ QString DicomUtils::read_series(
 	double spacing_x{};
 	double spacing_y{};
 	double spacing_z{};
-	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
-	const bool pred6_bug = wsettings->get_predictor_workaround();
-	const bool cornell_bug = wsettings->get_cornell_workaround();
-	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
-	const bool use_icc = wsettings->get_apply_icc();
-	const bool skip_too_large = wsettings->get_skip_too_large();
+	const bool clean_unused_bits = settings.clean_unused_bits;
+	const bool pred6_bug = settings.predictor_workaround;
+	const bool cornell_bug = settings.cornell_workaround;
+	const bool fix_jpeg_prec = settings.try_fix_jpeg_prec;
+	const bool use_icc = settings.apply_icc;
+	const bool skip_too_large = settings.skip_too_large;
 	bool icc_ok{};
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
@@ -7906,7 +7899,7 @@ QString DicomUtils::read_series(
 	bool geometry_from_image = min_load;
 	bool slices_ok{};
 	const mdcm::Tag tnumframes(0x0028,0x0008);
-	const bool overlays_enabled = wsettings->get_overlays();
+	const bool overlays_enabled = settings.overlays;
 	std::vector<double> levels_;
 	std::vector<double> windows_;
 	std::vector<short>  luts_;
@@ -8114,7 +8107,7 @@ QString DicomUtils::read_series(
 					double tmp_c{-999999.0};
 					double tmp_w{-999999.0};
 					short lut_function{1};
-					if (wsettings->get_level_for_PET() || !(
+					if (settings.level_for_PET || !(
 						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) ||
 						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")) ||
 						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))))
@@ -8152,7 +8145,7 @@ QString DicomUtils::read_series(
 		double scale_tmp{1.0};
 		QString buff_error;
 		const int overlays_idx = overlays_enabled ? j : -2;
-		const bool rescale = (!apply_rescale) ? false : wsettings->get_rescale();
+		const bool rescale = (!apply_rescale) ? false : settings.rescale;
 		const bool force_double_pf = (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128"));
 		unsigned long long buffers_size{};
 		std::vector<char*> data_;
@@ -8583,10 +8576,7 @@ QString DicomUtils::read_series(
 	}
 	//
 	const bool allow_geometry_from_image = (mosaic || uihgrid);
-	const bool no_warn_rescale =
-		(apply_rescale)
-		? wsettings->get_rescale()
-		: true;
+	const bool no_warn_rescale = (apply_rescale) ? settings.rescale : true;
 #ifdef ALIZA_LINUX_DEBUG_MEM
 	CommonUtils::linux_print_memusage("before gen_itk_image()");
 #endif
@@ -8600,8 +8590,8 @@ QString DicomUtils::read_series(
 		spacing_x, spacing_y, spacing_z,
 		geometry_from_image,
 		allow_geometry_from_image,
-		wsettings->get_resize(),
-		wsettings->get_size_x(), wsettings->get_size_y(),
+		settings.resize,
+		settings.size_x, settings.size_y,
 		no_warn_rescale,
 		(use_icc && icc_ok),
 		false);
@@ -10133,7 +10123,7 @@ QString DicomUtils::read_enhanced_common(
 	const FrameGroupValues & values,
 	const bool ok3d,
 	const bool min_load,
-	const QWidget * settings,
+	const CurrentSettings & settings,
 	double * dircos_read,
 	const int red_subscript,
 	const double spacing_x_read,
@@ -10153,8 +10143,6 @@ QString DicomUtils::read_enhanced_common(
 #endif
 	QString message;
 	bool error{};
-	const SettingsWidget * wsettings =
-		static_cast<const SettingsWidget *>(settings);
 	//
 	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
@@ -10383,7 +10371,7 @@ QString DicomUtils::read_enhanced_common(
 			// Disable texture for Breast Tomosynthesis
 			bool skip_texture =
 				(min_load || !enable_gl || (sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
-				? true : !wsettings->get_3d();
+				? true : !settings.use3d;
 			const int new_id = min_load ? -1 : CommonUtils::get_next_id();
 			double window_center{-999999.0};
 			double window_width{-999999.0};
@@ -10422,7 +10410,7 @@ QString DicomUtils::read_enhanced_common(
 				skip_texture,
 				nullptr,
 				0);
-			ivariant->di->filtering = wsettings->get_filtering();
+			ivariant->di->filtering = settings.filtering;
 			//
 			{
 				mdcm::Reader reader;
@@ -10842,15 +10830,12 @@ QString DicomUtils::read_enhanced_common(
 			ivariant->di->default_lut_function =
 				ivariant->di->lut_function = lut_function;
 			ivariant->di->supp_palette_subsciptor = red_subscript;
-			const bool no_warn_rescale =
-				(apply_rescale)
-				? wsettings->get_rescale()
-				: true;
+			const bool no_warn_rescale = (apply_rescale) ? settings.rescale : true;
 			{
 				// MDCM can not read rescale from per frame groups
 				const bool rescale_tmp =
 					(!apply_rescale || pixelformat.GetSamplesPerPixel() > 1)
-					? false : wsettings->get_rescale();
+					? false : settings.rescale;
 				const double saved_window_center = ivariant->di->default_us_window_center;
 				const double saved_window_width = ivariant->di->default_us_window_width;
 				const short saved_lut_function = ivariant->di->default_lut_function;
@@ -10876,9 +10861,9 @@ QString DicomUtils::read_enhanced_common(
 						spacing_z,
 						!geom_ok,
 						false,
-						wsettings->get_resize(),
-						wsettings->get_size_x(),
-						wsettings->get_size_y(),
+						settings.resize,
+						settings.size_x,
+						settings.size_y,
 						no_warn_rescale,
 						use_icc,
 						false);
@@ -10914,9 +10899,9 @@ QString DicomUtils::read_enhanced_common(
 								enable_gl,
 								nullptr,
 								0,
-								wsettings->get_resize(),
-								wsettings->get_size_x(),
-								wsettings->get_size_y());
+								settings.resize,
+								settings.size_x,
+								settings.size_y);
 						if (!ok_) *ok = false;
 					}
 				}
@@ -10942,9 +10927,9 @@ QString DicomUtils::read_enhanced_common(
 						spacing_z,
 						!geom_ok,
 						false,
-						wsettings->get_resize(),
-						wsettings->get_size_x(),
-						wsettings->get_size_y(),
+						settings.resize,
+						settings.size_x,
+						settings.size_y,
 						no_warn_rescale,
 						use_icc,
 						false);
@@ -11393,7 +11378,7 @@ QString DicomUtils::read_enhanced_3d_8d(
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
 	const bool ok3d,
 	const bool min_load,
-	const QWidget * settings,
+	const CurrentSettings & settings,
 	double * dircos_read,
 	const int red_subscript,
 	const double spacing_x_read, const double spacing_y_read, const double spacing_z_read,
@@ -11765,7 +11750,7 @@ bool DicomUtils::process_contrours_ref(
 	std::vector<ImageVariant*> & tmp_ivariants,
 	bool ok3d,
 	short enh_loading_type,
-	const QWidget * settings)
+	const CurrentSettings & settings)
 {
 	unsigned short count_{};
 	mdcm::Reader reader;
@@ -12783,7 +12768,7 @@ QString DicomUtils::read_dicom(
 	const QString & root,
 	const QStringList & filenames,
 	bool ok3d,
-	const QWidget * settings,
+	const CurrentSettings & settings,
 	short load_type,
 	short enh_loading_type)
 {
@@ -12834,9 +12819,7 @@ QString DicomUtils::read_dicom(
 	double pspacing_x_tmp1{};
 	double pspacing_y_tmp1{};
 	std::map<unsigned int, SliceInstanceCommon> slice_pos_map;
-	const SettingsWidget * const wsettings =
-		static_cast<const SettingsWidget * const>(settings);
-	const bool process_multiseries = wsettings->get_process_multiseries();
+	const bool process_multiseries = settings.process_multiseries;
 	const float tolerance{0.01f};
 	int count_images{};
 	int count_uid_errors{};
@@ -13064,7 +13047,7 @@ QString DicomUtils::read_dicom(
 				}
 				//
 				bool icc_found{};
-				if (wsettings->get_apply_icc() && ds.FindDataElement(mdcm::Tag(0x0028,0x2000)))
+				if (settings.apply_icc && ds.FindDataElement(mdcm::Tag(0x0028,0x2000)))
 				{
 					icc_found = true;
 				}
@@ -13111,7 +13094,7 @@ QString DicomUtils::read_dicom(
 					{
 						if ((load_type == 0 || load_type == 2) && has_supp_palette(ds))
 						{
-							supp_palette = wsettings->get_apply_supplemental_lut();
+							supp_palette = settings.apply_supplemental_lut;
 						}
 					}
 					else if (force_suppllut == 1)
@@ -13130,7 +13113,7 @@ QString DicomUtils::read_dicom(
 						multiframe = true;
 					}
 					//
-					if (wsettings->get_mosaic())
+					if (settings.mosaic)
 					{
 						if (is_mosaic(ds))
 						{
@@ -13782,10 +13765,10 @@ QString DicomUtils::read_dicom(
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
 					ok3d,
-					!wsettings->get_3d(),
+					!settings.use3d,
 					nullptr,
 					0);
-				ivariant->di->filtering = wsettings->get_filtering();
+				ivariant->di->filtering = settings.filtering;
 				message_ = read_series(
 					&ok,
 					false,
@@ -14010,10 +13993,10 @@ QString DicomUtils::read_dicom(
 			ImageVariant * ivariant = new ImageVariant(
 				CommonUtils::get_next_id(),
 				ok3d,
-				!wsettings->get_3d(),
+				!settings.use3d,
 				nullptr,
 				0);
-			ivariant->di->filtering = wsettings->get_filtering();
+			ivariant->di->filtering = settings.filtering;
 			message_ = read_series(
 				&ok,
 				false,
@@ -14046,10 +14029,10 @@ QString DicomUtils::read_dicom(
 			ImageVariant * ivariant = new ImageVariant(
 				CommonUtils::get_next_id(),
 				ok3d,
-				!wsettings->get_3d(),
+				!settings.use3d,
 				nullptr,
 				0);
-			ivariant->di->filtering = wsettings->get_filtering();
+			ivariant->di->filtering = settings.filtering;
 			message_ = read_series(
 				&ok,
 				false,
@@ -14084,10 +14067,10 @@ QString DicomUtils::read_dicom(
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
 					ok3d,
-					!wsettings->get_3d(),
+					!settings.use3d,
 					nullptr,
 					0);
-				ivariant->di->filtering = wsettings->get_filtering();
+				ivariant->di->filtering = settings.filtering;
 				message_ = read_series(
 					&ok,
 					false,
@@ -14313,10 +14296,10 @@ QString DicomUtils::read_dicom(
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
 					ok3d,
-					!wsettings->get_3d(),
+					!settings.use3d,
 					nullptr,
 					0);
-				ivariant->di->filtering = wsettings->get_filtering();
+				ivariant->di->filtering = settings.filtering;
 				message_ = read_series(
 					&ok,
 					false,
@@ -14399,10 +14382,10 @@ QString DicomUtils::read_dicom(
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
 					ok3d,
-					!wsettings->get_3d(),
+					!settings.use3d,
 					nullptr,
 					0);
-				ivariant->di->filtering = wsettings->get_filtering();
+				ivariant->di->filtering = settings.filtering;
 				message_ = read_series(
 					&ok,
 					false,
@@ -14594,7 +14577,7 @@ QString DicomUtils::read_dicom(
 				{
 					ImageVariant * ivariant = new ImageVariant(
 						CommonUtils::get_next_id(),
-						ok3d, !wsettings->get_3d(), nullptr, 0);
+						ok3d, !settings.use3d, nullptr, 0);
 					ivariant->filenames = QStringList(rtstruct_ref_search.at(x));
 					const mdcm::File & file = reader.GetFile();
 					const mdcm::DataSet & ds = file.GetDataSet();
@@ -14623,7 +14606,7 @@ QString DicomUtils::read_dicom(
 		unsigned int count = process_gsps(
 			grey_softcopy_pr_files,
 			root_tmp,
-			wsettings,
+			settings,
 			ok3d,
 			ivariants,
 			message_pr);
@@ -14636,7 +14619,7 @@ QString DicomUtils::read_dicom(
 				count = process_gsps(
 					grey_softcopy_pr_files,
 					QDir::toNativeSeparators(fi5.absoluteFilePath()),
-					wsettings,
+					settings,
 					ok3d,
 					ivariants,
 					message_pr);

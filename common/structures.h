@@ -127,6 +127,37 @@ struct Contourcolor { float r, g, b; };
 struct Meshcolor { float r, g, b; };
 typedef QList<DPoint> ListOfDPoints;
 
+class CurrentSettings
+{
+public:
+	short  filtering{};
+	bool   resize{};
+	int    size_x{};
+	int    size_y{};
+	bool   rescale{};
+	bool   use3d{};
+	int    time_unit{};
+	bool   mosaic{};
+	bool   overlays{};
+	double font_pt{};
+	bool   level_for_PET{};
+	bool   clean_unused_bits{};
+	float  scale_icons{};
+	bool   sr_info{};
+	int    sr_image_width{};
+	bool   sr_chapters{};
+	bool   sr_skip_images{};
+	bool   predictor_workaround{};
+	bool   cornell_workaround{};
+	bool   apply_icc{};
+	bool   try_fix_jpeg_prec{};
+	short  enh_strategy{};
+	bool   apply_supplemental_lut{};
+	bool   skip_too_large{};
+	bool   dcm_thread{};
+	bool   process_multiseries{};
+};
+
 class Contour
 {
 public:

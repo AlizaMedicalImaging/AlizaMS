@@ -1,7 +1,7 @@
 #ifndef A_LOADDICOM_H
 #define A_LOADDICOM_H
 
-#include <QWidget>
+#include "structures.h"
 #include <QString>
 #include <QStringList>
 #include <vector>
@@ -16,14 +16,14 @@ public:
 		const QString root_,
 		const QStringList & filenames_,
 		const bool ok3d_,
-		const QWidget * const settingswidget_,
+		const CurrentSettings & settings_,
 		const short load_type_,
 		const short enh_type_)
 		:
 		root(root_),
 		filenames(filenames_),
 		ok3d(ok3d_),
-		settingswidget(settingswidget_),
+		settings(settings_),
 		load_type(load_type_),
 		enh_type(enh_type_) {}
 	~LoadDicom() = default;
@@ -40,7 +40,7 @@ private:
 	const QString root;
 	const QStringList filenames;
 	const bool ok3d;
-	const QWidget * const settingswidget;
+	const CurrentSettings settings;
 	const short load_type;
 	const short enh_type;
 };

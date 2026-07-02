@@ -3,12 +3,13 @@
 
 #include <mdcmDataSet.h>
 #include <QString>
-#include <QWidget>
 #include <QTextBrowser>
 #include <QProgressDialog>
 #include <QStringList>
 #include <QImage>
 #include <vector>
+
+class CurrentSettings;
 
 class SRImage
 {
@@ -60,7 +61,7 @@ public:
 		QTextBrowser*,
 		const std::vector<SRGraphic>&,
 		bool,
-		const QWidget*,
+		const CurrentSettings&,
 		QProgressDialog*);
 	static bool read_SCOORD(
 		const mdcm::DataSet&,
@@ -71,7 +72,7 @@ public:
 		std::vector<SRImage>&,
 		QTextBrowser*,
 		bool,
-		const QWidget*,
+		const CurrentSettings&,
 		QProgressDialog*);
 	static void    read_PNAME(const mdcm::DataSet&,const QString&,QString&);
 	static void    read_TEXT (const mdcm::DataSet&,const QString&,QString&);
@@ -93,7 +94,7 @@ public:
 		const mdcm::DataSet&,
 		const QString&,
 		const QString&,
-		const QWidget*,
+		const CurrentSettings&,
 		QTextBrowser*,
 		QProgressDialog*,
 		QStringList&,

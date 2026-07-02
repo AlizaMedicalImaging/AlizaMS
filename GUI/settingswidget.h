@@ -4,6 +4,8 @@
 #include "ui_settingswidget.h"
 #include <QSettings>
 
+class CurrentSettings;
+
 class SettingsWidget: public QWidget, public Ui::SettingsWidget
 {
 Q_OBJECT
@@ -15,7 +17,6 @@ public:
 	int    get_size_x() const;
 	int    get_size_y() const;
 	bool   get_rescale() const;
-	bool   get_force_rescale() const;
 	bool   get_3d() const;
 	void   set_gl_visible(bool);
 	int    get_time_unit() const;
@@ -40,6 +41,7 @@ public:
 	bool   get_skip_too_large() const;
 	bool   get_dcm_thread() const;
 	bool   get_process_multiseries() const;
+	CurrentSettings get_current_settings();
 
 private:
 	int   saved_idx{};
