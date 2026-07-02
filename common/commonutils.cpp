@@ -39,7 +39,6 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QDateTime>
-#include "settingswidget.h"
 #include "updateqtcommand.h"
 #include <iostream>
 #include <list>
