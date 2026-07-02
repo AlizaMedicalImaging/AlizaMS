@@ -3,8 +3,7 @@
 
 #include "ui_settingswidget.h"
 #include <QSettings>
-
-class CurrentSettings;
+#include "structures.h"
 
 class SettingsWidget: public QWidget, public Ui::SettingsWidget
 {
