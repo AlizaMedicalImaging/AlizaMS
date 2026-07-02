@@ -936,6 +936,7 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb)
 	if (!v) return;
 	if (v->image_type < 0) return;
 	if (v->image_type >= 20) return;
+	bool interrupt{};
 	HistogramGen * t = new HistogramGen(v);
 	t->start();
 	while (!t->isFinished())
@@ -946,8 +947,10 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb)
 #if QT_VERSION < QT_VERSION_CHECK(5,2,0)
 			exit_null();
 #else
+			interrupt = true;
 			t->requestInterruption();
 			t->wait();
+			break;
 #endif
 		}
 	}
@@ -961,6 +964,11 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb)
 	else
 	{
 		t->gen_pixmap();
+	}
+	if (!interrupt)
+	{
+		t->quit();
+		t->wait();
 	}
 	delete t;
 }
@@ -3704,6 +3712,8 @@ void Aliza::toggle_maxwindow(bool i)
 			delay1(100U);
 		}
 		t->gen_pixmap();
+		t->quit();
+		t->wait();
 		delete t;
 	}
 	histogramview->update__(v);
