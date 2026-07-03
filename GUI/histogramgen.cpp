@@ -93,7 +93,6 @@ template<typename T> QString calculate_histogramm(
 
 template<typename T> QString calculate_histogramm_rgb(
 	const typename T::Pointer & image,
-	ImageVariant * v,
 	unsigned int & bins_size,
 	double & factor,
 	std::vector<int> & bins0,
@@ -211,25 +210,25 @@ void HistogramGen::run()
 		error = calculate_histogramm<ImageTypeULL>(ivariant->pULL, ivariant, bins_size, factor, bins);
 		break;
 	case 10:
-		error = calculate_histogramm_rgb<RGBImageTypeSS>(ivariant->pSS_rgb, ivariant, bins_size, factor, bins0, bins1, bins2);
+		error = calculate_histogramm_rgb<RGBImageTypeSS>(ivariant->pSS_rgb, bins_size, factor, bins0, bins1, bins2);
 		break;
 	case 11:
-		error = calculate_histogramm_rgb<RGBImageTypeUS>(ivariant->pUS_rgb, ivariant, bins_size, factor, bins0, bins1, bins2);
+		error = calculate_histogramm_rgb<RGBImageTypeUS>(ivariant->pUS_rgb, bins_size, factor, bins0, bins1, bins2);
 		break;
 	case 12:
-		error = calculate_histogramm_rgb<RGBImageTypeSI>(ivariant->pSI_rgb, ivariant, bins_size, factor, bins0, bins1, bins2);
+		error = calculate_histogramm_rgb<RGBImageTypeSI>(ivariant->pSI_rgb, bins_size, factor, bins0, bins1, bins2);
 		break;
 	case 13:
-		error = calculate_histogramm_rgb<RGBImageTypeUI>(ivariant->pUI_rgb, ivariant, bins_size, factor, bins0, bins1, bins2);
+		error = calculate_histogramm_rgb<RGBImageTypeUI>(ivariant->pUI_rgb, bins_size, factor, bins0, bins1, bins2);
 		break;
 	case 14:
-		error = calculate_histogramm_rgb<RGBImageTypeUC>(ivariant->pUC_rgb, ivariant, bins_size, factor, bins0, bins1, bins2);
+		error = calculate_histogramm_rgb<RGBImageTypeUC>(ivariant->pUC_rgb, bins_size, factor, bins0, bins1, bins2);
 		break;
 	case 15:
-		error = calculate_histogramm_rgb<RGBImageTypeF>(ivariant->pF_rgb, ivariant, bins_size, factor, bins0, bins1, bins2);
+		error = calculate_histogramm_rgb<RGBImageTypeF>(ivariant->pF_rgb, bins_size, factor, bins0, bins1, bins2);
 		break;
 	case 16:
-		error = calculate_histogramm_rgb<RGBImageTypeD>(ivariant->pD_rgb, ivariant, bins_size, factor, bins0, bins1, bins2);
+		error = calculate_histogramm_rgb<RGBImageTypeD>(ivariant->pD_rgb, bins_size, factor, bins0, bins1, bins2);
 		break;
 	default:
 		break;

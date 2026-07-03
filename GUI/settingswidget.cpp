@@ -276,7 +276,9 @@ void SettingsWidget::readSettings()
 	const int tmp14 = settings.value(QString("force_cp1251"),    0).toInt();
 	const int tmp15 = settings.value(QString("apply_suppl"),     1).toInt();
 	const int tmp16 = settings.value(QString("mvsep"),           0).toInt();
+#ifndef ALIZA_LOAD_DCM_THREAD
 	const int tmp17 = settings.value(QString("dcm_thread2"),     1).toInt();
+#endif
 #if defined(Q_OS_LINUX) && QT_VERSION >= QT_VERSION_CHECK(5,11,0)
 	int tmp18;
 	if (QApplication::platformName() == QString("wayland"))

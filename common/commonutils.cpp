@@ -1540,7 +1540,6 @@ template<typename T> QString process_dicom_rgb_image1(
 	const short image_type,
 	const short ybr, // 0 - no, 1 - full, 2 - partial
 	const bool hsv,
-	const int bitsstored,
 	bool * bad_direction)
 {
 	if (data.size() != dimz)
@@ -2994,28 +2993,28 @@ bool CommonUtils::reload_monochrome(
 	if (ivariant->image_type == 0)
 	{
 		ok = reload_monochrome_image<ImageTypeSS>(
-			ivariant, ivariant->pSS, gl, max_3d_tex_size,
+			ivariant, ivariant->pSS, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 1)
 	{
 		ok = reload_monochrome_image<ImageTypeUS>(
-			ivariant, ivariant->pUS, gl, max_3d_tex_size,
+			ivariant, ivariant->pUS, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 2)
 	{
 		ok = reload_monochrome_image<ImageTypeSI>(
-			ivariant, ivariant->pSI, gl, max_3d_tex_size,
+			ivariant, ivariant->pSI, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 3)
 	{
 		ok = reload_monochrome_image<ImageTypeUI>(
-			ivariant, ivariant->pUI, gl, max_3d_tex_size,
+			ivariant, ivariant->pUI, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
@@ -3023,35 +3022,35 @@ bool CommonUtils::reload_monochrome(
 	{
 		ivariant->di->maxwindow = true;
 		ok = reload_monochrome_image<ImageTypeUC>(
-			ivariant, ivariant->pUC, gl, max_3d_tex_size,
+			ivariant, ivariant->pUC, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 5)
 	{
 		ok = reload_monochrome_image<ImageTypeF>(
-			ivariant, ivariant->pF, gl, max_3d_tex_size,
+			ivariant, ivariant->pF, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 6)
 	{
 		ok = reload_monochrome_image<ImageTypeD>(
-			ivariant, ivariant->pD, gl, max_3d_tex_size,
+			ivariant, ivariant->pD, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 7)
 	{
 		ok = reload_monochrome_image<ImageTypeSLL>(
-			ivariant, ivariant->pSLL, gl, max_3d_tex_size,
+			ivariant, ivariant->pSLL, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 8)
 	{
 		ok = reload_monochrome_image<ImageTypeULL>(
-			ivariant, ivariant->pULL, gl, max_3d_tex_size,
+			ivariant, ivariant->pULL, (ok3d ? gl : nullptr), max_3d_tex_size,
 			nullptr,
 			change_size, size_x_, size_y_);
 	}
@@ -3607,7 +3606,6 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	double origin_x, double origin_y, double origin_z,
 	double spacing_x, double spacing_y, double spacing_z,
 	bool geometry_from_image, bool allow_geometry_from_image,
-	bool resize_, unsigned int size_x, unsigned int size_y,
 	bool no_warn_rescale,
 	bool use_icc,
 	bool skip_ybr)
@@ -3878,7 +3876,6 @@ QString CommonUtils::gen_itk_image(bool * ok,
 		case mdcm::PixelFormat::UINT8:
 		case mdcm::PixelFormat::INT8:
 			{
-				const int bitsstored = pixelformat.GetBitsStored();
 				bool bad_direction{true};
 				error = process_dicom_rgb_image1<RGBImageTypeUC>(
 					ok,
@@ -3892,7 +3889,6 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					14,
 					ybr,
 					hsv,
-					bitsstored,
 					&bad_direction);
 				if (!error.isEmpty()) return error;
 				process_dicom_rgb_image2<RGBImageTypeUC>(
@@ -3904,7 +3900,6 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			break;
 		case mdcm::PixelFormat::UINT16:
 			{
-				const int bitsstored = pixelformat.GetBitsStored();
 				bool bad_direction{true};
 				error = process_dicom_rgb_image1<RGBImageTypeUS>(
 					ok,
@@ -3918,7 +3913,6 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					11,
 					ybr,
 					false,
-					bitsstored,
 					&bad_direction);
 				if (!error.isEmpty()) return error;
 				process_dicom_rgb_image2<RGBImageTypeUS>(
@@ -3941,9 +3935,8 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					10,
-					false,
-					false,
 					0,
+					false,
 					&bad_direction);
 				if (!error.isEmpty()) return error;
 				process_dicom_rgb_image2<RGBImageTypeSS>(
@@ -3966,9 +3959,8 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					15,
-					false,
-					false,
 					0,
+					false,
 					&bad_direction);
 				if (!error.isEmpty()) return error;
 				process_dicom_rgb_image2<RGBImageTypeF>(

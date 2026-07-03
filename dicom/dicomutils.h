@@ -340,7 +340,6 @@ public:
 		const bool,
 		const bool,
 		ImageVariant*, const QStringList&,
-		bool,
 		const CurrentSettings&,
 		float,
 		bool);
@@ -389,7 +388,6 @@ public:
 				unsigned int,
 				std::less<unsigned int> >
 			> &,
-		const DimIndexValues&,
 		const FrameGroupValues&,
 		const bool,
 		const bool,

@@ -1272,7 +1272,7 @@ bool Aliza::load_3d(
 	if (ivariant->image_type >= 0 && ivariant->image_type < 10)
 	{
 		ok = CommonUtils::reload_monochrome(
-			ivariant,ok3d,(ok3d ? glwidget : nullptr), max_3d_tex_size,
+			ivariant, ok3d, (ok3d ? glwidget : nullptr), max_3d_tex_size,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type >= 10 && ivariant->image_type < 20)

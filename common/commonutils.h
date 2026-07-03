@@ -90,7 +90,6 @@ public:
 		double, double, double,
 		double, double, double,
 		bool, bool,
-		bool, unsigned int, unsigned int,
 		bool,
 		bool,
 		bool=false);

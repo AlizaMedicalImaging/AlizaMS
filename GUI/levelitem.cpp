@@ -23,7 +23,7 @@ LevelItem::LevelItem(
 	setCursor(Qt::SizeHorCursor);
 }
 
-void LevelItem::paint(QPainter * paint, const QStyleOptionGraphicsItem *, QWidget *)
+void LevelItem::paint(QPainter * /* paint */, const QStyleOptionGraphicsItem *, QWidget *)
 {
 	//paint->drawRect(boundingRect());
 }

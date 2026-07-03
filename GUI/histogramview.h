@@ -15,7 +15,7 @@ class HistogramView : public QGraphicsView
 {
 Q_OBJECT
 public:
-	HistogramView(QWidget*,QObject*,QWidget*,bool);
+	HistogramView(QWidget*,QObject*,QWidget*);
 	~HistogramView();
 	void update__(const ImageVariant*);
 	void update_window(const ImageVariant*);

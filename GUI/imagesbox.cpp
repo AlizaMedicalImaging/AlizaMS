@@ -23,7 +23,7 @@ ListWidgetItem2::ListWidgetItem2(QListWidget * p, int t)
 }
 
 ListWidgetItem2::ListWidgetItem2(
-	const QString & text,
+	const QString &,
 	QListWidget * p,
 	int t)
 	: QListWidgetItem(p, t)
@@ -35,8 +35,8 @@ ListWidgetItem2::ListWidgetItem2(
 }
 
 ListWidgetItem2::ListWidgetItem2(
-	const QIcon & icon,
-	const QString & text,
+	const QIcon &,
+	const QString &,
 	QListWidget * p,
 	int t)
 	: QListWidgetItem(p, t)
@@ -50,8 +50,8 @@ ListWidgetItem2::ListWidgetItem2(
 ListWidgetItem2::ListWidgetItem2(
 	int id_,
 	ImageVariant * v,
-	const QIcon & icon,
-	const QString & text,
+	const QIcon &,
+	const QString &,
 	QListWidget * p, int t)
 	:
 	QListWidgetItem(p, t), id(id_), ivariant(v)

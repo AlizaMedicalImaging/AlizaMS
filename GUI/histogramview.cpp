@@ -123,8 +123,7 @@ void LevelRectItem::paint(
 HistogramView::HistogramView(
 	QWidget * parent,
 	QObject * a_,
-	QWidget * p,
-	bool gl_)
+	QWidget * p)
 	:
 	QGraphicsView(parent), aliza(a_), multi_frame_ptr(p)
 {

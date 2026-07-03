@@ -2497,6 +2497,8 @@ void PrConfigUtils::read_graphic_layers(
 	// Graphic Layer Sequence 0070|0060 SQ
 	// Graphic Layer 0070|0002 CS
 	// Graphic Layer Order 0070|0062 IS
+	(void)ds;
+	(void)ref;
 }
 
 void PrConfigUtils::read_spatial_transformation(

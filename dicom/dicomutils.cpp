@@ -5702,6 +5702,8 @@ void DicomUtils::read_gems_params(
 		++it;
 	}
 	std::cout << std::endl;
+#else
+	(void)dict;
 #endif
 }
 
@@ -7620,8 +7622,6 @@ QString DicomUtils::read_ultrasound(
 #else
 		false, false,
 #endif
-		settings.resize,
-		settings.size_x, settings.size_y,
 		settings.rescale,
 		(use_icc && icc_ok),
 		false);
@@ -7837,8 +7837,6 @@ are stacked in front of the first slice. See Image Orientation
 #else
 		false, false,
 #endif
-		settings.resize,
-		settings.size_x, settings.size_y,
 		settings.rescale,
 		(use_icc && icc_ok),
 		false);
@@ -7868,7 +7866,6 @@ QString DicomUtils::read_series(
 	const bool elscint,
 	ImageVariant * ivariant,
 	const QStringList & images_ipp,
-	bool ok3d,
 	const CurrentSettings & settings,
 	float tolerance,
 	bool apply_rescale)
@@ -8590,8 +8587,6 @@ QString DicomUtils::read_series(
 		spacing_x, spacing_y, spacing_z,
 		geometry_from_image,
 		allow_geometry_from_image,
-		settings.resize,
-		settings.size_x, settings.size_y,
 		no_warn_rescale,
 		(use_icc && icc_ok),
 		false);
@@ -10119,7 +10114,6 @@ QString DicomUtils::read_enhanced_common(
 			unsigned int,
 			unsigned int,
 			std::less<unsigned int> > > & tmp0,
-	const DimIndexValues & idx_values,
 	const FrameGroupValues & values,
 	const bool ok3d,
 	const bool min_load,
@@ -10861,9 +10855,6 @@ QString DicomUtils::read_enhanced_common(
 						spacing_z,
 						!geom_ok,
 						false,
-						settings.resize,
-						settings.size_x,
-						settings.size_y,
 						no_warn_rescale,
 						use_icc,
 						false);
@@ -10927,9 +10918,6 @@ QString DicomUtils::read_enhanced_common(
 						spacing_z,
 						!geom_ok,
 						false,
-						settings.resize,
-						settings.size_x,
-						settings.size_y,
 						no_warn_rescale,
 						use_icc,
 						false);
@@ -11404,7 +11392,7 @@ QString DicomUtils::read_enhanced_3d_8d(
 		rows_, columns_,
 		pixelformat, pi,
 		tmp0,
-		idx_values,  values,
+		values,
 		ok3d,
 		min_load,
 		settings,
@@ -12846,8 +12834,6 @@ QString DicomUtils::read_dicom(
 		QApplication::processEvents();
 #endif
 		const mdcm::File & file = reader.GetFile();
-		const mdcm::FileMetaInformation & header = file.GetHeader();
-		const mdcm::TransferSyntax & ts = header.GetDataSetTransferSyntax();
 		const mdcm::DataSet & ds = file.GetDataSet();
 		if (ds.IsEmpty())
 		{
@@ -13366,7 +13352,6 @@ QString DicomUtils::read_dicom(
 								// Error 'if false'.
 								if (k < slices_.size() && j < slices_.at(k).size())
 								{
-									const unsigned int id_0_ = slices_.at(k).at(j);
 									const unsigned int id_1_ = slice_pos_map[slices_.at(k).at(j)].file_idx;
 									if (id_1_ < static_cast<unsigned int>(filenames.size()))
 									{
@@ -13490,7 +13475,8 @@ QString DicomUtils::read_dicom(
 					std::cout << std::endl;
 #endif
 					bool seq2{};
-					if (!count_slice_locations.empty() && num_slice_location_in_group > 0)
+					if (!count_slice_locations.empty() &&
+						same_size_slice_location_groups && num_slice_location_in_group > 0)
 					{
 						seq2 =
 							verify_sequential_groups<long long>(slice_locations_list1, num_slice_location_in_group);
@@ -13552,7 +13538,6 @@ QString DicomUtils::read_dicom(
 								{
 									if (k < slices_.size() && j < slices_.at(k).size())
 									{
-										const unsigned int id_0_ = slices_.at(k).at(j);
 										const unsigned int id_1_ = slice_pos_map[slices_.at(k).at(j)].file_idx;
 										if (id_1_ < static_cast<unsigned int>(filenames.size()))
 										{
@@ -13722,7 +13707,6 @@ QString DicomUtils::read_dicom(
 					false,
 					ivariant,
 					images_tmp,
-					false,
 					settings,
 					tolerance,
 					(load_type == 1) ? false : true);
@@ -13777,7 +13761,6 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					ok3d,
 					settings,
 					tolerance,
 					true);
@@ -14005,7 +13988,6 @@ QString DicomUtils::read_dicom(
 				false,
 				ivariant,
 				images_tmp,
-				ok3d,
 				settings,
 				tolerance,
 				true);
@@ -14041,7 +14023,6 @@ QString DicomUtils::read_dicom(
 				false,
 				ivariant,
 				images_tmp,
-				ok3d,
 				settings,
 				tolerance,
 				true);
@@ -14079,7 +14060,6 @@ QString DicomUtils::read_dicom(
 					false,
 					ivariant,
 					images_tmp,
-					ok3d,
 					settings,
 					tolerance,
 					true);
@@ -14109,7 +14089,6 @@ QString DicomUtils::read_dicom(
 					false,
 					ivariant,
 					images_tmp,
-					false,
 					settings,
 					tolerance,
 					(load_type == 3));
@@ -14308,7 +14287,6 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					ok3d,
 					settings,
 					tolerance,
 					true);
@@ -14338,7 +14316,6 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					false,
 					settings,
 					tolerance,
 					(load_type == 3));
@@ -14394,7 +14371,6 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					ok3d,
 					settings,
 					tolerance,
 					true);
@@ -14441,7 +14417,6 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					false,
 					settings,
 					tolerance,
 					(load_type == 3));

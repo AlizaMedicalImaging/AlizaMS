@@ -417,8 +417,7 @@ MainWindow::MainWindow(
 	studyview->init_(aliza);
 	sqtree->set_aliza(aliza);
 	//
-	histogramview = new HistogramView(
-		this, static_cast<QObject*>(aliza), multi_frame, false);
+	histogramview = new HistogramView(this, static_cast<QObject*>(aliza), multi_frame);
 	histogram_frame_layout = new QVBoxLayout(histogram_frame);
 	histogram_frame_layout->setSpacing(0);
 	histogram_frame_layout->setContentsMargins(0, 0, 0, 0);
