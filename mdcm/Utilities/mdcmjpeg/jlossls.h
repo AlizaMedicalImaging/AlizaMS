@@ -25,10 +25,12 @@
 #define PREDICTOR6 (int)((IJG_INT)Rb + RIGHT_SHIFT((IJG_INT)Ra - (IJG_INT)Rc, 1))
 #define PREDICTOR7 (int)RIGHT_SHIFT((IJG_INT)Ra + (IJG_INT)Rb, 1)
 /* Workaround */
+#if BITS_IN_JSAMPLE == 16
 #define PREDICTOR4A (int)((IJG_SHRT)Ra + (IJG_SHRT)Rb - (IJG_SHRT)Rc)
 #define PREDICTOR5A (int)((IJG_SHRT)Ra + RIGHT_SHIFT((IJG_SHRT)Rb - (IJG_SHRT)Rc, 1))
 #define PREDICTOR6A (int)((IJG_SHRT)Rb + RIGHT_SHIFT((IJG_SHRT)Ra - (IJG_SHRT)Rc, 1))
 #define PREDICTOR7A (int)RIGHT_SHIFT((IJG_SHRT)Ra + (IJG_SHRT)Rb, 1)
+#endif
 
 typedef JMETHOD(
   void,

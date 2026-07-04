@@ -245,7 +245,9 @@ decode_mcu(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
   int               blkn;
   BITREAD_STATE_VARS;
   savable_state state;
+#if BITS_IN_JSAMPLE == 16
   boolean       cornell_workaround = (cinfo->workaround_options & WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER) != 0;
+#endif
   /* Process restart marker if needed; may have to suspend */
   if (cinfo->restart_interval)
   {
@@ -276,7 +278,11 @@ decode_mcu(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
       /* Decode a single block's worth of coefficients */
 
       /* Section F.2.2.1: decode the DC coefficient difference */
+#if BITS_IN_JSAMPLE == 16
       HUFF_DECODE(s, br_state, dctbl, return FALSE, label1, cornell_workaround);
+#else
+      HUFF_DECODE(s, br_state, dctbl, return FALSE, label1);
+#endif
       if (s)
       {
         CHECK_BIT_BUFFER(br_state, s, return FALSE);
@@ -301,11 +307,13 @@ decode_mcu(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
         /* Since zeroes are skipped, output area must be cleared beforehand */
         for (k = 1; k < DCTSIZE2; k++)
         {
+#if BITS_IN_JSAMPLE == 16
           HUFF_DECODE(s, br_state, actbl, return FALSE, label2, cornell_workaround);
-
+#else
+          HUFF_DECODE(s, br_state, actbl, return FALSE, label2);
+#endif
           r = s >> 4;
           s &= 15;
-
           if (s)
           {
             k += r;
@@ -333,11 +341,13 @@ decode_mcu(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
         /* In this path we just discard the values */
         for (k = 1; k < DCTSIZE2; k++)
         {
+#if BITS_IN_JSAMPLE == 16
           HUFF_DECODE(s, br_state, actbl, return FALSE, label3, cornell_workaround);
-
+#else
+          HUFF_DECODE(s, br_state, actbl, return FALSE, label3);
+#endif
           r = s >> 4;
           s &= 15;
-
           if (s)
           {
             k += r;

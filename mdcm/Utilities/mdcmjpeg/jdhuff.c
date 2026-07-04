@@ -309,6 +309,7 @@ jpeg_fill_bit_buffer(bitread_working_state * state, register bit_buf_type get_bu
  * See jdhuff.h for info about usage.
  */
 
+#if BITS_IN_JSAMPLE == 16
 GLOBAL(int)
 jpeg_huff_decode(bitread_working_state * state,
                  register bit_buf_type   get_buffer,
@@ -316,6 +317,14 @@ jpeg_huff_decode(bitread_working_state * state,
                  d_derived_tbl *         htbl,
                  int                     min_bits,
                  boolean                 enable_cornell_workaround)
+#else
+GLOBAL(int)
+jpeg_huff_decode(bitread_working_state * state,
+                 register bit_buf_type   get_buffer,
+                 register int            bits_left,
+                 d_derived_tbl *         htbl,
+                 int                     min_bits)
+#endif
 {
   register int     l = min_bits;
   register IJG_INT code;

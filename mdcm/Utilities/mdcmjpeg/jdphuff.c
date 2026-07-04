@@ -321,7 +321,9 @@ decode_mcu_DC_first(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
   savable_state         state;
   d_derived_tbl *       tbl;
   jpeg_component_info * compptr;
+#if BITS_IN_JSAMPLE == 16
   boolean cornell_workaround = (cinfo->workaround_options & WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER) != 0;
+#endif
   /* Process restart marker if needed; may have to suspend */
   if (cinfo->restart_interval)
   {
@@ -352,7 +354,11 @@ decode_mcu_DC_first(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
       /* Decode a single block's worth of coefficients */
 
       /* Section F.2.2.1: decode the DC coefficient difference */
+#if BITS_IN_JSAMPLE == 16
       HUFF_DECODE(s, br_state, tbl, return FALSE, label1, cornell_workaround);
+#else
+      HUFF_DECODE(s, br_state, tbl, return FALSE, label1);
+#endif
       if (s)
       {
         CHECK_BIT_BUFFER(br_state, s, return FALSE);
@@ -405,7 +411,9 @@ decode_mcu_AC_first(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
   JBLOCKROW         block;
   BITREAD_STATE_VARS;
   d_derived_tbl * tbl;
+#if BITS_IN_JSAMPLE == 16
   boolean         cornell_workaround = (cinfo->workaround_options & WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER) != 0;
+#endif
 
   /* Process restart marker if needed; may have to suspend */
   if (cinfo->restart_interval)
@@ -438,7 +446,11 @@ decode_mcu_AC_first(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
 
       for (k = cinfo->Ss; k <= Se; k++)
       {
+#if BITS_IN_JSAMPLE == 16
         HUFF_DECODE(s, br_state, tbl, return FALSE, label2, cornell_workaround);
+#else
+        HUFF_DECODE(s, br_state, tbl, return FALSE, label2);
+#endif
         r = s >> 4;
         s &= 15;
         if (s)
@@ -552,7 +564,9 @@ decode_mcu_AC_refine(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
   phuff_entropy_ptr entropy = (phuff_entropy_ptr)lossyd->entropy_private;
   int               Se = cinfo->Se;
   int               p1 = 1 << cinfo->Al; /* 1 in the bit position being coded */
+#if BITS_IN_JSAMPLE == 16
   boolean           cornell_workaround = (cinfo->workaround_options & WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER) != 0;
+#endif
   int               m1 = (int)((~0U) << cinfo->Al); /* -1 in the bit position being coded */
   register int      s, k, r;
   unsigned int      EOBRUN;
@@ -599,7 +613,11 @@ decode_mcu_AC_refine(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
     {
       for (; k <= Se; k++)
       {
+#if BITS_IN_JSAMPLE == 16
         HUFF_DECODE(s, br_state, tbl, goto undoit, label3, cornell_workaround);
+#else
+        HUFF_DECODE(s, br_state, tbl, goto undoit, label3);
+#endif
         r = s >> 4;
         s &= 15;
         if (s)

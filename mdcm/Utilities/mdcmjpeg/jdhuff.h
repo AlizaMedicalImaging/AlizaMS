@@ -177,6 +177,7 @@ jpeg_fill_bit_buffer
  * 3. jpeg_huff_decode returns -1 if forced to suspend.
  */
 
+#if BITS_IN_JSAMPLE == 16
 #define HUFF_DECODE(result, state, htbl, failaction, slowlabel, cornell_workaround)                                    \
   {                                                                                                                    \
     register int nb, look;                                                                                             \
@@ -212,7 +213,6 @@ jpeg_fill_bit_buffer
       bits_left = state.bits_left;                                                                                     \
     }                                                                                                                  \
   }
-
 /* Out-of-line case for Huffman code fetching */
 EXTERN(int)
 jpeg_huff_decode JPP((bitread_working_state * state,
@@ -221,6 +221,50 @@ jpeg_huff_decode JPP((bitread_working_state * state,
                       d_derived_tbl *       htbl,
                       int                   min_bits,
                       boolean               enable_cornell_workaround));
+#else
+#define HUFF_DECODE(result, state, htbl, failaction, slowlabel)                                                        \
+  {                                                                                                                    \
+    register int nb, look;                                                                                             \
+    if (bits_left < HUFF_LOOKAHEAD)                                                                                    \
+    {                                                                                                                  \
+      if (!jpeg_fill_bit_buffer(&state, get_buffer, bits_left, 0))                                                     \
+      {                                                                                                                \
+        failaction;                                                                                                    \
+      }                                                                                                                \
+      get_buffer = state.get_buffer;                                                                                   \
+      bits_left = state.bits_left;                                                                                     \
+      if (bits_left < HUFF_LOOKAHEAD)                                                                                  \
+      {                                                                                                                \
+        nb = 1;                                                                                                        \
+        goto slowlabel;                                                                                                \
+      }                                                                                                                \
+    }                                                                                                                  \
+    look = PEEK_BITS(HUFF_LOOKAHEAD);                                                                                  \
+    if ((nb = htbl->look_nbits[look]) != 0)                                                                            \
+    {                                                                                                                  \
+      DROP_BITS(nb);                                                                                                   \
+      result = htbl->look_sym[look];                                                                                   \
+    }                                                                                                                  \
+    else                                                                                                               \
+    {                                                                                                                  \
+      nb = HUFF_LOOKAHEAD + 1;                                                                                         \
+    slowlabel:                                                                                                         \
+      if ((result = jpeg_huff_decode(&state, get_buffer, bits_left, htbl, nb)) < 0)                                    \
+      {                                                                                                                \
+        failaction;                                                                                                    \
+      }                                                                                                                \
+      get_buffer = state.get_buffer;                                                                                   \
+      bits_left = state.bits_left;                                                                                     \
+    }                                                                                                                  \
+  }
+/* Out-of-line case for Huffman code fetching */
+EXTERN(int)
+jpeg_huff_decode JPP((bitread_working_state * state,
+                      register bit_buf_type get_buffer,
+                      register int          bits_left,
+                      d_derived_tbl *       htbl,
+                      int                   min_bits));
+#endif
 
 
 /* Common fields between sequential, progressive and lossless Huffman entropy

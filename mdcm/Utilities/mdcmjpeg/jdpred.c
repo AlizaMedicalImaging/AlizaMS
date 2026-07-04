@@ -186,7 +186,11 @@ jpeg_undifference4a(j_decompress_ptr cinfo,
                     JDIFFROW         undiff_buf,
                     JDIMENSION       width)
 {
+  (void)cinfo;
+  (void)comp_index;
   UNDIFFERENCE_2D(PREDICTOR4A);
+  (void)(Rc);
+  (void)(Rb);
 }
 
 METHODDEF(void)
@@ -197,8 +201,12 @@ jpeg_undifference5a(j_decompress_ptr cinfo,
                     JDIFFROW         undiff_buf,
                     JDIMENSION       width)
 {
+  (void)cinfo;
+  (void)comp_index;
   SHIFT_TEMPS
   UNDIFFERENCE_2D(PREDICTOR5A);
+  (void)(Rc);
+  (void)(Rb);
 }
 
 METHODDEF(void)
@@ -209,8 +217,12 @@ jpeg_undifference6a(j_decompress_ptr cinfo,
                     JDIFFROW         undiff_buf,
                     JDIMENSION       width)
 {
+  (void)cinfo;
+  (void)comp_index;
   SHIFT_TEMPS
   UNDIFFERENCE_2D(PREDICTOR6A);
+  (void)(Rc);
+  (void)(Rb);
 }
 
 METHODDEF(void)
@@ -221,8 +233,12 @@ jpeg_undifference7a(j_decompress_ptr cinfo,
                     JDIFFROW         undiff_buf,
                     JDIMENSION       width)
 {
+  (void)cinfo;
+  (void)comp_index;
   SHIFT_TEMPS
   UNDIFFERENCE_2D(PREDICTOR7A);
+  (void)(Rc);
+  (void)(Rb);
 }
 #  endif
 

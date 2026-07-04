@@ -219,8 +219,9 @@ decode_mcus(j_decompress_ptr cinfo,
   unsigned int      mcu_num;
   int               sampn, ci, yoffset, MCU_width, ptrn;
   BITREAD_STATE_VARS;
+#if BITS_IN_JSAMPLE == 16
   boolean cornell_workaround = (cinfo->workaround_options & WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER) != 0;
-
+#endif
   /* Set output pointer locations based on MCU_col_num */
   for (ptrn = 0; ptrn < entropy->num_output_ptrs; ptrn++)
   {
@@ -263,8 +264,8 @@ decode_mcus(j_decompress_ptr cinfo,
         register int    s, r;
 
         /* Section H.2.2: decode the sample difference */
+#if BITS_IN_JSAMPLE == 16
         HUFF_DECODE(s, br_state, dctbl, return mcu_num, label1, cornell_workaround);
-#  if BITS_IN_JSAMPLE == 16
         if (s)
         {
           if (cornell_workaround)
@@ -307,7 +308,8 @@ decode_mcus(j_decompress_ptr cinfo,
             }
           }
         }
-#  else
+#else
+        HUFF_DECODE(s, br_state, dctbl, return mcu_num, label1);
         if (s)
         {
           if (s == 16) /* special case: always output 32768 */
@@ -319,7 +321,7 @@ decode_mcus(j_decompress_ptr cinfo,
             s = HUFF_EXTEND(r, s);
           }
         }
-#  endif
+#endif
 
         /* Output the sample difference */
         *entropy->output_ptr[entropy->output_ptr_index[sampn]]++ = (JDIFF)s;
