@@ -9453,11 +9453,9 @@ QString DicomUtils::read_buffer(
 		{
 			*shift_tmp = rescale_intercept;
 			*scale_tmp = rescale_slope;
-			if (force_double_pf || !(
-				rescale_intercept >= 0.0      &&
-				rescale_intercept <  0.000001 &&
-				rescale_slope     >  0.999999 &&
-				rescale_slope     <  1.000001))
+			if (force_double_pf ||
+				!(MMath::AlmostEqual(rescale_intercept, 0.0) &&
+				  MMath::AlmostEqual(rescale_slope, 1.0)))
 			{
 				if (pixelformat.GetBitsAllocated() < 8)
 				{
@@ -10574,11 +10572,8 @@ QString DicomUtils::read_enhanced_common(
 				if (!spacing_ok) break;
 				if (i > 0)
 				{
-					if (!(
-						(spacing_tmp0[0] + 0.0001 > spacing_tmp1[0]) &&
-						(spacing_tmp0[0] - 0.0001 < spacing_tmp1[0]) &&
-						(spacing_tmp0[1] + 0.0001 > spacing_tmp1[1]) &&
-						(spacing_tmp0[1] - 0.0001 < spacing_tmp1[1])))
+					if (!(MMath::AlmostEqual(spacing_tmp0[0], spacing_tmp1[0], 0.0001) &&
+						  MMath::AlmostEqual(spacing_tmp0[1], spacing_tmp1[1], 0.0001)))
 					{
 						spacing_ok = false;
 						break;
@@ -10852,11 +10847,8 @@ QString DicomUtils::read_enhanced_common(
 						bool really_rescale{};
 						for (int u = 0; u < tmp6.size(); ++u)
 						{
-							if (!(
-								tmp6.at(u).first > -0.000001 &&
-								tmp6.at(u).first <  0.000001 &&
-								tmp6.at(u).second > 0.999999 &&
-								tmp6.at(u).second < 1.000001))
+							if (!(MMath::AlmostEqual(tmp6.at(u).first,  0.0) &&
+								  MMath::AlmostEqual(tmp6.at(u).second, 1.0)))
 							{
 								really_rescale = true;
 								break;

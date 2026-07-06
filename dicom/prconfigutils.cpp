@@ -1364,7 +1364,7 @@ QString voi_lut_slice_by_slice(
 					{
 						const double c = centers.value(k);
 						const double w = widths.value(k);
-						if (!(c > -0.000001 && c < 0.000001 && w > -0.000001 && w < 0.000001))
+						if (!(MMath::AlmostEqual(c, 0.0) && MMath::AlmostEqual(w, 0.0)))
 						{
 							FrameLevel fl;
 							fl.us_window_center = c;
@@ -3261,7 +3261,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			{
 				shift = l.at(x).values.at(0).toDouble();
 				scale = l.at(x).values.at(1).toDouble();
-				if (!(scale > 0.999999 && scale < 1.000001 && shift > -0.000001 && shift < 0.000001))
+				if (!(MMath::AlmostEqual(scale, 1.0) && MMath::AlmostEqual(shift, 0.0)))
 				{
 					rescale_found = true;
 				}
@@ -3711,7 +3711,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 				{
 					const double tmp0 = it0.value();
-					if (!(ax > tmp0 - 0.0001 && ax < tmp0 + 0.0001))
+					if (!MMath::AlmostEqual(ax, tmp0, 0.0001))
 					{
 						one_aspect = false;
 						break;
@@ -3729,7 +3729,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 					{
 						const double tmp1 = it1.value();
-						if (!(ay > tmp1 - 0.0001 && ay < tmp1 + 0.0001))
+						if (!MMath::AlmostEqual(ay, tmp1, 0.0001))
 						{
 							one_aspect = false;
 							break;
@@ -3739,7 +3739,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				}
 				if (one_aspect)
 				{
-					if (!(ax > 0.99999 && ax < 1.00001 && ay > 0.99999 && ay < 1.00001))
+					if (!(MMath::AlmostEqual(ax, 1.0) && MMath::AlmostEqual(ay, 1.0)))
 					{
 						set_asp_ratio<ImageTypeF>(v->pF, ax, ay);
 					}

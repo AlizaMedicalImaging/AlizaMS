@@ -89,15 +89,15 @@ double abs_max(double x, double y, double z)
 bool check_bad_direction(const itk::Matrix<itk::SpacePrecisionType, 3, 3> & d)
 {
 	const bool r =
-		d[0][0] > -0.000001 && d[0][0] < 0.000001 &&
-		d[1][0] > -0.000001 && d[1][0] < 0.000001 &&
-		d[2][0] > -0.000001 && d[2][0] < 0.000001 &&
-		d[0][1] > -0.000001 && d[0][1] < 0.000001 &&
-		d[1][1] > -0.000001 && d[1][1] < 0.000001 &&
-		d[2][1] > -0.000001 && d[2][1] < 0.000001 &&
-		d[0][2] > -0.000001 && d[0][2] < 0.000001 &&
-		d[1][2] > -0.000001 && d[1][2] < 0.000001 &&
-		d[2][2] > -0.000001 && d[2][2] < 0.000001;
+		MMath::AlmostEqual(d[0][0], 0.0, 0.000001) &&
+		MMath::AlmostEqual(d[1][0], 0.0, 0.000001) &&
+		MMath::AlmostEqual(d[2][0], 0.0, 0.000001) &&
+		MMath::AlmostEqual(d[0][1], 0.0, 0.000001) &&
+		MMath::AlmostEqual(d[1][1], 0.0, 0.000001) &&
+		MMath::AlmostEqual(d[2][1], 0.0, 0.000001) &&
+		MMath::AlmostEqual(d[0][2], 0.0, 0.000001) &&
+		MMath::AlmostEqual(d[1][2], 0.0, 0.000001) &&
+		MMath::AlmostEqual(d[2][2], 0.0, 0.000001);
 	return r;
 }
 
