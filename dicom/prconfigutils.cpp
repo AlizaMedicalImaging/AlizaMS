@@ -18,6 +18,7 @@
 #include "dicomutils.h"
 #include "codecutils.h"
 #include "commonutils.h"
+#include "mmath.h"
 #include <itkShiftScaleImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkImageSliceIteratorWithIndex.h>
@@ -3656,7 +3657,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 				{
 					const double tmp0 = it0.value();
-					if (!(px > tmp0 - 0.0001 && px < tmp0 + 0.0001))
+					if (!MMath::AlmostEqual(px, tmp0, 0.0001))
 					{
 						one_spacing = false;
 						break;
@@ -3674,7 +3675,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 					{
 						const double tmp1 = it1.value();
-						if (!(py > tmp1 - 0.0001 && py < tmp1 + 0.0001))
+						if (!MMath::AlmostEqual(py, tmp1, 0.0001))
 						{
 							one_spacing = false;
 							break;
@@ -3684,7 +3685,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				}
 				if (one_spacing)
 				{
-					if (!(px > 0.99999 && px < 1.00001 && py > 0.99999 && py < 1.00001))
+					if (!MMath::AlmostEqual(px, 1.0, 0.0001) && !MMath::AlmostEqual(py, 1.0, 0.0001))
 					{
 						set_spacing<ImageTypeF>(v->pF, px, py);
 					}

@@ -3410,10 +3410,8 @@ bool DicomUtils::read_slices(
 				{
 					ok1 = false;
 				}
-				if (spacing_x > pix_spacing[1] + 0.0001 ||
-					spacing_x < pix_spacing[1] - 0.0001 ||
-					spacing_y > pix_spacing[0] + 0.0001 ||
-					spacing_y < pix_spacing[0] - 0.0001)
+				if (!MMath::AlmostEqual(spacing_x, pix_spacing[1], 0.0001) ||
+					!MMath::AlmostEqual(spacing_y, pix_spacing[0], 0.0001)) 
 				{
 					ok1 = false;
 				}
@@ -5245,10 +5243,9 @@ bool DicomUtils::generate_geometry(
 	{
 		const sVector3 direction0_tmp = last - first;
 		if (!(
-			(direction0_tmp.getX() > -0.00001f && direction0_tmp.getX() < 0.00001f) &&
-			(direction0_tmp.getY() > -0.00001f && direction0_tmp.getY() < 0.00001f) &&
-			(direction0_tmp.getZ() > -0.00001f && direction0_tmp.getZ() < 0.00001f)
-			))
+				MMath::AlmostEqual(direction0_tmp.getX(), 0.0f, 0.00001f) &&
+				MMath::AlmostEqual(direction0_tmp.getY(), 0.0f, 0.00001f) &&
+				MMath::AlmostEqual(direction0_tmp.getZ(), 0.0f, 0.00001f)))
 		{
 			const sVector3 direction0 = normalize(direction0_tmp);
 			*slices_dir_x = direction0.getX();
@@ -5257,10 +5254,9 @@ bool DicomUtils::generate_geometry(
 			if (tmp1 &&
 				((tmp2 && (size_ > 2)) || size_ == 2) &&
 				!(
-				(direction0.getX() < direction1.getX() + 0.0001f && direction0.getX() > direction1.getX() - 0.0001f) &&
-				(direction0.getY() < direction1.getY() + 0.0001f && direction0.getY() > direction1.getY() - 0.0001f) &&
-				(direction0.getZ() < direction1.getZ() + 0.0001f && direction0.getZ() > direction1.getZ() - 0.0001f)
-				))
+					MMath::AlmostEqual(direction0.getX(), direction1.getX(), 0.0001f) &&
+					MMath::AlmostEqual(direction0.getY(), direction1.getY(), 0.0001f) &&
+					MMath::AlmostEqual(direction0.getZ(), direction1.getZ(), 0.0001f)))
 			{
 				invalidate_volume = true;
 #ifdef ALIZA_VERBOSE
@@ -8305,8 +8301,7 @@ QString DicomUtils::read_series(
 						invalidate = true;
 						ivariant->di->iz_spacing = 0.00001;
 					}
-					if ((tmp0_spacing_x + 0.0001f) < tmp1_spacing_x ||
-						(tmp0_spacing_x - 0.0001f) > tmp1_spacing_x)
+					if (!MMath::AlmostEqual(tmp0_spacing_x, tmp1_spacing_x, 0.0001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_spacing_x != tmp1_spacing_x "
@@ -8314,8 +8309,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_spacing_y + 0.0001f) < tmp1_spacing_y ||
-						(tmp0_spacing_y - 0.0001f) > tmp1_spacing_y)
+					if (!MMath::AlmostEqual(tmp0_spacing_y, tmp1_spacing_y, 0.0001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_spacing_y != tmp1_spacing_y "
@@ -8329,8 +8323,7 @@ QString DicomUtils::read_series(
 					const float tmp1_origin_x = ivariant->di->ix_origin;
 					const float tmp1_origin_y = ivariant->di->iy_origin;
 					const float tmp1_origin_z = ivariant->di->iz_origin;
-					if ((tmp0_origin_x + 0.001f) < tmp1_origin_x ||
-						(tmp0_origin_x - 0.001f) > tmp1_origin_x)
+					if (!MMath::AlmostEqual(tmp0_origin_x, tmp1_origin_x, 0.001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_x != tmp1_origin_x "
@@ -8338,8 +8331,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_origin_y + 0.001f) < tmp1_origin_y ||
-						(tmp0_origin_y - 0.001f) > tmp1_origin_y)
+					if (!MMath::AlmostEqual(tmp0_origin_y, tmp1_origin_y, 0.001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_y != tmp1_origin_y "
@@ -8347,8 +8339,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_origin_z + 0.001f) < tmp1_origin_z ||
-						(tmp0_origin_z - 0.001f) > tmp1_origin_z)
+					if (!MMath::AlmostEqual(tmp0_origin_z, tmp1_origin_z, 0.001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_z != tmp1_origin_z "
@@ -8368,8 +8359,7 @@ QString DicomUtils::read_series(
 					const float tmp1_dircos_3 = ivariant->di->dircos[3];
 					const float tmp1_dircos_4 = ivariant->di->dircos[4];
 					const float tmp1_dircos_5 = ivariant->di->dircos[5];
-					if ((tmp0_dircos_0 + 0.001f) < tmp1_dircos_0 ||
-						(tmp0_dircos_0 - 0.001f) > tmp1_dircos_0)
+					if (!MMath::AlmostEqual(tmp0_dircos_0, tmp1_dircos_0, 0.0001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_0 != tmp1_dircos_0 "
@@ -8377,8 +8367,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_dircos_1 + 0.001f) < tmp1_dircos_1 ||
-						(tmp0_dircos_1 - 0.001f) > tmp1_dircos_1)
+					if (!MMath::AlmostEqual(tmp0_dircos_1, tmp1_dircos_1, 0.0001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_1 != tmp1_dircos_1 "
@@ -8386,8 +8375,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_dircos_2 + 0.001f) < tmp1_dircos_2 ||
-						(tmp0_dircos_2 - 0.001f) > tmp1_dircos_2)
+					if (!MMath::AlmostEqual(tmp0_dircos_2, tmp1_dircos_2, 0.0001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_2 != tmp1_dircos_2 "
@@ -8395,8 +8383,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_dircos_3 + 0.001f) < tmp1_dircos_3 ||
-						(tmp0_dircos_3 - 0.001f) > tmp1_dircos_3)
+					if (!MMath::AlmostEqual(tmp0_dircos_3, tmp1_dircos_3, 0.0001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_3 != tmp1_dircos_3 "
@@ -8404,8 +8391,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_dircos_4 + 0.001f) < tmp1_dircos_4 ||
-						(tmp0_dircos_4 - 0.001f) > tmp1_dircos_4)
+					if (!MMath::AlmostEqual(tmp0_dircos_4, tmp1_dircos_4, 0.0001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_4 != tmp1_dircos_4 "
@@ -8413,8 +8399,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_dircos_5 + 0.001f) < tmp1_dircos_5 ||
-						(tmp0_dircos_5 - 0.001f) > tmp1_dircos_5)
+					if (!MMath::AlmostEqual(tmp0_dircos_5, tmp1_dircos_5, 0.0001f))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_5 != tmp1_dircos_5 "
