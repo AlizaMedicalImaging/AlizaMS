@@ -3410,10 +3410,10 @@ bool DicomUtils::read_slices(
 				{
 					ok1 = false;
 				}
-				if (spacing_x > pix_spacing[1] + 0.01 ||
-					spacing_x < pix_spacing[1] - 0.01 ||
-					spacing_y > pix_spacing[0] + 0.01 ||
-					spacing_y < pix_spacing[0] - 0.01)
+				if (spacing_x > pix_spacing[1] + 0.0001 ||
+					spacing_x < pix_spacing[1] - 0.0001 ||
+					spacing_y > pix_spacing[0] + 0.0001 ||
+					spacing_y < pix_spacing[0] - 0.0001)
 				{
 					ok1 = false;
 				}
@@ -5257,9 +5257,9 @@ bool DicomUtils::generate_geometry(
 			if (tmp1 &&
 				((tmp2 && (size_ > 2)) || size_ == 2) &&
 				!(
-				(direction0.getX() < direction1.getX() + 0.001f && direction0.getX() > direction1.getX() - 0.001f) &&
-				(direction0.getY() < direction1.getY() + 0.001f && direction0.getY() > direction1.getY() - 0.001f) &&
-				(direction0.getZ() < direction1.getZ() + 0.001f && direction0.getZ() > direction1.getZ() - 0.001f)
+				(direction0.getX() < direction1.getX() + 0.0001f && direction0.getX() > direction1.getX() - 0.0001f) &&
+				(direction0.getY() < direction1.getY() + 0.0001f && direction0.getY() > direction1.getY() - 0.0001f) &&
+				(direction0.getZ() < direction1.getZ() + 0.0001f && direction0.getZ() > direction1.getZ() - 0.0001f)
 				))
 			{
 				invalidate_volume = true;
@@ -8305,8 +8305,8 @@ QString DicomUtils::read_series(
 						invalidate = true;
 						ivariant->di->iz_spacing = 0.00001;
 					}
-					if ((tmp0_spacing_x + 0.001f) < tmp1_spacing_x ||
-						(tmp0_spacing_x - 0.001f) > tmp1_spacing_x)
+					if ((tmp0_spacing_x + 0.0001f) < tmp1_spacing_x ||
+						(tmp0_spacing_x - 0.0001f) > tmp1_spacing_x)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_spacing_x != tmp1_spacing_x "
@@ -8314,8 +8314,8 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if ((tmp0_spacing_y + 0.001f) < tmp1_spacing_y ||
-						(tmp0_spacing_y - 0.001f) > tmp1_spacing_y)
+					if ((tmp0_spacing_y + 0.0001f) < tmp1_spacing_y ||
+						(tmp0_spacing_y - 0.0001f) > tmp1_spacing_y)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_spacing_y != tmp1_spacing_y "
@@ -8432,9 +8432,9 @@ QString DicomUtils::read_series(
 					std::cout << "warning: could not validate image, using as non-uniform" << std::endl;
 #endif
 				}
-				spacing_x = ivariant->di->ix_spacing > 0 ?  ivariant->di->ix_spacing : 1;
-				spacing_y = ivariant->di->iy_spacing > 0 ?  ivariant->di->iy_spacing : 1;
-				spacing_z = ivariant->di->iz_spacing > 0.00001 ?  ivariant->di->iz_spacing : 0.00001;
+				spacing_x = ivariant->di->ix_spacing > 0.0 ? ivariant->di->ix_spacing : 1.0;
+				spacing_y = ivariant->di->iy_spacing > 0.0 ? ivariant->di->iy_spacing : 1.0;
+				spacing_z = ivariant->di->iz_spacing > 0.0 ? ivariant->di->iz_spacing : 0.00001;
 				origin_x = ivariant->di->ix_origin;
 				origin_y = ivariant->di->iy_origin;
 				origin_z = ivariant->di->iz_origin;
@@ -8462,9 +8462,9 @@ QString DicomUtils::read_series(
 			}
 			else
 			{
-				spacing_x = spacing_x_ > 0 ? spacing_x_ : 1;
-				spacing_y = spacing_y_ > 0 ? spacing_y_ : 1;
-				spacing_z = spacing_z_ > 0.00001 ? spacing_z_ : 0.00001;
+				spacing_x = spacing_x_ > 0.0 ? spacing_x_ : 1.0;
+				spacing_y = spacing_y_ > 0.0 ? spacing_y_ : 1.0;
+				spacing_z = spacing_z_ > 0.0 ? spacing_z_ : 0.00001;
 				origin_x = origin_x_;
 				origin_y = origin_y_;
 				origin_z = origin_z_;
@@ -9469,7 +9469,7 @@ QString DicomUtils::read_buffer(
 			*shift_tmp = rescale_intercept;
 			*scale_tmp = rescale_slope;
 			if (force_double_pf || !(
-				rescale_intercept >= 0        &&
+				rescale_intercept >= 0.0      &&
 				rescale_intercept <  0.000001 &&
 				rescale_slope     >  0.999999 &&
 				rescale_slope     <  1.000001))
@@ -10696,9 +10696,9 @@ QString DicomUtils::read_enhanced_common(
 			}
 			else
 			{
-				spacing_x = spacing_x_read > 0 ? spacing_x_read : 1;
-				spacing_y = spacing_y_read > 0 ? spacing_y_read : 1;
-				spacing_z = spacing_z_read > 0 ? spacing_z_read : 0.00001;
+				spacing_x = spacing_x_read > 0.0 ? spacing_x_read : 1.0;
+				spacing_y = spacing_y_read > 0.0 ? spacing_y_read : 1.0;
+				spacing_z = spacing_z_read > 0.0 ? spacing_z_read : 0.00001;
 				origin_x  = origin_x_read;
 				origin_y  = origin_y_read;
 				origin_z  = origin_z_read;

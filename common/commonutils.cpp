@@ -86,7 +86,7 @@ double abs_max(double x, double y, double z)
 	return r;
 }
 
-bool check_direction_matrix(const itk::Matrix<itk::SpacePrecisionType, 3, 3> & d)
+bool check_bad_direction(const itk::Matrix<itk::SpacePrecisionType, 3, 3> & d)
 {
 	const bool r =
 		d[0][0] > -0.000001 && d[0][0] < 0.000001 &&
@@ -1426,7 +1426,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = check_direction_matrix(direction);
+	*bad_direction = check_bad_direction(direction);
 	try
 	{
 		image = T::New();
@@ -1565,7 +1565,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = check_direction_matrix(direction);
+	*bad_direction = check_bad_direction(direction);
 	try
 	{
 		image = T::New();
@@ -1760,7 +1760,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = check_direction_matrix(direction);
+	*bad_direction = check_bad_direction(direction);
 	try
 	{
 		image = T::New();

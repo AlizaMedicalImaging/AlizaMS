@@ -511,7 +511,7 @@ void rotate_flip_points(
 			translation2[1] = cy;
 			transform->SetIdentity();
 			transform->Translate(translation1);
-			transform->Rotate2D(rotation*0.0174532925199432957692369, false);
+			transform->Rotate2D(rotation * 0.0174532925199432957692369, false);
 			transform->Translate(translation2, false);
 			if (idx0 >= -1)
 			{
@@ -1051,7 +1051,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 					f[1] = false;
 					transform->SetIdentity();
 					transform->Translate(translation1);
-					transform->Rotate2D(-rotation*0.0174532925199432957692369, false);
+					transform->Rotate2D(-rotation * 0.0174532925199432957692369, false);
 					transform->Translate(translation2, false);
 					try
 					{
@@ -1127,7 +1127,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 						translation2[1] = cy;
 						transform->SetIdentity();
 						transform->Translate(translation1);
-						transform->Rotate2D(-rotation*0.0174532925199432957692369, false);
+						transform->Rotate2D(-rotation * 0.0174532925199432957692369, false);
 						transform->Translate(translation2, false);
 						try
 						{
@@ -3656,7 +3656,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 				{
 					const double tmp0 = it0.value();
-					if (!(px > tmp0 - 0.00001 && px < tmp0 + 0.00001))
+					if (!(px > tmp0 - 0.0001 && px < tmp0 + 0.0001))
 					{
 						one_spacing = false;
 						break;
@@ -3674,7 +3674,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 					{
 						const double tmp1 = it1.value();
-						if (!(py > tmp1 - 0.00001 && py < tmp1 + 0.00001))
+						if (!(py > tmp1 - 0.0001 && py < tmp1 + 0.0001))
 						{
 							one_spacing = false;
 							break;
@@ -3710,7 +3710,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 				{
 					const double tmp0 = it0.value();
-					if (!(ax > tmp0 - 0.00001 && ax < tmp0 + 0.00001))
+					if (!(ax > tmp0 - 0.0001 && ax < tmp0 + 0.0001))
 					{
 						one_aspect = false;
 						break;
@@ -3728,7 +3728,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 					{
 						const double tmp1 = it1.value();
-						if (!(ay > tmp1 - 0.00001 && ay < tmp1 + 0.00001))
+						if (!(ay > tmp1 - 0.0001 && ay < tmp1 + 0.0001))
 						{
 							one_aspect = false;
 							break;
