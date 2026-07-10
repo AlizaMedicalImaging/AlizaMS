@@ -178,9 +178,10 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
         if (end != std::streampos(-1) && is.good() &&
             static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField))
         {
-          mdcmWarningMacro(
-            "Value Length " << ValueLengthField <<
-            " exceeds remaining stream size for tag " << TagField);
+          mdcmAlwaysWarnMacro(
+            "The \"Value Length\" of tag " << TagField <<
+            " is " << static_cast<double>(ValueLengthField) / (1024.0 * 1024.0) <<
+            " MB and exceeds the remaining stream size; the file will be rejected.");
           throw std::logic_error("Value Length exceeds remaining stream size for tag");
         }
       }

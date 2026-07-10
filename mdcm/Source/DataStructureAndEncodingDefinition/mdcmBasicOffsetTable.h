@@ -71,8 +71,10 @@ public:
         if (end != std::streampos(-1) && is.good() &&
             static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField))
         {
-          mdcmWarningMacro(
-            "Basic Offset Table Value Length " << ValueLengthField << " exceeds remaining stream size");
+          mdcmAlwaysWarnMacro(
+            "The \"Value Length\" of the Basic Offset Table is" <<
+            static_cast<double>(ValueLengthField) / (1024.0 * 1024.0) <<
+            " MB and exceeds the remaining stream size; the file will be rejected.");
           throw std::logic_error("Basic Offset Table Value Length exceeds remaining stream size");
         }
       }

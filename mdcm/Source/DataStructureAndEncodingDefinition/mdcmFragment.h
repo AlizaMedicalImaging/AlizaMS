@@ -97,8 +97,10 @@ public:
       if (end != std::streampos(-1) && is.good() &&
           static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField))
       {
-        mdcmWarningMacro(
-          "Fragment Value Length " << ValueLengthField << " exceeds remaining stream size");
+        mdcmAlwaysWarnMacro(
+          "The \"Value Length\" of the fragment is " <<
+          static_cast<double>(ValueLengthField) / (1024.0 * 1024.0) <<
+          " MB and exceeds the remaining stream size; the file will be rejected.");
         throw std::logic_error("Fragment Value Length exceeds remaining stream size");
       }
     }
