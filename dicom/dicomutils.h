@@ -62,6 +62,8 @@ public:
 	double us_temp_pos_unknown{};
 	double rescale_intercept{};
 	double rescale_slope{1.0};
+	double rwv_rescale_intercept{};
+	double rwv_rescale_slope{1.0};
 	QString pat_pos;
 	QString pat_orient;
 	QString pix_spacing;
@@ -73,6 +75,7 @@ public:
 	QString frame_body_part;
 	QString frame_laterality;
 	QString rescale_type;
+	QString rwv_lut_label;
 	QString frame_acquisition_datetime;
 	QString frame_reference_datetime;
 	bool stack_id_ok{};
@@ -83,6 +86,7 @@ public:
 	bool temp_pos_off_ok{};
 	bool us_temp_pos_unknown_ok{};
 	bool rescale_ok{};
+	bool rwv_rescale_ok{};
 	int ref_segment_num{-1};
 	double vol_pos[3]{};
 	double vol_orient[6]{};

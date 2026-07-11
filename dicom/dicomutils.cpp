@@ -4031,6 +4031,10 @@ bool DicomUtils::read_group_sq(
 	const mdcm::Tag tRescaleIntercept(0x0028,0x1052);
 	const mdcm::Tag tRescaleSlope(0x0028,0x1053);
 	const mdcm::Tag tRescaleType(0x0028,0x1054);
+	const mdcm::Tag tRealWorldValueMappingSequence(0x0040,0x9096);
+	const mdcm::Tag tRWVRescaleIntercept(0x0040,0x9224);
+	const mdcm::Tag tRWVRescaleSlope(0x0040,0x9225);
+	const mdcm::Tag tRWVLUTLabel(0x0040,0x9210);
 	const mdcm::Tag tFrameAcquisitionDateTime(0x0018,0x9074);
 	const mdcm::Tag tFrameReferenceDateTime(0x0018,0x9151);
 	const mdcm::Tag tSegmentIdentificationSequence(0x0062,0x000a);
@@ -4446,6 +4450,43 @@ bool DicomUtils::read_group_sq(
 					if (get_string_value(nestedds1, tRescaleType, tmp3))
 					{
 						fg.rescale_type = std::move(tmp3);
+					}
+				}
+			}
+		}
+		{
+			const mdcm::DataElement & deRealWorldValueMappingSequence =
+				nestedds.GetDataElement(tRealWorldValueMappingSequence);
+			if (!deRealWorldValueMappingSequence.IsEmpty())
+			{
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sqRealWorldValueMappingSequence =
+					deRealWorldValueMappingSequence.GetValueAsSQ();
+				if (sqRealWorldValueMappingSequence &&
+					sqRealWorldValueMappingSequence->GetNumberOfItems() == 1)
+				{
+					const mdcm::Item & item1 = sqRealWorldValueMappingSequence->GetItem(1);
+					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
+					double tmp1;
+					double tmp2;
+					if (get_fd_value(nestedds1, tRWVRescaleIntercept, &tmp1) &&
+						get_fd_value(nestedds1, tRWVRescaleSlope, &tmp2))
+					{
+						fg.rwv_rescale_ok = true;
+						fg.rwv_rescale_intercept = tmp1;
+						fg.rwv_rescale_slope = tmp2;
+#if 0
+						std::cout
+							<< "rwv rescale intercept = " << fg.rwv_rescale_intercept
+							<< ", rwv rescale slope = " << fg.rwv_rescale_slope << std::endl;
+#endif
+					}
+					QString tmp3;
+					if (get_string_value(nestedds1, tRWVLUTLabel, tmp3))
+					{
+						fg.rwv_lut_label = std::move(tmp3);
+#if 0
+						std::cout << "rwv lut label = " << fg.rwv_lut_label.toStdString() << std::endl;
+#endif
 					}
 				}
 			}
