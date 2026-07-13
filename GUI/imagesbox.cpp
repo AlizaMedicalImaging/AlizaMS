@@ -358,6 +358,14 @@ void ImagesBox::set_html(const ImageVariant * v)
 	{
 		html.append(QString("<br />"));
 	}
+	if (!v->pet_units.isEmpty())
+	{
+		html.append(
+			QString("<span class='y'>PET unit: ") +
+			v->pet_units +
+			QString("</span><br /><br />"));
+
+	}
 	if (!v->study_description.isEmpty())
 	{
 		html.append(QString("<span class='y'>") +
@@ -481,18 +489,23 @@ void ImagesBox::set_html(const ImageVariant * v)
 // Image pixel
 //
 //
+		if (v->rescale_disabled)
+		{
+			html.append(QString(
+				"<span class='red2'>"
+				"Rescale was disabled in settings"
+				"</span><br />"));
+		}
 		QString t;
 		if (!v->interpretation.isEmpty())
 		{
 			t.append(v->interpretation + QString("<br />"));
 		}
-		if (v->di->idimx > 0 && v->di->idimy > 0 && v->di->idimz > 0)
-		{
-			t.append(QVariant(v->di->idimx).toString() + QString(" x ") +
-					QVariant(v->di->idimy).toString()  + QString(" x ") +
-					QVariant(v->di->idimz).toString()  + QString("<br />"));
-		}
-		const QString cs = v->ybr ? QString("Y'CbCr") : QString("RGB"); // TODO
+		t.append(
+			QVariant(v->di->idimx).toString() + QString(" x ") +
+			QVariant(v->di->idimy).toString() + QString(" x ") +
+			QVariant(v->di->idimz).toString() + QString("<br />"));
+		const QString cs = v->ybr ? QString("Y'CbCr") : QString("RGB");
 		switch (v->image_type)
 		{
 		case  0: t.append(QString("signed short"));       break;
@@ -541,13 +554,6 @@ void ImagesBox::set_html(const ImageVariant * v)
 			QString("<span class='y6'>") +
 			t +
 			QString("</span><br />"));
-		if (v->rescale_disabled)
-		{
-			html.append(QString(
-				"<span class='red2'>"
-				"Rescale was disabled in settings"
-				"</span><br />"));
-		}
 //
 //
 //

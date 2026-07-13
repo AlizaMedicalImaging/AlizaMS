@@ -182,6 +182,7 @@ void SettingsWidget::set_default()
 #endif
 	adjust_spinBox->setValue(14);
 	multiseries_checkBox->setChecked(true);
+	rwvpet_checkBox->setChecked(true);
 #if defined(Q_OS_LINUX) && QT_VERSION >= QT_VERSION_CHECK(5,11,0)
 	if (QApplication::platformName() == QString("wayland"))
 	{
@@ -295,6 +296,7 @@ void SettingsWidget::readSettings()
 	const int tmp19 = settings.value(QString("adj_fps_value"), 14).toInt();
 	const int tmp20 = settings.value(QString("filtering"),      0).toInt();
 	const int tmp21 = settings.value(QString("multiseries"),    1).toInt();
+	const int tmp22 = settings.value(QString("rwvpet"),         1).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -370,6 +372,7 @@ void SettingsWidget::readSettings()
 	adjust_spinBox->setValue(tmp19);
 	adjust_checkBox->setChecked((tmp18 == 1));
 	multiseries_checkBox->setChecked((tmp21 == 1));
+	rwvpet_checkBox->setChecked((tmp22 == 1));
 	if (tmp20 == 2)
 	{
 		f_no_radioButton->setChecked(false);
@@ -416,6 +419,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("adj_fps2"),      QVariant(adjust_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("adj_fps_value"), QVariant(adjust_spinBox->value()));
 	s.setValue(QString("multiseries"),   QVariant(multiseries_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("rwvpet"),        QVariant(rwvpet_checkBox->isChecked() ? 1 : 0));
 	if (enh_dim_skip_radioButton->isChecked())
 	{
 		s.setValue(QString("enh_strategy"), QVariant(4));
@@ -546,6 +550,11 @@ bool SettingsWidget::get_process_multiseries() const
 	return multiseries_checkBox->isChecked();
 }
 
+bool SettingsWidget::get_rwv_for_enh_pet() const
+{
+	return rwvpet_checkBox->isChecked();
+}
+
 CurrentSettings SettingsWidget::get_current_settings()
 {
 	CurrentSettings s;
@@ -575,5 +584,6 @@ CurrentSettings SettingsWidget::get_current_settings()
 	s.skip_too_large = get_skip_too_large();
 	s.dcm_thread = get_dcm_thread();
 	s.process_multiseries = get_process_multiseries();
+	s.rwv_for_enh_pet = get_rwv_for_enh_pet();
 	return s;
 }

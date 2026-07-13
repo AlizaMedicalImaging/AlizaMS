@@ -40,6 +40,7 @@ public:
 	bool   get_skip_too_large() const;
 	bool   get_dcm_thread() const;
 	bool   get_process_multiseries() const;
+	bool   get_rwv_for_enh_pet() const;
 	CurrentSettings get_current_settings();
 
 private:

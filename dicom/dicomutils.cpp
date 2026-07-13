@@ -72,14 +72,15 @@
 #include <random>
 #include <chrono>
 #include <atomic>
+#include <cmath>
 #include <iterator>
 #include "vectormath/scalar/vectormath.h"
+#include "mmath.h"
 #ifdef ALIZA_USE_SYSTEM_LCMS2
 #include <lcms2.h>
 #else
 #include <alizalcms/lcms2.h>
 #endif
-#include "mmath.h"
 
 namespace
 {
@@ -4461,32 +4462,92 @@ bool DicomUtils::read_group_sq(
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sqRealWorldValueMappingSequence =
 					deRealWorldValueMappingSequence.GetValueAsSQ();
-				if (sqRealWorldValueMappingSequence &&
-					sqRealWorldValueMappingSequence->GetNumberOfItems() == 1)
+				if (sqRealWorldValueMappingSequence && sqRealWorldValueMappingSequence->GetNumberOfItems() > 0)
 				{
-					const mdcm::Item & item1 = sqRealWorldValueMappingSequence->GetItem(1);
-					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
-					double tmp1;
-					double tmp2;
-					if (get_fd_value(nestedds1, tRWVRescaleIntercept, &tmp1) &&
-						get_fd_value(nestedds1, tRWVRescaleSlope, &tmp2))
+					const int rwv_size = sqRealWorldValueMappingSequence->GetNumberOfItems();
+					int rwv_idx{-1};
+					if (rwv_size == 1)
 					{
-						fg.rwv_rescale_ok = true;
-						fg.rwv_rescale_intercept = tmp1;
-						fg.rwv_rescale_slope = tmp2;
-#if 0
-						std::cout
-							<< "rwv rescale intercept = " << fg.rwv_rescale_intercept
-							<< ", rwv rescale slope = " << fg.rwv_rescale_slope << std::endl;
-#endif
+						rwv_idx = 0;
 					}
-					QString tmp3;
-					if (get_string_value(nestedds1, tRWVLUTLabel, tmp3))
+					else
 					{
-						fg.rwv_lut_label = std::move(tmp3);
+						// Prefer in the order: g/ml{SUVbw}, other g/ml, Bq/ml
+						QStringList rwv_l;
+						for (int rwv = 0; rwv < rwv_size; ++rwv)
+						{
+							const mdcm::Item & item1 = sqRealWorldValueMappingSequence->GetItem(rwv + 1);
+							const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
+							QString tmp3;
+							if (get_string_value(nestedds1, tRWVLUTLabel, tmp3))
+							{
+								rwv_l.push_back(tmp3.remove(QChar('\0')));
+							}
+						}
+						const int rwv_l_size = rwv_l.size();
+						for (int rwv = 0; rwv < rwv_l_size; ++rwv)
+						{
+							if (rwv_l.at(rwv).toUpper() == QString("G/ML{SUVBW}"))
+							{
+								rwv_idx = rwv;
+								break;
+							}
+						}
+						if (rwv_idx < 0)
+						{
+							for (int rwv = 0; rwv < rwv_l_size; ++rwv)
+							{
+								if (rwv_l.at(rwv).startsWith(QString("g/ml"), Qt::CaseInsensitive) ||
+									rwv_l.at(rwv) == QString("GML"))
+								{
+									rwv_idx = rwv;
+									break;
+								}
+							}
+						}
+						if (rwv_idx < 0)
+						{
+							for (int rwv = 0; rwv < rwv_l_size; ++rwv)
+							{
+								if (rwv_l.at(rwv).toUpper() == QString("BQ/ML") ||
+									rwv_l.at(rwv).toUpper() == QString("BQML")) 	
+								{
+									rwv_idx = rwv;
+									break;
+								}
+							}
+						}
+						if (rwv_idx < 0)
+						{
+							rwv_idx = 0; // take first
+						}
+					}
+					//
+					{
+						const mdcm::Item & item1 = sqRealWorldValueMappingSequence->GetItem(rwv_idx + 1);
+						const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
+						double tmp1;
+						double tmp2;
+						if (get_fd_value(nestedds1, tRWVRescaleIntercept, &tmp1) &&
+							get_fd_value(nestedds1, tRWVRescaleSlope, &tmp2))
+						{
+							fg.rwv_rescale_ok = true;
+							fg.rwv_rescale_intercept = tmp1;
+							fg.rwv_rescale_slope = tmp2;
 #if 0
-						std::cout << "rwv lut label = " << fg.rwv_lut_label.toStdString() << std::endl;
+							std::cout
+								<< "rwv rescale intercept = " << fg.rwv_rescale_intercept
+								<< ", rwv rescale slope = " << fg.rwv_rescale_slope << std::endl;
 #endif
+						}
+						QString tmp3;
+						if (get_string_value(nestedds1, tRWVLUTLabel, tmp3))
+						{
+							fg.rwv_lut_label = std::move(tmp3);
+#if 0
+							std::cout << "rww lut label = " << fg.rwv_lut_label.toStdString() << std::endl;
+#endif
+						}
 					}
 				}
 			}
@@ -6387,6 +6448,7 @@ void DicomUtils::enhanced_process_values(
 	bool laterality_miss{};
 	bool body_part_miss{};
 	bool rescale_miss{};
+	bool rwv_rescale_miss{};
 	for (unsigned int x = 0; x < values.size(); ++x)
 	{
 		if (!values.at(x).vol_pos_ok) vol_pos_miss = true;
@@ -6401,6 +6463,7 @@ void DicomUtils::enhanced_process_values(
 		if (values.at(x).frame_laterality.isEmpty()) laterality_miss = true;
 		if (values.at(x).frame_body_part.isEmpty()) body_part_miss = true;
 		if (!values.at(x).rescale_ok) rescale_miss = true;
+		if (!values.at(x).rwv_rescale_ok) rwv_rescale_miss = true;
 	}
 	if (vol_pos_miss && shared_values.size() == 1 && shared_values.at(0).vol_pos_ok)
 	{
@@ -6482,16 +6545,39 @@ void DicomUtils::enhanced_process_values(
 			values[x].rescale_type = rescale_type;
 		}
 	}
+	if (rwv_rescale_miss)
+	{
+		double rwv_rescale_intercept{};
+		double rwv_rescale_slope{1.0};
+		QString rwv_lut_label;
+		if (shared_values.size() == 1 && shared_values.at(0).rwv_rescale_ok)
+		{
+			rwv_rescale_intercept = shared_values.at(0).rwv_rescale_intercept;
+			rwv_rescale_slope = shared_values.at(0).rwv_rescale_slope;
+			rwv_lut_label = shared_values.at(0).rwv_lut_label;
+		}
+		for (unsigned int x = 0; x < values.size(); ++x)
+		{
+			values[x].rwv_rescale_intercept = rwv_rescale_intercept;
+			values[x].rwv_rescale_slope = rwv_rescale_slope;
+			values[x].rwv_lut_label = rwv_lut_label;
+		}
+	}
 }
 
 void DicomUtils::enhanced_check_rescale(
 	const mdcm::DataSet & ds,
 	FrameGroupValues & v)
 {
+	// TODO is this very old function required
+	// at all?
+	//
+	// If no slope/intercept found in groups, check
+	// top level. 
 	bool rescale_miss{};
-	for (unsigned int x = 0; x < v.size(); ++x)
+	for (size_t x = 0; x < v.size(); ++x)
 	{
-		if (!v.at(x).rescale_ok)
+		if (!(v.at(x).rescale_ok || v.at(x).rwv_rescale_ok))
 		{
 			rescale_miss = true;
 			break;
@@ -6502,11 +6588,11 @@ void DicomUtils::enhanced_check_rescale(
 	const mdcm::Tag tRescaleSlope(0x0028,0x1053);
 	std::vector<double> tmp0;
 	std::vector<double> tmp1;
-	const bool ok0 = DicomUtils::get_ds_values(ds, tRescaleIntercept, tmp0);
-	const bool ok1 = DicomUtils::get_ds_values(ds, tRescaleSlope, tmp1);
+	const bool ok0 = get_ds_values(ds, tRescaleIntercept, tmp0);
+	const bool ok1 = get_ds_values(ds, tRescaleSlope, tmp1);
 	if (ok0 && ok1 && !tmp0.empty() && !tmp1.empty())
 	{
-		for (unsigned int x = 0; x < v.size(); ++x)
+		for (size_t x = 0; x < v.size(); ++x)
 		{
 			v.at(x).rescale_intercept = tmp0.at(0);
 			v.at(x).rescale_slope = tmp1.at(0);
@@ -7091,7 +7177,7 @@ QString DicomUtils::read_enhanced(
 		INT_MIN,
 		spacing_x_read, spacing_y_read, spacing_z_read,
 		origin_x_read, origin_y_read, origin_z_read,
-		unsused0, unsused1,
+		0.0, 1.0,
 		apply_rescale,
 		(use_icc && icc_ok),
 		tolerance,
@@ -7394,7 +7480,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 		red_subscript,
 		spacing_x_read, spacing_y_read, spacing_z_read,
 		origin_x_read, origin_y_read, origin_z_read,
-		unsused0, unsused1,
+		0.0, 1.0,
 		false,
 		false,
 		tolerance,
@@ -7627,12 +7713,9 @@ QString DicomUtils::read_ultrasound(
 	const float col_dircos_x = dircos_[3];
 	const float col_dircos_y = dircos_[4];
 	const float col_dircos_z = dircos_[5];
-	const float nrm_dircos_x =
-		row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
-	const float nrm_dircos_y =
-		row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
-	const float nrm_dircos_z =
-		row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	direction[0][0] = row_dircos_x;
 	direction[1][0] = row_dircos_y;
 	direction[2][0] = row_dircos_z;
@@ -8138,13 +8221,18 @@ QString DicomUtils::read_series(
 			if (!min_load)
 			{
 				{
+					bool apply_level{true};
+					if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128"))
+					{
+						if (!settings.level_for_PET)
+						{
+							apply_level = false;
+						}
+					}
 					double tmp_c{-999999.0};
 					double tmp_w{-999999.0};
 					short lut_function{1};
-					if (settings.level_for_PET || !(
-						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) ||
-						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")) ||
-						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))))
+					if (apply_level)
 					{
 						read_window(ds, &tmp_c, &tmp_w, &lut_function);
 					}
@@ -10169,16 +10257,10 @@ QString DicomUtils::read_enhanced_common(
 			*ok = false;
 			return QString("read_enhanced_common error (01)");
 		}
-		for (std::map<
-				unsigned int,
-				unsigned int,
-				std::less<unsigned int> >::const_iterator
-			it = tmp0.at(x).cbegin(); it != tmp0.at(x).cend(); ++it)
+		for (auto it = tmp0.at(x).cbegin(); it != tmp0.at(x).cend(); ++it)
 		{
 			const unsigned int idx__ = it->first;
-			if (!(
-					idx__ < data.size() && data.at(idx__) &&
-					idx__ < values.size()))
+			if (!(idx__ < data.size() && data.at(idx__) && idx__ < values.size()))
 			{
 				*ok = false;
 				return QString("read_enhanced_common error (02)");
@@ -10215,15 +10297,8 @@ QString DicomUtils::read_enhanced_common(
 #ifdef ENHANCED_PRINT_INFO
 		if (!min_load) std::cout << " Indices: ";
 #endif
-		std::map<
-			unsigned int,
-			unsigned int,
-			std::less<unsigned int> > tmp1;
-		for (std::map<
-				unsigned int,
-				unsigned int,
-				std::less<unsigned int> >::const_iterator
-			it = tmp0.at(x).cbegin(); it != tmp0.at(x).cend(); ++it)
+		std::map< unsigned int, unsigned int, std::less<unsigned int> > tmp1;
+		for (auto it = tmp0.at(x).cbegin(); it != tmp0.at(x).cend(); ++it)
 		{
 			tmp1[it->second] = it->first;
 		}
@@ -10244,29 +10319,81 @@ QString DicomUtils::read_enhanced_common(
 #endif
 			tmp1.clear();
 		}
-		for (std::map<
-				unsigned int,
-				unsigned int,
-				std::less<unsigned int> >::const_iterator
-			it = tmp1.cbegin(); it != tmp1.cend(); ++it)
+		std::list<QString> check_rescale_unit;
+		bool use_rwv_rescale{};
+		QString pet_unit;
+		if (sop == QString("1.2.840.10008.5.1.4.1.1.130"))
+		{
+			bool rwv_failed{};
+			for (auto it = tmp1.cbegin(); it != tmp1.cend(); ++it)
+			{
+				const unsigned int idx__ = it->second;
+				if (settings.rwv_for_enh_pet)
+				{
+					if (values.at(idx__).rwv_rescale_ok)
+					{
+						check_rescale_unit.push_back(values.at(idx__).rwv_lut_label);
+					}
+					else
+					{
+						rwv_failed = true;
+					}
+				}
+				else
+				{
+					if (values.at(idx__).rescale_ok)
+					{
+						check_rescale_unit.push_back(values.at(idx__).rescale_type);
+					}
+				}
+			}
+			// Fallback to rescale/slope if failed with RWV
+			if (rwv_failed)
+			{
+				check_rescale_unit.clear();
+				for (auto it = tmp1.cbegin(); it != tmp1.cend(); ++it)
+				{
+					const unsigned int idx__ = it->second;
+					if (values.at(idx__).rescale_ok)
+					{
+						check_rescale_unit.push_back(values.at(idx__).rescale_type);
+					}
+				}
+			}
+			if (!check_rescale_unit.empty())
+			{
+				const QString & first_pet_unit = check_rescale_unit.front();
+				const bool validate_pet_unit = std::all_of(
+					std::next(check_rescale_unit.cbegin()),
+					check_rescale_unit.cend(),
+					[&first_pet_unit](const QString & item_pet_unit)
+					{
+						return item_pet_unit == first_pet_unit;
+					});
+				if (validate_pet_unit && tmp1.size() == check_rescale_unit.size())
+				{
+					if (settings.rwv_for_enh_pet)
+					{
+						use_rwv_rescale = true;
+					}
+					// If rescale/slope also failed pet_unit will be empty
+					pet_unit = first_pet_unit;
+				}
+			}
+		}
+		for (auto it = tmp1.cbegin(); it != tmp1.cend(); ++it)
 		{
 			const unsigned int idx__ = it->second;
 #ifdef ENHANCED_PRINT_INFO
 			if (!min_load)
 			{
-				std::cout
-					<< " " <<  it->first
-					<< "[" << idx__ << "]";
+				std::cout << " " <<  it->first << "[" << idx__ << "]";
 			}
 #endif
-			if (idx__ < data.size() &&
-				data.at(idx__) &&
-				idx__ < values.size())
+			if (idx__ < data.size() && data.at(idx__) && idx__ < values.size())
 			{
 				tmp3.push_back(data.at(idx__));
-				if (values.at(idx__).vol_pos_ok &&
-					values.at(idx__).vol_orient_ok &&
-					!ipp_iop_found)
+				if (values.at(idx__).vol_pos_ok && values.at(idx__).vol_orient_ok && !ipp_iop_found)
 				{
 					// IPV/IOV
 					double * ss = new double[9];
@@ -10323,8 +10450,33 @@ QString DicomUtils::read_enhanced_common(
 					tmp4_ok = false;
 				}
 				QPair<double, double> rp;
-				rp.first  = values.at(idx__).rescale_intercept;
-				rp.second = values.at(idx__).rescale_slope;
+				if (use_rwv_rescale)
+				{
+					rp.first  = values.at(idx__).rwv_rescale_intercept;
+					rp.second = values.at(idx__).rwv_rescale_slope;
+#if 0
+					std::cout
+						<< "\nread_enhanced_common: RWV intercept = " << rp.first
+						<< ", RWV slope = " << rp.second
+						<< ", RWV lut label = " << values.at(idx__).rwv_lut_label.toStdString()
+						<< '\n' << std::endl;
+#endif
+				}
+				else
+				{
+					rp.first  = values.at(idx__).rescale_intercept;
+					rp.second = values.at(idx__).rescale_slope;
+					if (sop == QString("1.2.840.10008.5.1.4.1.1.130"))
+					{
+#if 0
+						std::cout
+							<< "read_enhanced_common: intercept = " << values.at(idx__).rescale_intercept
+							<< ", slope = " << values.at(idx__).rescale_slope
+							<< ", rescale type = " << values.at(idx__).rescale_type.toStdString()
+							<< '\n' << std::endl;
+#endif
+					}
+				}
 				tmp6.push_back(rp);
 				if (!values.at(idx__).window_center.isEmpty() &&
 					!values.at(idx__).window_width.isEmpty())
@@ -10454,6 +10606,17 @@ QString DicomUtils::read_enhanced_common(
 					{
 						read_us_regions(ds, ivariant);
 					}
+					if (sop == QString("1.2.840.10008.5.1.4.1.1.130"))
+					{
+						if (!pet_unit.isEmpty())
+						{
+							ivariant->pet_units = pet_unit;
+						}
+					}
+					if (sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))
+					{
+						// TODO
+					}
 					if (sop == QString("1.2.840.10008.5.1.4.1.1.4.1") ||
 						sop == QString("1.2.840.10008.5.1.4.1.1.4.4"))
 					{
@@ -10473,6 +10636,8 @@ QString DicomUtils::read_enhanced_common(
 						ivariant->iinfo = read_PhotoacousticImage(ds);
 					}
 					read_ivariant_info_tags(ds, ivariant);
+					// Check top level window, this is invalid, but some datasets
+					// may exist, will only be used as fallback later.
 					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
 					instance_uid = read_instance_uid(ds);
 					{
@@ -10750,104 +10915,120 @@ QString DicomUtils::read_enhanced_common(
 			}
 			tmp4.clear();
 			//
-			const size_t tmp1s = window_centers_l.size();
-			const bool tmp1ok =
-				(tmp1s > 0) &&
-				(static_cast<size_t>(window_widths_l.size()) == tmp1s) &&
-				(static_cast<size_t>(lut_functions_l.size()) == tmp1s);
-			if (tmp1ok)
+			bool apply_level{true};
+			if (sop == QString("1.2.840.10008.5.1.4.1.1.130") || sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))
 			{
-				QList<double> tmp1w;
-				QList<double> tmp1c;
-				QList<short>  tmp1l;
-				for (size_t k = 0; k < tmp1s; ++k)
+				if (use_rwv_rescale || !settings.level_for_PET)
 				{
+					apply_level = false;
+				}
+			}
+			if (apply_level)
+			{
+				const size_t tmp1s = window_centers_l.size();
+				const bool tmp1ok =
+					(tmp1s > 0) &&
+					(static_cast<size_t>(window_widths_l.size()) == tmp1s) &&
+					(static_cast<size_t>(lut_functions_l.size()) == tmp1s);
+				if (tmp1ok)
+				{
+					QList<double> tmp1w;
+					QList<double> tmp1c;
+					QList<short>  tmp1l;
+					for (size_t k = 0; k < tmp1s; ++k)
+					{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-					QStringList w__ = window_widths_l.at(k).split(QString("\\"), Qt::SkipEmptyParts);
-					QStringList c__ = window_centers_l.at(k).split(QString("\\"), Qt::SkipEmptyParts);
+						QStringList w__ =
+							window_widths_l.at(k).split(QString("\\"),
+							Qt::SkipEmptyParts);
+						QStringList c__ =
+							window_centers_l.at(k).split(QString("\\"),
+							Qt::SkipEmptyParts);
 #else
-					QStringList w__ = window_widths_l.at(k).split(QString("\\"), QString::SkipEmptyParts);
-					QStringList c__ = window_centers_l.at(k).split(QString("\\"), QString::SkipEmptyParts);
+						QStringList w__ =
+							window_widths_l.at(k).split(QString("\\"),
+							QString::SkipEmptyParts);
+						QStringList c__ =
+							window_centers_l.at(k).split(QString("\\"),
+							QString::SkipEmptyParts);
 #endif
-					if (!w__.empty() && !c__.empty())
-					{
-						bool ok_c{};
-						bool ok_w{};
-						const double tmp_w = QVariant(w__.at(0).trimmed().remove(QChar('\0'))).toDouble(&ok_w);
-						const double tmp_c = QVariant(c__.at(0).trimmed().remove(QChar('\0'))).toDouble(&ok_c);
-						if (ok_c && ok_w)
+						if (!w__.empty() && !c__.empty())
 						{
-							double tmp7890 = tmp_w;
-							short  tmp7891{1};
-							const QString tmp7892 = lut_functions_l.at(k).trimmed().toUpper();
-							if (tmp7892 == QString("SIGMOID"))
+							bool ok_c{};
+							bool ok_w{};
+							const double tmp_w = QVariant(w__.at(0).trimmed().remove(QChar('\0'))).toDouble(&ok_w);
+							const double tmp_c = QVariant(c__.at(0).trimmed().remove(QChar('\0'))).toDouble(&ok_c);
+							if (ok_c && ok_w)
 							{
-								tmp7891 = 2;
+								double tmp7890 = tmp_w;
+								short  tmp7891{1};
+								const QString tmp7892 = lut_functions_l.at(k).trimmed().toUpper();
+								if (tmp7892 == QString("SIGMOID"))
+								{
+									tmp7891 = 2;
+								}
+								else if (tmp7892 == QString("LINEAR_EXACT"))
+								{
+									tmp7891 = 0;
+								}
+								tmp1c.push_back(tmp_c);
+								tmp1w.push_back(tmp7890);
+								tmp1l.push_back(tmp7891);
 							}
-							else if (tmp7892 == QString("LINEAR_EXACT"))
+						}
+					}
+					//
+					const int tmp1c_size = tmp1c.size();
+					if (tmp1c_size > 0)
+					{
+						bool tmp5468ok{true};
+						for (int k = 0; k < tmp1c_size; ++k)
+						{
+							FrameLevel fl;
+							fl.lut_function = tmp1l.at(k);
+							fl.us_window_center = tmp1c.at(k);
+							fl.us_window_width = tmp1w.at(k);
+							ivariant->frame_levels[k] = fl;
+							//
+							if (k > 0)
 							{
-								tmp7891 = 0;
+								if (!(
+									MMath::AlmostEqual(tmp1c.at(k), tmp1c.at(k - 1)) &&
+									MMath::AlmostEqual(tmp1w.at(k), tmp1w.at(k - 1))))
+								{
+									tmp5468ok = false;
+								}
 							}
-							tmp1c.push_back(tmp_c);
-							tmp1w.push_back(tmp7890);
-							tmp1l.push_back(tmp7891);
+						}
+						if (tmp5468ok)
+						{
+							window_center = tmp1c.at(0);
+							window_width  = tmp1w.at(0);
+							lut_function  = tmp1l.at(0);
+						}
+						else
+						{
+							if (tmp1c_size > 1)
+							{
+								ivariant->di->lock_level2D = true;
+							}
 						}
 					}
 				}
-				//
-				const int tmp1c_size = tmp1c.size();
-				if (tmp1c_size > 0)
+				else
 				{
-					bool tmp5468ok{true};
-					for (int k = 0; k < tmp1c_size; ++k)
-					{
-						FrameLevel fl;
-						fl.lut_function = tmp1l.at(k);
-						fl.us_window_center = tmp1c.at(k);
-						fl.us_window_width = tmp1w.at(k);
-						ivariant->frame_levels[k] = fl;
-						//
-						if (k > 0)
-						{
-							if (!(
-								MMath::AlmostEqual(tmp1c.at(k), tmp1c.at(k - 1)) &&
-								MMath::AlmostEqual(tmp1w.at(k), tmp1w.at(k - 1))))
-							{
-								tmp5468ok = false;
-							}
-						}
-					}
-					if (tmp5468ok)
-					{
-						window_center = tmp1c.at(0);
-						window_width  = tmp1w.at(0);
-						lut_function  = tmp1l.at(0);
-					}
-					else
-					{
-						if (tmp1c_size > 1)
-						{
-							ivariant->di->lock_level2D = true;
-						}
-					}
+					window_center = window_center_tmp;
+					window_width  = window_width_tmp;
+					lut_function  = lut_function_tmp;
 				}
+				ivariant->di->default_us_window_center = ivariant->di->us_window_center = window_center;
+				ivariant->di->default_us_window_width = ivariant->di->us_window_width  = window_width;
+				ivariant->di->default_lut_function = ivariant->di->lut_function = lut_function;
 			}
-			else
-			{
-				window_center = window_center_tmp;
-				window_width  = window_width_tmp;
-				lut_function  = lut_function_tmp;
-			}
-			ivariant->di->default_us_window_center =
-				ivariant->di->us_window_center = window_center;
-			ivariant->di->default_us_window_width =
-				ivariant->di->us_window_width  = window_width;
-			ivariant->di->default_lut_function =
-				ivariant->di->lut_function = lut_function;
 			ivariant->di->supp_palette_subsciptor = red_subscript;
 			const bool no_warn_rescale = (apply_rescale) ? settings.rescale : true;
 			{
-				// MDCM can not read rescale from per frame groups
+				// MDCM can not read rescale from per frame groups (inherited from GDCM)
 				const bool rescale_tmp =
 					(!apply_rescale || pixelformat.GetSamplesPerPixel() > 1)
 					? false : settings.rescale;

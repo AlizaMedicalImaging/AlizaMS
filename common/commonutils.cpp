@@ -4227,7 +4227,8 @@ QString CommonUtils::apply_per_slice_rescale(
 	if (!(image_type >= 0 && image_type < 10)) return QString("");
 	bool float64{};
 	const double float_max = (1 << FLT_MANT_DIG);
-	if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1") ||
+	if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")   ||
+		ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1") ||
 		ivariant->sop == QString(""))
 	{
 		float64 = true;
@@ -4236,10 +4237,8 @@ QString CommonUtils::apply_per_slice_rescale(
 	{
 		for (int x = 0; x < rescale_values.size(); ++x)
 		{
-			if (((abs(ivariant->di->vmax)*rescale_values.at(x).second +
-					rescale_values.at(x).first) > float_max) ||
-				((abs(ivariant->di->vmin)*rescale_values.at(x).second +
-					rescale_values.at(x).first) > float_max))
+			if (((abs(ivariant->di->vmax) * rescale_values.at(x).second + rescale_values.at(x).first) > float_max) ||
+				((abs(ivariant->di->vmin) * rescale_values.at(x).second + rescale_values.at(x).first) > float_max))
 			{
 				float64 = true;
 				break;
