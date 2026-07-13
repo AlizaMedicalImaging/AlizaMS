@@ -4229,7 +4229,7 @@ QString CommonUtils::apply_per_slice_rescale(
 	const double float_max = (1 << FLT_MANT_DIG);
 	if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")   ||
 		ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1") ||
-		ivariant->sop == QString(""))
+		ivariant->sop.isEmpty())
 	{
 		float64 = true;
 	}
