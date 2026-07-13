@@ -11028,7 +11028,8 @@ QString DicomUtils::read_enhanced_common(
 			ivariant->di->supp_palette_subsciptor = red_subscript;
 			const bool no_warn_rescale = (apply_rescale) ? settings.rescale : true;
 			{
-				// MDCM can not read rescale from per frame groups (inherited from GDCM)
+				// MDCM can not read rescale from all per frame groups (inherited from GDCM),
+				// this will be done in CommonUtils::apply_per_slice_rescale.
 				const bool rescale_tmp =
 					(!apply_rescale || pixelformat.GetSamplesPerPixel() > 1)
 					? false : settings.rescale;
