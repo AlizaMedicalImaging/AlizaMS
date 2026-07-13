@@ -156,6 +156,7 @@ public:
 	bool   skip_too_large{};
 	bool   dcm_thread{};
 	bool   process_multiseries{};
+	bool   rwv_for_enh_pet{};
 };
 
 class Contour
@@ -650,6 +651,7 @@ public:
 	QString unit_str;
 	QString comment;
 	QString ioinfo;
+	QString pet_units;
 	ImageOverlays image_overlays;
 	SOPInstanceUids image_instance_uids;
 	USRegions usregions;

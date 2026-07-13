@@ -44,7 +44,7 @@
             <x>0</x>
             <y>0</y>
             <width>973</width>
-            <height>960</height>
+            <height>996</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -111,6 +111,25 @@
              </property>
              <property name="text">
               <string>Process Siemens Mosaic / UIH Grid</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="rwvpet_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Enhanced PET&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Prefer &lt;span style=&quot; font-style:italic;&quot;&gt;Real World Value Mapping Sequence&lt;/span&gt; for rescale intercept/slope.&lt;/p&gt;&lt;p&gt;If there are multiple mappings, priority is determined by the following order:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;g/ml{SUVbw), &lt;/span&gt;other&lt;span style=&quot; font-weight:600;&quot;&gt; g/ml, Bq/ml, &lt;/span&gt;first item&lt;/p&gt;&lt;p&gt;In the absence of data or in the event of an error, the &lt;span style=&quot; font-style:italic;&quot;&gt;Pixel Value Transformation Sequence&lt;/span&gt; will be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Prefer RWV rescale for enhanced PET</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -1303,6 +1322,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>multiseries_checkBox</tabstop>
   <tabstop>overlays_checkBox</tabstop>
   <tabstop>mosaic_checkBox</tabstop>
+  <tabstop>rwvpet_checkBox</tabstop>
   <tabstop>icc_checkBox</tabstop>
   <tabstop>supplut_checkBox</tabstop>
   <tabstop>clean_unused_checkBox</tabstop>

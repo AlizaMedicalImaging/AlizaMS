@@ -1461,9 +1461,9 @@ template<typename T> QString process_dicom_monochrome_image1(
 				return print_idx_z_error(idx_z);
 			}
 #endif
+			const typename T::PixelType * p__ = static_cast<const typename T::PixelType*>(vbuffer);
 			while (!it.IsAtEndOfSlice())
 			{
-				const typename T::PixelType * p__ = static_cast<const typename T::PixelType*>(vbuffer);
 				while (!it.IsAtEndOfLine())
 				{
 					it.Set(p__[j]);
@@ -1787,15 +1787,16 @@ template<typename T> QString process_dicom_rgba_image1(
 		it.GoToBegin();
 		while (!it.IsAtEnd())
 		{
-			const typename T::PixelType::ValueType * p__ =
-				reinterpret_cast<typename T::PixelType::ValueType*>(data.at(idx_z));
+			const void * vbuffer = static_cast<void*>(data.at(idx_z));
 #if 1
-			if (p__ == nullptr)
+			if (vbuffer == nullptr)
 			{
 				*ok = false;
 				return print_idx_z_error(idx_z);
 			}
 #endif
+			const typename T::PixelType::ValueType * p__ =
+				static_cast<const typename T::PixelType::ValueType*>(vbuffer);
 			while (!it.IsAtEndOfSlice())
 			{
 				while (!it.IsAtEndOfLine())
