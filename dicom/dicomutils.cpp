@@ -3412,7 +3412,7 @@ bool DicomUtils::read_slices(
 					ok1 = false;
 				}
 				if (!MMath::AlmostEqual(spacing_x, pix_spacing[1], 0.0001) ||
-					!MMath::AlmostEqual(spacing_y, pix_spacing[0], 0.0001)) 
+					!MMath::AlmostEqual(spacing_y, pix_spacing[0], 0.0001))
 				{
 					ok1 = false;
 				}
@@ -4510,7 +4510,7 @@ bool DicomUtils::read_group_sq(
 							for (int rwv = 0; rwv < rwv_l_size; ++rwv)
 							{
 								if (rwv_l.at(rwv).toUpper() == QString("BQ/ML") ||
-									rwv_l.at(rwv).toUpper() == QString("BQML")) 	
+									rwv_l.at(rwv).toUpper() == QString("BQML"))
 								{
 									rwv_idx = rwv;
 									break;
@@ -5063,6 +5063,73 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 		if (get_us_value(ds, tpixelrepresentation, &PixelRepresentation))
 		{
 			if (PixelRepresentation == 1) ivariant->dicom_pixel_signed = true;
+		}
+	}
+}
+
+void DicomUtils::read_pet_attributes(const mdcm::DataSet & ds, ImageVariant * ivariant)
+{
+	if (!ivariant) return;
+	{
+		QString pet_units;
+		if (get_string_value(ds, mdcm::Tag(0x0054,0x1001), pet_units))
+		{
+			if (!pet_units.isEmpty())
+			{
+				ivariant->pet_info = pet_units.remove(QChar('\0'));
+			}
+		}
+	}
+	if (ivariant->pet_info == QString("GML") || ivariant->pet_info == QString("CM2ML"))
+	{
+		QString suv_type;
+		if (get_string_value(ds, mdcm::Tag(0x0054,0x1006), suv_type))
+		{
+			if (!suv_type.isEmpty())
+			{
+				ivariant->pet_info.append(QString(" {") + suv_type + QString("}"));
+			}
+		}
+	}
+}
+
+void DicomUtils::read_pet_attributes_legacy(const mdcm::DataSet & ds, ImageVariant * ivariant)
+{
+	if (!ivariant) return;
+	const mdcm::DataElement & de = ds.GetDataElement(mdcm::Tag(0x5200,0x9229));
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
+	if (sq && sq->GetNumberOfItems() == 1)
+	{
+		const mdcm::Item & item = sq->GetItem(1);
+		const mdcm::DataSet & nds = item.GetNestedDataSet();
+		// Unassigned Shared Converted Attributes Sequence
+		if (nds.FindDataElement(mdcm::Tag(0x0020,0x9170)))
+		{
+			const mdcm::DataElement & de1 = nds.GetDataElement(mdcm::Tag(0x0020,0x9170));
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
+			if (sq1 && sq1->GetNumberOfItems() == 1)
+			{
+				const mdcm::Item & item1 = sq1->GetItem(1);
+				const mdcm::DataSet & nds1 = item1.GetNestedDataSet();
+				{
+					QString s;
+					if (get_string_value(nds1, mdcm::Tag(0x0054,0x1001), s)) // unit
+					{
+						ivariant->pet_info = s.remove(QChar('\0'));
+					}
+				}
+				if (ivariant->pet_info == QString("GML") || ivariant->pet_info == QString("CM2ML"))
+				{
+					QString s;
+					if (get_string_value(ds, mdcm::Tag(0x0054,0x1006), s)) // SUV type
+					{
+						if (!s.isEmpty())
+						{
+							ivariant->pet_info.append(QString(" {") + s + QString("}"));
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -6573,7 +6640,7 @@ void DicomUtils::enhanced_check_rescale(
 	// at all?
 	//
 	// If no slope/intercept found in groups, check
-	// top level. 
+	// top level.
 	bool rescale_miss{};
 	for (size_t x = 0; x < v.size(); ++x)
 	{
@@ -8172,6 +8239,10 @@ QString DicomUtils::read_series(
 #endif
 							}
 						}
+					}
+					if (!min_load && ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) // PET
+					{
+						read_pet_attributes(ds, ivariant);
 					}
 				}
 				//
@@ -10610,12 +10681,12 @@ QString DicomUtils::read_enhanced_common(
 					{
 						if (!pet_unit.isEmpty())
 						{
-							ivariant->pet_units = pet_unit;
+							ivariant->pet_info = pet_unit;
 						}
 					}
 					if (sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))
 					{
-						// TODO
+						read_pet_attributes_legacy(ds, ivariant);
 					}
 					if (sop == QString("1.2.840.10008.5.1.4.1.1.4.1") ||
 						sop == QString("1.2.840.10008.5.1.4.1.1.4.4"))

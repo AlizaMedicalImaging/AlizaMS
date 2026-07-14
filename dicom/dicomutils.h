@@ -273,6 +273,8 @@ public:
 		const mdcm::DataSet&, ImageVariant*);
 	static void read_pet_attributes(
 		const mdcm::DataSet&, ImageVariant*);
+	static void read_pet_attributes_legacy(
+		const mdcm::DataSet&, ImageVariant*);
 	static bool get_patient_position(
 		const QString&, double*);
 	static bool get_patient_orientation(

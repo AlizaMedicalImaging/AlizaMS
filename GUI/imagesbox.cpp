@@ -358,11 +358,11 @@ void ImagesBox::set_html(const ImageVariant * v)
 	{
 		html.append(QString("<br />"));
 	}
-	if (!v->pet_units.isEmpty())
+	if (!v->pet_info.isEmpty())
 	{
 		html.append(
-			QString("<span class='y'>PET unit: ") +
-			v->pet_units +
+			QString("<span class='y6'>PET unit: ") +
+			v->pet_info +
 			QString("</span><br /><br />"));
 
 	}

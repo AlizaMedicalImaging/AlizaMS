@@ -651,7 +651,7 @@ public:
 	QString unit_str;
 	QString comment;
 	QString ioinfo;
-	QString pet_units;
+	QString pet_info;
 	ImageOverlays image_overlays;
 	SOPInstanceUids image_instance_uids;
 	USRegions usregions;
