@@ -60,7 +60,7 @@ int main()
 		float n0 = -0.0f;
 		EXPECT(MMath::AlmostEqual(p0, n0, 0.0f, (uint32_t)0), "float: +0 == -0 with zero max_diff");
 
-		// +0 / -0 equality via abs-diff check
+		// +0 / -0 equality with default
 		float p1 = 0.0f;
 		float n1 = -0.0f;
 		EXPECT(MMath::AlmostEqual(p1, n1), "float: +0 == -0 with default");

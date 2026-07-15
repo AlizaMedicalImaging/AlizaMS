@@ -4,8 +4,11 @@
 #include <algorithm>
 #include <cstdlib>
 
+namespace
+{
+
 // Converts a float to a sign-magnitude-safe signed integer
-static std::int32_t FloatToBiasedInt(float f)
+std::int32_t FloatToBiasedInt(float f)
 {
 	static_assert(sizeof(float) == 4, "");
 	std::uint32_t u;
@@ -19,7 +22,7 @@ static std::int32_t FloatToBiasedInt(float f)
 }
 
 // Converts a double to a sign-magnitude-safe signed integer
-static std::int64_t DoubleToBiasedInt(double d)
+std::int64_t DoubleToBiasedInt(double d)
 {
 	static_assert(sizeof(double) == 8, "");
 	std::uint64_t u;
@@ -29,6 +32,8 @@ static std::int64_t DoubleToBiasedInt(double d)
 	    return static_cast<std::int64_t>(0x8000000000000000ULL - u);
 	}
 	return static_cast<std::int64_t>(u);
+}
+
 }
 
 bool MMath::AlmostEqual(float A, float B, float max_diff, std::uint32_t max_ulps_diff)
