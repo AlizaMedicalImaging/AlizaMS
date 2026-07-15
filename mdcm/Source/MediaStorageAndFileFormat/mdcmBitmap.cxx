@@ -210,12 +210,12 @@ Bitmap::GetBufferLength() const
       return 0ull;
     }
 #if 1
-	// https://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html
-	//
-	// "In a Multi-frame Image with a Bits Allocated (0028,0100) of 1 that is transmitted
-	// in Native Format, the individual Frames are not padded, therefore successive bits
-	// are packed into bytes or words as described in 8.2. I.e., a frame other than the
-	// first frame may start in the middle of a byte or word."
+    // https://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html
+    //
+    // "In a Multi-frame Image with a Bits Allocated (0028,0100) of 1 that is transmitted
+    // in Native Format, the individual Frames are not padded, therefore successive bits
+    // are packed into bytes or words as described in 8.2. I.e., a frame other than the
+    // first frame may start in the middle of a byte or word."
     unsigned long long size_bits = static_cast<unsigned long long>(Dimensions[0]) * Dimensions[1];
     if (GetTransferSyntax().IsEncapsulated())
     {
