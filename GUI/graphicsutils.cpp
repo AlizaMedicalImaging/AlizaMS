@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <iostream>
+#include <cmath>
 #include "imageinfodialog.h"
 
 namespace
@@ -124,12 +125,12 @@ template<typename T> QString get_scalar_pixel_value__(
 		case 5:
 		case 6:
 			{
-				const double tmp0 = static_cast<double>(p);
+				const double tmp0 = std::round(static_cast<double>(p) * 10000.0) / 10000.0;
 				*label = static_cast<long long>(p);
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				s += QString::asprintf("%.6f", tmp0);
+				s += QString::asprintf("%.4f", tmp0);
 #else
-				s.sprintf("%.6f", tmp0);
+				s.sprintf("%.4f", tmp0);
 #endif
 				s.append(idx_);
 			}
@@ -235,9 +236,9 @@ template<typename T> QString get_rgb_pixel_value__(
 		case 15:
 		case 16:
 			{
-				const double tmp0 = static_cast<double>(p.GetRed());
-				const double tmp1 = static_cast<double>(p.GetGreen());
-				const double tmp2 = static_cast<double>(p.GetBlue());
+				const double tmp0 = std::round(static_cast<double>(p.GetRed())   * 1000.0) / 1000.0;
+				const double tmp1 = std::round(static_cast<double>(p.GetGreen()) * 1000.0) / 1000.0;
+				const double tmp2 = std::round(static_cast<double>(p.GetBlue())  * 1000.0) / 1000.0;
 				QString tmp0s;
 				QString tmp1s;
 				QString tmp2s;
@@ -358,10 +359,10 @@ template<typename T> QString get_rgba_pixel_value__(
 		case 25:
 		case 26:
 			{
-				const double tmp0 = static_cast<double>(p.GetRed());
-				const double tmp1 = static_cast<double>(p.GetGreen());
-				const double tmp2 = static_cast<double>(p.GetBlue());
-				const double tmp3 = static_cast<double>(p.GetAlpha());
+				const double tmp0 = std::round(static_cast<double>(p.GetRed())   * 1000.0) / 1000.0;
+				const double tmp1 = std::round(static_cast<double>(p.GetGreen()) * 1000.0) / 1000.0;
+				const double tmp2 = std::round(static_cast<double>(p.GetBlue())  * 1000.0) / 1000.0;
+				const double tmp3 = std::round(static_cast<double>(p.GetAlpha()) * 1000.0) / 1000.0;
 				QString tmp0s;
 				QString tmp1s;
 				QString tmp2s;

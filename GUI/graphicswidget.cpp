@@ -27,6 +27,7 @@
 #include "contourutils.h"
 #include "aliza.h"
 #include "updateqtcommand.h"
+#include "mmath.h"
 #include <climits>
 #include <utility>
 #ifdef A_TMP_BENCHMARK
@@ -3113,18 +3114,14 @@ void GraphicsWidget::update_pixel_value(double x, double  y)
 	if (lookup_id >= 0)
 	{
 		const ImageVariant * v = aliza->get_image(lookup_id);
-		if (v &&
-			v->equi &&
+		if (v && v->equi &&
 			(v->di->idimx == image_container.image3D->di->idimx) &&
 			(v->di->idimy == image_container.image3D->di->idimy) &&
 			(v->di->idimz == image_container.image3D->di->idimz) &&
 			(v->orientation == image_container.image3D->orientation) &&
-			(v->di->ix_origin + 0.001 > image_container.image3D->di->ix_origin) &&
-			(v->di->ix_origin - 0.001 < image_container.image3D->di->ix_origin) &&
-			(v->di->iy_origin + 0.001 > image_container.image3D->di->iy_origin) &&
-			(v->di->iy_origin - 0.001 < image_container.image3D->di->iy_origin) &&
-			(v->di->iz_origin + 0.001 > image_container.image3D->di->iz_origin) &&
-			(v->di->iz_origin - 0.001 < image_container.image3D->di->iz_origin))
+			MMath::AlmostEqual(v->di->ix_origin, image_container.image3D->di->ix_origin, 0.001f) &&
+			MMath::AlmostEqual(v->di->iy_origin, image_container.image3D->di->iy_origin, 0.001f) &&
+			MMath::AlmostEqual(v->di->iz_origin, image_container.image3D->di->iz_origin, 0.001f))
 		{
 			const QString d = GraphicsUtils::get_scalar_pixel_value(v, a, x, y, sx, sy, sz, false);
 			info_line->setText(d);
