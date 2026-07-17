@@ -14773,6 +14773,7 @@ QString DicomUtils::read_dicom(
 				}
 				else
 				{
+#if 0
 					// Try to go one directory up
 					QFileInfo fi5(rtstruct_ref_search_path + QString("/.."));
 					if (fi5.exists())
@@ -14785,6 +14786,7 @@ QString DicomUtils::read_dicom(
 							enh_loading_type,
 							settings);
 					}
+#endif
 				}
 				if (ref2_ok)
 				{
@@ -14803,8 +14805,9 @@ QString DicomUtils::read_dicom(
 				if (!message_.isEmpty()) message_.append(QChar('\n'));
 				message_.append(QString(
 					"The series referenced in the RTSTRUCT "
-					"could not be found. Try using the DICOM scanner from a "
-					"folder containing both the RTSTRUCT and the referenced series."));
+					"could not be found. Try using the DICOM scanner, "
+					"specifying the folder that contains both the RTSTRUCT itself "
+					" and the series it references. They may be located in subfolders."));
 				mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -14840,6 +14843,19 @@ QString DicomUtils::read_dicom(
 		const QString file0 = grey_softcopy_pr_files.at(0);
 		QFileInfo p0(file0);
 		QString message_pr;
+		unsigned int count{};
+#if 1
+		if (!root.isEmpty())
+		{
+			count = process_gsps(
+				grey_softcopy_pr_files,
+				root,
+				settings,
+				ok3d,
+				ivariants,
+				message_pr);
+		}
+#else
 		QString root_tmp;
 		if (root.isEmpty())
 		{
@@ -14849,7 +14865,7 @@ QString DicomUtils::read_dicom(
 		{
 			root_tmp = root;
 		}
-		unsigned int count = process_gsps(
+		count = process_gsps(
 			grey_softcopy_pr_files,
 			root_tmp,
 			settings,
@@ -14871,6 +14887,7 @@ QString DicomUtils::read_dicom(
 					message_pr);
 			}
 		}
+#endif
 		if (!message_pr.isEmpty())
 		{
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
@@ -14881,8 +14898,9 @@ QString DicomUtils::read_dicom(
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
 			message_.append(QString(
 				"The series referenced in the Grayscale Soft Copy presentation "
-				"could not be found or opened. Try using the DICOM scanner from a "
-				"folder containing both the GSPS series and the referenced series."));
+				"could not be found. Try using the DICOM scanner, "
+				"specifying the folder that contains both the GSPS series"
+				" and the series it references. They may be located in subfolders."));
 		}
 	}
 	//
