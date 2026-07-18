@@ -13,10 +13,12 @@
 #endif
 #endif
 #include "contourutils.h"
+#include "mmath.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <itkContinuousIndex.h>
 #include "vectormath/scalar/vectormath.h"
+#include <atomic>
 
 namespace
 {
@@ -31,8 +33,7 @@ template <typename T> void calculate_uvt(
 	unsigned int count{};
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
-		QMap< int, Contour* >::iterator it =
-			ivariant->di->rois[x].contours.begin();
+		QMap< int, Contour* >::iterator it = ivariant->di->rois[x].contours.begin();
 		while (it != ivariant->di->rois[x].contours.end())
 		{
 			++count;
@@ -48,9 +49,7 @@ template <typename T> void calculate_uvt(
 					point[0] = c->dpoints.at(k).x;
 					point[1] = c->dpoints.at(k).y;
 					point[2] = c->dpoints.at(k).z;
-					const bool ok =
-						image->TransformPhysicalPointToContinuousIndex(
-							point,index);
+					const bool ok = image->TransformPhysicalPointToContinuousIndex(point,index);
 					if (ok)
 					{
 						c->dpoints[k].u = index[0];
@@ -95,9 +94,8 @@ float ContourUtils::distance_to_plane(
 
 long long ContourUtils::get_next_contour_tmpid()
 {
-	static long long contour_tmpid___ = 0;
-	++contour_tmpid___;
-	return contour_tmpid___;
+	static std::atomic<long long> contour_tmpid___{};
+	return ++contour_tmpid___;
 }
 
 void ContourUtils::calculate_rois_center(ImageVariant * iv)
@@ -110,12 +108,10 @@ void ContourUtils::calculate_rois_center(ImageVariant * iv)
 	for (int x = 0; x < iv->di->rois.size(); ++x)
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		QMap< int, Contour* >::const_iterator it =
-			iv->di->rois.at(x).contours.cbegin();
+		QMap< int, Contour* >::const_iterator it = iv->di->rois.at(x).contours.cbegin();
 		while (it != iv->di->rois.at(x).contours.cend())
 #else
-		QMap< int, Contour* >::const_iterator it =
-			iv->di->rois.at(x).contours.constBegin();
+		QMap< int, Contour* >::const_iterator it = iv->di->rois.at(x).contours.constBegin();
 		while (it != iv->di->rois.at(x).contours.constEnd())
 #endif
 		{
@@ -158,17 +154,14 @@ void ContourUtils::generate_roi_vbos(
 	ROI & roi,
 	bool delete_after)
 {
-	QMap< int, Contour* >::iterator it =
-		roi.contours.begin();
+	QMap< int, Contour* >::iterator it = roi.contours.begin();
 	while (it != roi.contours.end())
 	{
 		Contour * c = it.value();
 		if (c)
 		{
 			bool ok{true};
-			if (
-				GLWidget::get_max_vbos_65535() &&
-				GLWidget::get_count_vbos() >= 64000)
+			if (GLWidget::get_max_vbos_65535() && GLWidget::get_count_vbos() >= 64000)
 			{
 				ok = false;
 			}
@@ -235,9 +228,7 @@ void ContourUtils::generate_roi_vbos(
 	}
 }
 
-void ContourUtils::copy_roi(
-	ROI & dest,
-	const ROI & src)
+void ContourUtils::copy_roi(ROI & dest, const ROI & src)
 {
 	const int id = dest.id;
 	dest.show             = src.show;
@@ -248,12 +239,10 @@ void ContourUtils::copy_roi(
 	dest.color.b          = src.color.b;
 	dest.ref_frame_of_ref = src.ref_frame_of_ref;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QMap< int, Contour* >::const_iterator it =
-		src.contours.cbegin();
+	QMap< int, Contour* >::const_iterator it = src.contours.cbegin();
 	while (it != src.contours.cend())
 #else
-	QMap< int, Contour* >::const_iterator it =
-		src.contours.constBegin();
+	QMap< int, Contour* >::const_iterator it = src.contours.constBegin();
 	while (it != src.contours.constEnd())
 #endif
 	{
@@ -269,12 +258,9 @@ void ContourUtils::copy_roi(
 			{
 				contour->dpoints.push_back(c->dpoints[i]);
 			}
-			for (int i = 0;
-				i < c->ref_sop_instance_uids.size();
-				++i)
+			for (int i = 0; i < c->ref_sop_instance_uids.size(); ++i)
 			{
-				contour->ref_sop_instance_uids
-					.push_back(c->ref_sop_instance_uids.at(i));
+				contour->ref_sop_instance_uids.push_back(c->ref_sop_instance_uids.at(i));
 			}
 			dest.contours[contour->id] = contour;
 		}
@@ -290,16 +276,13 @@ void ContourUtils::calculate_uvt_nonuniform(
 	if (ivariant->di->idimz != slices_size) return;
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
-		QMap< int, Contour* >::iterator it =
-			ivariant->di->rois[x].contours.begin();
+		QMap< int, Contour* >::iterator it = ivariant->di->rois[x].contours.begin();
 		while (it != ivariant->di->rois[x].contours.end())
 		{
 			Contour * c = it.value();
 			if (!c) continue;
 			QList<int> slices;
-			for (unsigned int z = 0;
-				z < static_cast<unsigned int>(ivariant->di->idimz);
-				++z)
+			for (unsigned int z = 0; z < static_cast<unsigned int>(ivariant->di->idimz); ++z)
 			{
 				bool in_slice{};
 				if (static_cast<int>(z) < slices_size)
@@ -349,8 +332,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
 						ImageTypeUC::Pointer image = ImageTypeUC::New();
-						const bool image_ok =
-							phys_space_from_slice(ivariant, idx, image);
+						const bool image_ok = phys_space_from_slice(ivariant, idx, image);
 						if (image_ok)
 						{
 							itk::ContinuousIndex<float, 3> index;
@@ -358,9 +340,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 							point[0] = c->dpoints.at(k).x;
 							point[1] = c->dpoints.at(k).y;
 							point[2] = c->dpoints.at(k).z;
-							const bool ok =
-								image->TransformPhysicalPointToContinuousIndex(
-									point, index);
+							const bool ok = image->TransformPhysicalPointToContinuousIndex(point, index);
 							if (ok)
 							{
 								c->dpoints[k].u = index[0];
@@ -449,8 +429,7 @@ void ContourUtils::map_contours_uniform(
 {
 	if (!ivariant) return;
 	if (ivariant->di->idimz == 0) return;
-	if (ivariant->di->idimz !=
-			static_cast<int>(ivariant->di->image_slices.size()))
+	if (ivariant->di->idimz != static_cast<int>(ivariant->di->image_slices.size()))
 	{
 #ifdef ALIZA_VERBOSE
 		std::cout << "ContourUtils::map_contours: dimz != slices size, "
@@ -466,12 +445,10 @@ void ContourUtils::map_contours_uniform(
 		{
 			ivariant->di->rois[x].map.clear();
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.cbegin();
+			QMap< int, Contour* >::const_iterator it = ivariant->di->rois.at(x).contours.cbegin();
 			while (it != ivariant->di->rois.at(x).contours.cend())
 #else
-			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.constBegin();
+			QMap< int, Contour* >::const_iterator it = ivariant->di->rois.at(x).contours.constBegin();
 			while (it != ivariant->di->rois.at(x).contours.constEnd())
 #endif
 			{
@@ -490,8 +467,7 @@ void ContourUtils::map_contours_uniform(
 						ivariant->di->image_slices.at(z)->v[6] - px,
 						ivariant->di->image_slices.at(z)->v[7] - py,
 						ivariant->di->image_slices.at(z)->v[8] - pz);
-					const sVector3 n = Vectormath::Scalar::normalize(
-						Vectormath::Scalar::cross(v1,v2));
+					const sVector3 n = Vectormath::Scalar::normalize(Vectormath::Scalar::cross(v1,v2));
 					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
 						const float distance = distance_to_plane(
@@ -524,8 +500,7 @@ void ContourUtils::map_contours_nonuniform(
 {
 	if (!ivariant) return;
 	if (ivariant->di->idimz == 0) return;
-	if (ivariant->di->idimz !=
-			static_cast<int>(ivariant->di->image_slices.size()))
+	if (ivariant->di->idimz != static_cast<int>(ivariant->di->image_slices.size()))
 	{
 #ifdef ALIZA_VERBOSE
 		std::cout << "ContourUtils::map_contours: dimz != slices size, "
@@ -541,12 +516,10 @@ void ContourUtils::map_contours_nonuniform(
 		{
 			ivariant->di->rois[x].map.clear();
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.cbegin();
+			QMap< int, Contour* >::const_iterator it = ivariant->di->rois.at(x).contours.cbegin();
 			while (it != ivariant->di->rois.at(x).contours.cend())
 #else
-			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.constBegin();
+			QMap< int, Contour* >::const_iterator it = ivariant->di->rois.at(x).contours.constBegin();
 			while (it != ivariant->di->rois.at(x).contours.constEnd())
 #endif
 			{
@@ -651,21 +624,17 @@ void ContourUtils::map_contours_test_refs(
 		for (int z = 0; z < ivariant->di->idimz; ++z)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.cbegin();
+			QMap< int, Contour* >::const_iterator it = ivariant->di->rois.at(x).contours.cbegin();
 			while (it != ivariant->di->rois.at(x).contours.cend())
 #else
-			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.constBegin();
+			QMap< int, Contour* >::const_iterator it = ivariant->di->rois.at(x).contours.constBegin();
 			while (it != ivariant->di->rois.at(x).contours.constEnd())
 #endif
 			{
 				const Contour * c = it.value();
 				if (c)
 				{
-					for (int y = 0;
-						y < c->ref_sop_instance_uids.size();
-						++y)
+					for (int y = 0; y < c->ref_sop_instance_uids.size(); ++y)
 					{
 						if (c->ref_sop_instance_uids.at(y) ==
 							ivariant->image_instance_uids.value(z))
@@ -688,8 +657,7 @@ void ContourUtils::contours_build_path(
 	{
 		if (ivariant->di->rois.at(x).id == roi_id)
 		{
-			QMap< int, Contour* >::iterator it =
-				ivariant->di->rois[x].contours.begin();
+			QMap< int, Contour* >::iterator it = ivariant->di->rois[x].contours.begin();
 			while (it != ivariant->di->rois[x].contours.end())
 			{
 				Contour * c = it.value();
@@ -797,9 +765,7 @@ bool ContourUtils::phys_space_from_slice(
 #if 0
 	if (ivariant->di->image_slices.at(x)->slice_orientation_string.isEmpty())
 	{
-		std::cout
-			<< "slice orientation string is empty"
-			<< std::endl;
+		std::cout << "slice orientation string is empty" << std::endl;
 		return false;
 	}
 #endif
@@ -809,12 +775,12 @@ bool ContourUtils::phys_space_from_slice(
 	const float col_dircos_x = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[6]);
 	const float col_dircos_y = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[7]);
 	const float col_dircos_z = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[8]);
-	if (row_dircos_x > -0.000001f && row_dircos_x < 0.000001f &&
-		row_dircos_y > -0.000001f && row_dircos_y < 0.000001f &&
-		row_dircos_z > -0.000001f && row_dircos_z < 0.000001f &&
-		col_dircos_x > -0.000001f && col_dircos_x < 0.000001f &&
-		col_dircos_y > -0.000001f && col_dircos_y < 0.000001f &&
-		col_dircos_z > -0.000001f && col_dircos_z < 0.000001f)
+	if (MMath::AlmostEqual(row_dircos_x, 0.0f, 0.0001f) &&
+		MMath::AlmostEqual(row_dircos_y, 0.0f, 0.0001f) &&
+		MMath::AlmostEqual(row_dircos_z, 0.0f, 0.0001f) &&
+		MMath::AlmostEqual(col_dircos_x, 0.0f, 0.0001f) &&
+		MMath::AlmostEqual(col_dircos_y, 0.0f, 0.0001f) &&
+		MMath::AlmostEqual(col_dircos_z, 0.0f, 0.0001f))
 	{
 #ifdef ALIZA_VERBOSE
 		std::cout << "can not process direction cosines" << std::endl;
