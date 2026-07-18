@@ -165,7 +165,7 @@ void ContourUtils::generate_roi_vbos(
 			{
 				ok = false;
 			}
-			size_t ind = 0;
+			size_t ind{};
 			if (ok && !c->vao_initialized)
 			{
 				const size_t s = 3 * c->dpoints.size();
