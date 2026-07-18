@@ -14750,12 +14750,9 @@ QString DicomUtils::read_dicom(
 			bool ref2_ok{};
 			if (ref_ok)
 			{
-				for (unsigned int y = 0;
-					y < tmp_ivariants_rtstruct.size();
-					++y)
+				for (unsigned int y = 0; y < tmp_ivariants_rtstruct.size(); ++y)
 				{
-					tmp_ivariants_rtstruct[y]->filenames =
-						QStringList(rtstruct_ref_search.at(x));
+					tmp_ivariants_rtstruct[y]->filenames = QStringList(rtstruct_ref_search.at(x));
 					ivariants.push_back(tmp_ivariants_rtstruct[y]);
 				}
 			}
@@ -14768,7 +14765,7 @@ QString DicomUtils::read_dicom(
 						root,
 						tmp_ivariants_rtstruct,
 						ok3d,
-						enh_loading_type,
+						1, // force sorted uniform
 						settings);
 				}
 				else
@@ -14783,19 +14780,16 @@ QString DicomUtils::read_dicom(
 							QDir::toNativeSeparators(fi5.absoluteFilePath()),
 							tmp_ivariants_rtstruct,
 							ok3d,
-							enh_loading_type,
+							1, // force sorted uniform
 							settings);
 					}
 #endif
 				}
 				if (ref2_ok)
 				{
-					for (unsigned int y = 0;
-						y < tmp_ivariants_rtstruct.size();
-						++y)
+					for (unsigned int y = 0; y < tmp_ivariants_rtstruct.size(); ++y)
 					{
-						tmp_ivariants_rtstruct[y]->filenames =
-							QStringList(rtstruct_ref_search.at(x));
+						tmp_ivariants_rtstruct[y]->filenames = QStringList(rtstruct_ref_search.at(x));
 						ivariants.push_back(tmp_ivariants_rtstruct[y]);
 					}
 				}
