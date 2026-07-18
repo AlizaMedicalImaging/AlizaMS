@@ -14807,7 +14807,7 @@ QString DicomUtils::read_dicom(
 					"The series referenced in the RTSTRUCT "
 					"could not be found. Try using the DICOM scanner, "
 					"specifying the folder that contains both the RTSTRUCT itself "
-					" and the series it references. They may be located in subfolders."));
+					" and the series it references. They can be located in subfolders."));
 				mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -14900,7 +14900,7 @@ QString DicomUtils::read_dicom(
 				"The series referenced in the Grayscale Soft Copy presentation "
 				"could not be found. Try using the DICOM scanner, "
 				"specifying the folder that contains both the GSPS series"
-				" and the series it references. They may be located in subfolders."));
+				" and the series it references. They can be located in subfolders."));
 		}
 	}
 	//
