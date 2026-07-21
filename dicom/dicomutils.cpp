@@ -492,7 +492,7 @@ QString generate_string_0(
 	QString tmp0;
 	if (DicomUtils::get_string_value(ds, t, tmp0))
 	{
-		const QString s2 = tmp0.trimmed();
+		const QString s2 = std::move(tmp0);
 		if (!s2.isEmpty())
 		{
 			s += QString("<span class='y9'>");
@@ -521,11 +521,9 @@ QString read_MRImageModule(const mdcm::DataSet & ds)
 		QString(""));
 	const mdcm::Tag tMRAcquisitionType(0x0018,0x0023);
 	QString MRAcquisitionType;
-	if (DicomUtils::get_string_value(
-		ds, tMRAcquisitionType, MRAcquisitionType))
+	if (DicomUtils::get_string_value(ds, tMRAcquisitionType, MRAcquisitionType))
 	{
-		const QString tmp2 = MRAcquisitionType.trimmed();
-		if (!tmp2.isEmpty())
+		if (!MRAcquisitionType.isEmpty())
 		{
 			s += QString("<span class='y9'>MR Acquisition Type </span><br />");
 			MRAcquisitionType = MRAcquisitionType.trimmed();
@@ -541,21 +539,15 @@ QString read_MRImageModule(const mdcm::DataSet & ds)
 	}
 	const mdcm::Tag tScanningSequence(0x0018,0x0020);
 	QString ScanningSequence;
-	if (DicomUtils::get_string_value(
-			ds, tScanningSequence, ScanningSequence))
+	if (DicomUtils::get_string_value(ds, tScanningSequence, ScanningSequence))
 	{
-		const QString tmp2 = ScanningSequence.trimmed();
-		if (!tmp2.isEmpty())
+		if (!ScanningSequence.isEmpty())
 		{
 			s += QString("<span class='y9'>Scanning Sequence</span><br />");
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			const QStringList tmp0 =
-				tmp2.split(
-					QString("\\"), Qt::SkipEmptyParts);
+			const QStringList tmp0 = ScanningSequence.split(QString("\\"), Qt::SkipEmptyParts);
 #else
-			const QStringList tmp0 =
-				tmp2.split(
-					QString("\\"), QString::SkipEmptyParts);
+			const QStringList tmp0 = ScanningSequence.split(QString("\\"), QString::SkipEmptyParts);
 #endif
 			const int tmp0_size = tmp0.size();
 			s += QString("<span class='y8'>");
@@ -579,22 +571,16 @@ QString read_MRImageModule(const mdcm::DataSet & ds)
 			s += QString("</span><br />");
 			const mdcm::Tag tSequenceVariant(0x0018,0x0021);
 			QString SequenceVariant;
-			if (DicomUtils::get_string_value(
-				ds, tSequenceVariant, SequenceVariant))
+			if (DicomUtils::get_string_value(ds, tSequenceVariant, SequenceVariant))
 			{
-				const QString tmp22 = SequenceVariant.trimmed();
-				if (!tmp22.isEmpty())
+				if (!SequenceVariant.isEmpty())
 				{
 					s += QString("<span class='y9'>Variant</span><br />");
 					{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-						const QStringList tmp00 =
-							tmp22.split(
-								QString("\\"), Qt::SkipEmptyParts);
+						const QStringList tmp00 = SequenceVariant.split(QString("\\"), Qt::SkipEmptyParts);
 #else
-						const QStringList tmp00 =
-							tmp22.split(
-								QString("\\"), QString::SkipEmptyParts);
+						const QStringList tmp00 = SequenceVariant.split(QString("\\"), QString::SkipEmptyParts);
 #endif
 						const int tmp00_size = tmp00.size();
 						s += QString("<span class='y8'>");
@@ -628,22 +614,16 @@ QString read_MRImageModule(const mdcm::DataSet & ds)
 			}
 			const mdcm::Tag tScanOptions(0x0018,0x0022);
 			QString ScanOptions;
-			if (DicomUtils::get_string_value(
-				ds, tScanOptions, ScanOptions))
+			if (DicomUtils::get_string_value(ds, tScanOptions, ScanOptions))
 			{
-				const QString tmp22 = ScanOptions.trimmed();
-				if (!tmp22.isEmpty())
+				if (!ScanOptions.isEmpty())
 				{
 					s += QString("<span class='y9'>Options</span><br />");
 					{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-						const QStringList tmp00 =
-							tmp22.split(
-								QString("\\"), Qt::SkipEmptyParts);
+						const QStringList tmp00 = ScanOptions.split(QString("\\"), Qt::SkipEmptyParts);
 #else
-						const QStringList tmp00 =
-							tmp22.split(
-								QString("\\"), QString::SkipEmptyParts);
+						const QStringList tmp00 = ScanOptions.split(QString("\\"), QString::SkipEmptyParts);
 #endif
 						const int tmp00_size = tmp00.size();
 						s += QString("<span class='y8'>");
@@ -1271,10 +1251,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 					const mdcm::Item & item = sq->GetItem(1);
 					const mdcm::DataSet & nds = item.GetNestedDataSet();
 					QString CodeMeaning;
-					if (DicomUtils::get_string_value(
-							nds,
-							tCodeMeaning,
-							CodeMeaning))
+					if (DicomUtils::get_string_value(nds, tCodeMeaning, CodeMeaning))
 					{
 						s0 += QString(
 								"<span class='y9'>Illumination Type</span><br />"
@@ -1287,10 +1264,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 		}
 		{
 			QString AcousticCouplingMediumFlag;
-			if (DicomUtils::get_string_value(
-					ds,
-					tAcousticCouplingMediumFlag,
-					AcousticCouplingMediumFlag))
+			if (DicomUtils::get_string_value(ds, tAcousticCouplingMediumFlag, AcousticCouplingMediumFlag))
 			{
 				s0 += QString(
 						"<span class='y9'>Acoustic Coupling Medium Flag</span><br />"
@@ -1310,10 +1284,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 					const mdcm::Item & item = sq->GetItem(1);
 					const mdcm::DataSet & nds = item.GetNestedDataSet();
 					QString CodeMeaning;
-					if (DicomUtils::get_string_value(
-							nds,
-							tCodeMeaning,
-							CodeMeaning))
+					if (DicomUtils::get_string_value(nds, tCodeMeaning, CodeMeaning))
 					{
 						s0 += QString(
 								"<span class='y9'>Acoustic Coupling Medium</span><br />"
@@ -1342,10 +1313,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 		}
 		{
 			QString PositionMeasuringDeviceUsed;
-			if (DicomUtils::get_string_value(
-					ds,
-					tPositionMeasuringDeviceUsed,
-					PositionMeasuringDeviceUsed))
+			if (DicomUtils::get_string_value(ds, tPositionMeasuringDeviceUsed, PositionMeasuringDeviceUsed))
 			{
 				s0 += QString(
 						"<span class='y9'>Position Measuring Device Used</span><br />"
@@ -1389,10 +1357,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 					const mdcm::Item & item = sq->GetItem(1);
 					const mdcm::DataSet & nds = item.GetNestedDataSet();
 					QString CodeMeaning;
-					if (DicomUtils::get_string_value(
-							nds,
-							tCodeMeaning,
-							CodeMeaning))
+					if (DicomUtils::get_string_value(nds, tCodeMeaning, CodeMeaning))
 					{
 						s1 += QString(
 								"<span class='y9'>Transducer Geometry</span><br />"
@@ -1414,10 +1379,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 					const mdcm::Item & item = sq->GetItem(1);
 					const mdcm::DataSet & nds = item.GetNestedDataSet();
 					QString CodeMeaning;
-					if (DicomUtils::get_string_value(
-							nds,
-							tCodeMeaning,
-							CodeMeaning))
+					if (DicomUtils::get_string_value(nds, tCodeMeaning, CodeMeaning))
 					{
 						s1 += QString(
 								"<span class='y9'>Transducer Technology</span><br />"
@@ -1521,28 +1483,19 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 					double ObjectSoundSpeed;
 					double CouplingMediumSoundSpeed;
 					QString CodeMeaning;
-					if (DicomUtils::get_string_value(
-							nds,
-							tCodeMeaning,
-							CodeMeaning))
+					if (DicomUtils::get_string_value(nds, tCodeMeaning, CodeMeaning))
 					{
 						s4 += QString("<span class='y8'>&#160;&#160;") +
 							CodeMeaning +
 							QString("</span><br />");
 					}
-					if (DicomUtils::get_fd_value(
-							nds,
-							tObjectSoundSpeed,
-							&ObjectSoundSpeed))
+					if (DicomUtils::get_fd_value(nds, tObjectSoundSpeed, &ObjectSoundSpeed))
 					{
 						s4 += QString("<span class='y8'>&#160;&#160;Object Sound Speed&#160;") +
 							QVariant(ObjectSoundSpeed).toString() +
 							QString("&#160;m/s</span><br />");
 					}
-					if (DicomUtils::get_fd_value(
-							nds,
-							tCouplingMediumSoundSpeed,
-							&CouplingMediumSoundSpeed))
+					if (DicomUtils::get_fd_value(nds, tCouplingMediumSoundSpeed, &CouplingMediumSoundSpeed))
 					{
 						s4 += QString("<span class='y8'>&#160;&#160;Coupling Medium Sound Speed&#160;") +
 							QVariant(CouplingMediumSoundSpeed).toString() +
@@ -2690,7 +2643,7 @@ bool DicomUtils::get_string_value(
 		return false;
 	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (!bv) return false;
-	s = QString::fromLatin1(bv->GetPointer(), bv->GetLength()).trimmed();
+	s = QString::fromLatin1(bv->GetPointer(), bv->GetLength()).trimmed().remove(QChar('\0'));
 	return true;
 }
 
@@ -2704,7 +2657,7 @@ bool DicomUtils::priv_get_string_value(
 		return false;
 	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (!bv) return false;
-	s = QString::fromLatin1(bv->GetPointer(), bv->GetLength()).trimmed();
+	s = QString::fromLatin1(bv->GetPointer(), bv->GetLength()).trimmed().remove(QChar('\0'));
 	return true;
 }
 
@@ -2756,20 +2709,14 @@ bool DicomUtils::has_functional_groups(const mdcm::DataSet & ds)
 	{
 		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
 		const mdcm::DataElement & e = ds.GetDataElement(tSharedFunctionalGroupsSequence);
-		if (!e.IsEmpty())
-		{
-			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
-			if (sq && sq->GetNumberOfItems() > 0) return true;
-		}
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+		if (sq && sq->GetNumberOfItems() > 0) return true;
 	}
 	{
 		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
 		const mdcm::DataElement & e = ds.GetDataElement(tPerFrameFunctionalGroupsSequence);
-		if (!e.IsEmpty())
-		{
-			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
-			if (sq && sq->GetNumberOfItems() > 0) return true;
-		}
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+		if (sq && sq->GetNumberOfItems() > 0) return true;
 	}
 	return false;
 }
@@ -2784,12 +2731,12 @@ bool DicomUtils::has_supp_palette(const mdcm::DataSet & ds)
 	QString PixelPresentation;
 	if (get_string_value(ds, tPixelPresentation, PixelPresentation))
 	{
-		if (PixelPresentation.toUpper().trimmed() == QString("COLOR"))
+		if (PixelPresentation.toUpper() == QString("COLOR"))
 		{
 			QString PhotometricInterpretation;
 			if (get_string_value(ds, tPhotometricInterpretation, PhotometricInterpretation))
 			{
-				if (PhotometricInterpretation.toUpper().trimmed() == QString("MONOCHROME2") &&
+				if (PhotometricInterpretation.toUpper() == QString("MONOCHROME2") &&
 					ds.FindDataElement(tRedPaletteColorLookupTableDescriptor) &&
 					ds.FindDataElement(tGreenPaletteColorLookupTableDescriptor) &&
 					ds.FindDataElement(tBluePaletteColorLookupTableDescriptor))
@@ -2805,19 +2752,16 @@ bool DicomUtils::has_supp_palette(const mdcm::DataSet & ds)
 bool DicomUtils::has_modality_lut_sq(const mdcm::DataSet & ds)
 {
 	const mdcm::DataElement& e = ds.GetDataElement(mdcm::Tag(0x0028,0x3000));
-	if (!e.IsEmpty())
+	const mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+	if (sq && sq->GetNumberOfItems() == 1)
 	{
-		const mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
-		if (sq && sq->GetNumberOfItems() == 1)
+		const mdcm::Item & item = sq->GetItem(1);
+		const mdcm::DataSet & nds = item.GetNestedDataSet();
+		const mdcm::DataElement & e1 = nds.GetDataElement(mdcm::Tag(0x0028,0x3006));
+		const mdcm::DataElement & e2 = nds.GetDataElement(mdcm::Tag(0x0028,0x3002));
+		if (!e1.IsEmpty() && !e2.IsEmpty())
 		{
-			const mdcm::Item & item = sq->GetItem(1);
-			const mdcm::DataSet & nds = item.GetNestedDataSet();
-			const mdcm::DataElement & e1 = nds.GetDataElement(mdcm::Tag(0x0028,0x3006));
-			const mdcm::DataElement & e2 = nds.GetDataElement(mdcm::Tag(0x0028,0x3002));
-			if (!e1.IsEmpty() && !e2.IsEmpty())
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 	return false;
@@ -2832,15 +2776,10 @@ bool DicomUtils::check_encapsulated(const mdcm::DataSet & ds)
 
 bool DicomUtils::is_multiframe(const mdcm::DataSet & ds)
 {
-	if (ds.IsEmpty()) return false;
-	const mdcm::Tag tnumframes(0x0028,0x0008);
-	QString numframes;
-	if (get_string_value(ds, tnumframes, numframes))
+	int i;
+	if (get_is_value(ds, mdcm::Tag(0x0028,0x0008), &i))
 	{
-		const QVariant v(numframes.remove(QChar('\0')));
-		bool ok{};
-		const int k = v.toInt(&ok);
-		if (ok && k > 1) return true;
+		if (i > 1) return true;
 	}
 	return false;
 }
@@ -2897,39 +2836,39 @@ void DicomUtils::read_image_info(
 	{
 		QString sop_instance_uid_;
 		if (get_string_value(ds, tsopinstance, sop_instance_uid_))
-			sop_instance_uid = sop_instance_uid_.remove(QChar('\0'));
+			sop_instance_uid = sop_instance_uid_;
 	}
 	//
 	{
 		QString position_;
 		if (get_string_value(ds, tpos, position_))
-			position = position_.remove(QChar('\0'));
+			position = position_;
 		else if (get_string_value(ds, tpos_old, position_))
-			position = position_.remove(QChar('\0'));
+			position = position_;
 	}
 	//
 	{
 		QString orientation_;
 		if (get_string_value(ds, torie, orientation_))
-			orientation = orientation_.remove(QChar('\0'));
+			orientation = orientation_;
 		else if (get_string_value(ds, torie_old, orientation_))
-			orientation = orientation_.remove(QChar('\0'));
+			orientation = orientation_;
 	}
 	//
 	{
 		QString spacing_;
 		if (get_string_value(ds, tspacing0, spacing_))
-			spacing = spacing_.remove(QChar('\0'));
+			spacing = spacing_;
 		else if (get_string_value(ds, tspacing1, spacing_))
-			spacing = spacing_.remove(QChar('\0'));
+			spacing = spacing_;
 		else if (get_string_value(ds, tspacing2, spacing_))
-			spacing = spacing_.remove(QChar('\0'));
+			spacing = spacing_;
 	}
 	//
 	{
 		QString o20_20;
 		if (get_string_value(ds, t2020, o20_20))
-			orientation_20_20 = o20_20.remove(QChar('\0'));
+			orientation_20_20 = o20_20;
 	}
 }
 
@@ -2983,7 +2922,7 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 		QString numframes;
 		if (get_string_value(ds, tframes, numframes))
 		{
-			const QVariant v(numframes.remove(QChar('\0')));
+			const QVariant v(numframes);
 			bool ok{};
 			const int k = v.toInt(&ok);
 			if (ok && k > 0) *num_frames_ = static_cast<unsigned short>(k);
@@ -2993,19 +2932,19 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 	{
 		QString position_;
 		if (get_string_value(ds, tpos, position_))
-			position = position_.remove(QChar('\0'));
+			position = position_;
 	}
 	//
 	{
 		QString orientation_;
 		if (get_string_value(ds, torie, orientation_))
-			orientation = orientation_.remove(QChar('\0'));
+			orientation = orientation_;
 	}
 	//
 	{
 		QString spacing_;
 		if (get_string_value(ds, tspacing, spacing_))
-			spacing = spacing_.remove(QChar('\0'));
+			spacing = spacing_;
 	}
 #ifndef ALIZA_LOAD_DCM_THREAD
 	QApplication::processEvents();
@@ -3013,36 +2952,27 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 }
 
 //#define TMP_PRINT_LOAD_CONTOUR
-void DicomUtils::load_contour(
-	const mdcm::DataSet & ds,
-	ImageVariant * ivariant)
+void DicomUtils::load_contour(const mdcm::DataSet & ds, ImageVariant * ivariant)
 {
 	if (!ivariant) return;
 	QString charset;
 	const mdcm::Tag tcharset(0x0008,0x0005);
-	{
-		QString charset_;
-		if (get_string_value(ds, tcharset, charset_))
-			charset = charset_.remove(QChar('\0'));
-	}
+	(void)get_string_value(ds, tcharset, charset);
 	// StructureSetROISequence
 	const mdcm::Tag tssroisq(0x3006,0x0020);
 	const mdcm::DataElement & ssroisq = ds.GetDataElement(tssroisq);
-	if (ssroisq.IsEmpty()) return;
 	mdcm::SmartPointer<mdcm::SequenceOfItems> ssqi = ssroisq.GetValueAsSQ();
 	if (!(ssqi && ssqi->GetNumberOfItems() > 0)) return;
 	// ROIContourSequence
 	const mdcm::Tag troicsq(0x3006,0x0039);
 	const mdcm::DataElement & roicsq = ds.GetDataElement(troicsq);
-	if (roicsq.IsEmpty()) return;
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sqi = roicsq.GetValueAsSQ();
 	if (!(sqi && sqi->GetNumberOfItems() > 0)) return;
-	if (!(ssqi && ssqi->GetNumberOfItems() > 0)) return;
 	// RTROIObservationsSequence
 	mdcm::SmartPointer<mdcm::SequenceOfItems> obssq = nullptr;
 	const mdcm::Tag tobservationssq(0x3006,0x0080);
 	const mdcm::DataElement & eobservation = ds.GetDataElement(tobservationssq);
-	obssq = eobservation.GetValueAsSQ(); // null is empty
+	obssq = eobservation.GetValueAsSQ(); // nullptr if empty
 	//
 	for (unsigned int pd = 0; pd < sqi->GetNumberOfItems(); ++pd)
 	{
@@ -3082,25 +3012,20 @@ void DicomUtils::load_contour(
 		if (obssq && obssq->GetNumberOfItems() > 0)
 		{
 			const mdcm::Tag tinterpretedtype(0x3006,0x00a4);
-			for (unsigned int obsidx = 0;
-				obsidx < obssq->GetNumberOfItems();
-				++obsidx)
+			for (unsigned int obsidx = 0; obsidx < obssq->GetNumberOfItems(); ++obsidx)
 			{
 				const mdcm::Item & obsitem = obssq->GetItem(obsidx + 1);
 				const mdcm::DataSet & obsnestedds = obsitem.GetNestedDataSet();
 				const mdcm::DataElement & roinumber_de = obsnestedds.GetDataElement(mdcm::Tag(0x3006,0x0084));
 				if (!roinumber_de.IsEmpty())
 				{
-					roinumber.SetFromDataElement(obsnestedds.GetDataElement(roinumber.GetTag()));
+					roinumber.SetFromDataElement(obsnestedds.GetDataElement(mdcm::Tag(0x3006,0x0084)));
 					if (roinumber.GetValue() == roi_number)
 					{
-						const mdcm::DataElement & einterpretedtype = obsnestedds.GetDataElement(tinterpretedtype);
-						if (!einterpretedtype.IsEmpty() && !einterpretedtype.IsUndefinedLength() &&
-							einterpretedtype.GetByteValue())
+						QString roi_interpreted_type;
+						if (get_string_value(obsnestedds, tinterpretedtype, roi_interpreted_type))
 						{
-							roi.interpreted_type = QString::fromLatin1(
-								einterpretedtype.GetByteValue()->GetPointer(),
-								einterpretedtype.GetByteValue()->GetLength()).trimmed();
+							roi.interpreted_type = std::move(roi_interpreted_type);
 						}
 						break;
 					}
@@ -3110,14 +3035,10 @@ void DicomUtils::load_contour(
 		// Referenced Frame of Reference UID
 		{
 			const mdcm::Tag trefframeofref(0x3006,0x0024);
-			const mdcm::DataElement & erefframeofref = snestedds.GetDataElement(trefframeofref);
-			if (!erefframeofref.IsEmpty() && !erefframeofref.IsUndefinedLength() &&
-				erefframeofref.GetByteValue())
+			QString ref_frame_of_ref;
+			if (get_string_value(snestedds, trefframeofref, ref_frame_of_ref))
 			{
-				roi.ref_frame_of_ref =
-					QString::fromLatin1(
-						erefframeofref.GetByteValue()->GetPointer(),
-						erefframeofref.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+				roi.ref_frame_of_ref = std::move(ref_frame_of_ref);
 #ifdef TMP_PRINT_LOAD_CONTOUR
 				std::cout << "0x3006,0x0024 Referenced Frame of Reference " <<
 					roi.ref_frame_of_ref.toStdString() << std::endl;
@@ -3130,9 +3051,7 @@ void DicomUtils::load_contour(
 			const mdcm::DataElement & sde = snestedds.GetDataElement(stcsq);
 			if (!sde.IsEmpty() && !sde.IsUndefinedLength() && sde.GetByteValue())
 			{
-				QByteArray ba(
-					sde.GetByteValue()->GetPointer(),
-					sde.GetByteValue()->GetLength());
+				QByteArray ba(sde.GetByteValue()->GetPointer(), sde.GetByteValue()->GetLength());
 				const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 				roi.name = tmp0.trimmed().remove(QChar('\0'));
 #ifdef TMP_PRINT_LOAD_CONTOUR
@@ -3166,7 +3085,6 @@ void DicomUtils::load_contour(
 		// ContourSequence
 		const mdcm::Tag tcsq(0x3006, 0x0040);
 		const mdcm::DataElement & csq = nestedds.GetDataElement(tcsq);
-		if (csq.IsEmpty()) continue;
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sqi2 = csq.GetValueAsSQ();
 		if (!(sqi2 && sqi2->GetNumberOfItems() > 0)) continue;
 		unsigned int nitems = sqi2->GetNumberOfItems();
@@ -3177,14 +3095,10 @@ void DicomUtils::load_contour(
 			const mdcm::DataSet& nestedds2 = item2.GetNestedDataSet();
 			// ContourGeometricType
 			const mdcm::Tag tcontour_geometric_type(0x3006, 0x0042);
-			const mdcm::DataElement & contour_geometric_type = nestedds2.GetDataElement(tcontour_geometric_type);
 			QString qtr_contour_geometric_type;
-			if (!contour_geometric_type.IsEmpty() && !contour_geometric_type.IsUndefinedLength() &&
-				contour_geometric_type.GetByteValue())
+			if (get_string_value(nestedds2, tcontour_geometric_type, qtr_contour_geometric_type))
 			{
-				qtr_contour_geometric_type = QString::fromLatin1(
-					contour_geometric_type.GetByteValue()->GetPointer(),
-					contour_geometric_type.GetByteValue()->GetLength()).trimmed().remove(QChar('\0')).toUpper();
+				qtr_contour_geometric_type = qtr_contour_geometric_type.toUpper();
 			}
 			// ContourData
 			const mdcm::Tag tcontourdata(0x3006, 0x0050);
@@ -3238,30 +3152,23 @@ void DicomUtils::load_contour(
 			{
 				const mdcm::Tag timageseq(0x3006,0x0016);
 				const mdcm::DataElement & imageseq = nestedds2.GetDataElement(timageseq);
-				if (!imageseq.IsEmpty())
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sqimageseq = imageseq.GetValueAsSQ();
+				if (sqimageseq && sqimageseq->GetNumberOfItems() > 0)
 				{
-					mdcm::SmartPointer<mdcm::SequenceOfItems> sqimageseq = imageseq.GetValueAsSQ();
-					if (sqimageseq && sqimageseq->GetNumberOfItems() > 0)
+					for (unsigned int n_imageseq = 0; n_imageseq < sqimageseq->GetNumberOfItems(); ++n_imageseq)
 					{
-						for (unsigned int n_imageseq = 0; n_imageseq < sqimageseq->GetNumberOfItems(); ++n_imageseq)
+						const mdcm::Item & imageseqitem = sqimageseq->GetItem(n_imageseq + 1);
+						const mdcm::DataSet & imageseqds = imageseqitem.GetNestedDataSet();
+						// Referenced SOP Instance UID
+						const mdcm::Tag trefsopinstuid(0x0008, 0x1155);
+						QString tmp688;
+						if (get_string_value(imageseqds, trefsopinstuid, tmp688))
 						{
-							const mdcm::Item & imageseqitem = sqimageseq->GetItem(n_imageseq + 1);
-							const mdcm::DataSet & imageseqds = imageseqitem.GetNestedDataSet();
-							// Referenced SOP Instance UID
-							const mdcm::Tag trefsopinstuid(0x0008, 0x1155);
-							const mdcm::DataElement & erefsopinstuid = imageseqds.GetDataElement(trefsopinstuid);
-							if (!erefsopinstuid.IsEmpty() && !erefsopinstuid.IsUndefinedLength() &&
-								erefsopinstuid.GetByteValue())
-							{
-								const QString tmp688 = QString::fromLatin1(
-									erefsopinstuid.GetByteValue()->GetPointer(),
-									erefsopinstuid.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
-								contour->ref_sop_instance_uids << tmp688;
+							contour->ref_sop_instance_uids << tmp688;
 #ifdef TMP_PRINT_LOAD_CONTOUR
-								std::cout << " 0x0008, 0x1155 Referenced SOP Instance UID " <<
-									n_imageseq << " " << tmp688.toStdString() << std::endl;
+							std::cout << " 0x0008, 0x1155 Referenced SOP Instance UID " <<
+								n_imageseq << " " << tmp688.toStdString() << std::endl;
 #endif
-							}
 						}
 					}
 				}
@@ -3277,25 +3184,13 @@ void DicomUtils::load_contour(
 	ivariant->image_type = 100;
 	read_ivariant_info_tags(ds, ivariant);
 	read_acquisition_time(ds, ivariant->acquisition_date, ivariant->acquisition_time);
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 }
 #ifdef TMP_PRINT_LOAD_CONTOUR
 #undef TMP_PRINT_LOAD_CONTOUR
 #endif
-
-QString DicomUtils::read_instance_uid(const mdcm::DataSet & ds)
-{
-	if (ds.IsEmpty()) return QString("");
-	const mdcm::Tag tInstanceUID(0x0008,0x0018);
-	const mdcm::DataElement & e = ds.GetDataElement(tInstanceUID);
-	if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
-	{
-		const QString s = QString::fromLatin1(
-			e.GetByteValue()->GetPointer(),
-			e.GetByteValue()->GetLength());
-		return s;
-	}
-	return QString("");
-}
 
 void DicomUtils::read_window(
 	const mdcm::DataSet & ds,
@@ -3308,7 +3203,7 @@ void DicomUtils::read_window(
 	QString s;
 	if (get_string_value(ds, mdcm::Tag(0x0028,0x1056), s))
 	{
-		s = s.trimmed().toUpper().remove(QChar('\0'));
+		s = s.toUpper();
 		if (s == QString("LINEAR_EXACT"))
 		{
 			lut_function_ = 0;
@@ -3324,12 +3219,9 @@ void DicomUtils::read_window(
 	if (get_ds_values(ds, mdcm::Tag(0x0028,0x1050), c) &&
 		get_ds_values(ds, mdcm::Tag(0x0028,0x1051), w))
 	{
-		if (!c.empty())
+		if (!c.empty() && !w.empty())
 		{
 			*center_ = c.at(0);
-		}
-		if (!w.empty())
-		{
 			*width_ = w.at(0);
 		}
 	}
@@ -3542,13 +3434,13 @@ bool DicomUtils::read_slices_uihgrid(
 		{
 			QString spacing_;
 			if (get_string_value(ds, tspacing0, spacing_))
-				spacing_s = spacing_.remove(QChar('\0'));
+				spacing_s = std::move(spacing_);
 			else if (get_string_value(ds, tspacing1, spacing_))
-				spacing_s = spacing_.remove(QChar('\0'));
+				spacing_s = std::move(spacing_);
 			else if (get_string_value(ds, tspacing2, spacing_))
-				spacing_s = spacing_.remove(QChar('\0'));
+				spacing_s = std::move(spacing_);
 			else if (get_string_value(ds, tspacing3, spacing_))
-				spacing_s = spacing_.remove(QChar('\0'));
+				spacing_s = std::move(spacing_);
 		}
 		double pix_spacing[2];
 		if (get_pixel_spacing(spacing_s, pix_spacing))
@@ -3629,32 +3521,20 @@ bool DicomUtils::read_slices_uihgrid(
 		const mdcm::Tag tAcquisitionTime(0x0008,0x0022);
 		const mdcm::Tag tAcquisitionDateTime(0x0008,0x002a);
 		QString AcquisitionDateTime;
-		if (DicomUtils::get_string_value(
-				nds,
-				tAcquisitionDateTime,
-				AcquisitionDateTime))
+		if (DicomUtils::get_string_value(nds, tAcquisitionDateTime, AcquisitionDateTime))
 		{
-			AcquisitionDateTime =
-				AcquisitionDateTime.trimmed().remove(QChar('\0'));
+			;
 		}
 		else
 		{
 			QString AcquisitionDate;
 			QString AcquisitionTime;
-			if (DicomUtils::get_string_value(
-					nds,
-					tAcquisitionDate,
-					AcquisitionDate) &&
-				DicomUtils::get_string_value(
-					nds,
-					tAcquisitionTime,
-					AcquisitionTime))
+			if (DicomUtils::get_string_value(nds, tAcquisitionDate, AcquisitionDate) &&
+				DicomUtils::get_string_value(nds, tAcquisitionTime, AcquisitionTime))
 			{
 				if (!AcquisitionDate.isEmpty() && !AcquisitionTime.isEmpty())
 				{
-					AcquisitionDateTime =
-						AcquisitionDate.trimmed().remove(QChar('\0')) +
-						AcquisitionTime.trimmed().remove(QChar('\0'));
+					AcquisitionDateTime = AcquisitionDate + AcquisitionTime;
 				}
 			}
 		}
@@ -3911,7 +3791,7 @@ void DicomUtils::read_dimension_index_sq(
 			if (ok0 && ok1)
 			{
 				DimIndex idx;
-				idx.uid = dim_uid.trimmed().remove(QChar('\0')).toStdString();
+				idx.uid = dim_uid.toStdString();
 				idx.index_pointer = mdcm::Tag(group0, element0);
 				idx.group_pointer = mdcm::Tag(group1, element1);
 				sq.push_back(std::move(idx));
@@ -3919,7 +3799,7 @@ void DicomUtils::read_dimension_index_sq(
 			else if (ok0)
 			{
 				DimIndex idx;
-				idx.uid = dim_uid.trimmed().remove(QChar('\0')).toStdString();
+				idx.uid = dim_uid.toStdString();
 				idx.index_pointer = mdcm::Tag(group0, element0);
 				idx.group_pointer = mdcm::Tag(0xffff,0xffff);
 				sq.push_back(std::move(idx));
@@ -4044,16 +3924,7 @@ bool DicomUtils::read_group_sq(
 	const mdcm::DataElement & deGroup = ds.GetDataElement(t);
 	if (deGroup.IsEmpty()) return false;
 	QString charset;
-	{
-		const mdcm::DataElement & eSpecificCharacterSet = ds.GetDataElement(tSpecificCharacterSet);
-		if (!eSpecificCharacterSet.IsEmpty() && !eSpecificCharacterSet.IsUndefinedLength() &&
-			eSpecificCharacterSet.GetByteValue())
-		{
-			charset = QString::fromLatin1(
-				eSpecificCharacterSet.GetByteValue()->GetPointer(),
-				eSpecificCharacterSet.GetByteValue()->GetLength()).trimmed();
-		}
-	}
+	(void)get_string_value(ds, tSpecificCharacterSet, charset);
 	//
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sqGroup = deGroup.GetValueAsSQ();
 	if (!(sqGroup && sqGroup->GetNumberOfItems() > 0))
@@ -4140,14 +4011,10 @@ bool DicomUtils::read_group_sq(
 			{
 				const mdcm::Item & item1 = sqPlanePositionSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
-				const mdcm::DataElement & deImagePositionPatient = nestedds1.GetDataElement(tImagePositionPatient);
-				if (!deImagePositionPatient.IsEmpty() && !deImagePositionPatient.IsUndefinedLength() &&
-					deImagePositionPatient.GetByteValue())
+				QString pat_pos;
+				if (get_string_value(nestedds1, tImagePositionPatient, pat_pos))
 				{
-					fg.pat_pos =
-						QString::fromLatin1(
-							deImagePositionPatient.GetByteValue()->GetPointer(),
-							deImagePositionPatient.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+					fg.pat_pos = std::move(pat_pos);
 				}
 			}
 		}
@@ -4159,15 +4026,10 @@ bool DicomUtils::read_group_sq(
 			{
 				const mdcm::Item & item1 = sqPlaneOrientationSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
-				const mdcm::DataElement & deImageOrientationPatient = nestedds1.GetDataElement(tImageOrientationPatient);
-				if (!deImageOrientationPatient.IsEmpty() && !deImageOrientationPatient.IsUndefinedLength() &&
-					deImageOrientationPatient.GetByteValue())
+				QString pat_orient;
+				if (get_string_value(nestedds1, tImageOrientationPatient, pat_orient))
 				{
-					fg.pat_orient =
-						QString::fromLatin1(
-							deImageOrientationPatient.GetByteValue()->GetPointer(),
-							deImageOrientationPatient.GetByteValue()->GetLength()).
-								trimmed().remove(QChar('\0'));
+					fg.pat_orient = std::move(pat_orient);
 				}
 			}
 		}
@@ -4178,68 +4040,37 @@ bool DicomUtils::read_group_sq(
 			{
 				const mdcm::Item & item1 = sqPixelMeasuresSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
-				const mdcm::DataElement & dePixelSpacing = nestedds1.GetDataElement(tPixelSpacing);
-				if (!dePixelSpacing.IsEmpty() &&
-					!dePixelSpacing.IsUndefinedLength() &&
-					dePixelSpacing.GetByteValue())
+				QString pix_spacing;
+				if (get_string_value(nestedds1, tPixelSpacing, pix_spacing))
 				{
-					fg.pix_spacing =
-						QString::fromLatin1(
-							dePixelSpacing.GetByteValue()->GetPointer(),
-							dePixelSpacing.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+					fg.pix_spacing = std::move(pix_spacing);
 				}
 				else
 				{
-					const mdcm::DataElement & deImagerPixelSpacing = nestedds1.GetDataElement(tImagerPixelSpacing);
-					if (!deImagerPixelSpacing.IsEmpty() &&
-						!deImagerPixelSpacing.IsUndefinedLength() &&
-						deImagerPixelSpacing.GetByteValue())
+					if (get_string_value(nestedds1, tImagerPixelSpacing, pix_spacing))
 					{
-						fg.pix_spacing =
-							QString::fromLatin1(
-								deImagerPixelSpacing.GetByteValue()->GetPointer(),
-								deImagerPixelSpacing.GetByteValue()->GetLength()).
-									trimmed().remove(QChar('\0'));
+						fg.pix_spacing = std::move(pix_spacing);
 					}
 					else
 					{
-						const mdcm::DataElement & deNominalScannedPixelSpacing =
-							nestedds1.GetDataElement(tNominalScannedPixelSpacing);
-						if (!deNominalScannedPixelSpacing.IsEmpty() &&
-							!deNominalScannedPixelSpacing.IsUndefinedLength() &&
-							deNominalScannedPixelSpacing.GetByteValue())
+						if (get_string_value(nestedds1, tNominalScannedPixelSpacing, pix_spacing))
 						{
-							fg.pix_spacing =
-								QString::fromLatin1(
-									deNominalScannedPixelSpacing.GetByteValue()->GetPointer(),
-									deNominalScannedPixelSpacing.GetByteValue()->GetLength()).
-										trimmed().remove(QChar('\0'));
+							fg.pix_spacing = std::move(pix_spacing);
 						}
 						else
 						{
-							const mdcm::DataElement & dePixelAspectRatio = nestedds1.GetDataElement(tPixelAspectRatio);
-							if (!dePixelAspectRatio.IsEmpty() &&
-								!dePixelAspectRatio.IsUndefinedLength() &&
-								dePixelAspectRatio.GetByteValue())
+							if (get_string_value(nestedds1, tPixelAspectRatio, pix_spacing))
 							{
-								fg.pix_spacing =
-									QString::fromLatin1(
-										dePixelAspectRatio.GetByteValue()->GetPointer(),
-										dePixelAspectRatio.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+								fg.pix_spacing = std::move(pix_spacing);
 							}
 						}
 					}
 				}
 				{
-					const mdcm::DataElement & deSliceThickness = nestedds1.GetDataElement(tSliceThickness);
-					if (!deSliceThickness.IsEmpty() &&
-						!deSliceThickness.IsUndefinedLength() &&
-						deSliceThickness.GetByteValue())
+					QString slice_thick;
+					if (get_string_value(nestedds1, tSliceThickness, slice_thick))
 					{
-						fg.slice_thick =
-							QString::fromLatin1(
-								deSliceThickness.GetByteValue()->GetPointer(),
-								deSliceThickness.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+						fg.slice_thick = std::move(slice_thick);
 					}
 				}
 			}
@@ -4255,16 +4086,12 @@ bool DicomUtils::read_group_sq(
 					const mdcm::Item & item1 = sqFrameAnatomySequence->GetItem(1);
 					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
 					{
-						const mdcm::DataElement & deFrameLaterality = nestedds1.GetDataElement(tFrameLaterality);
-						if (!deFrameLaterality.IsEmpty() &&
-							!deFrameLaterality.IsUndefinedLength() &&
-							deFrameLaterality.GetByteValue())
+						QString frame_laterality;
+						if (get_string_value(nestedds1, tFrameLaterality, frame_laterality))
 						{
-							fg.frame_laterality =
-								QString::fromLatin1(
-									deFrameLaterality.GetByteValue()->GetPointer(),
-									deFrameLaterality.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+							fg.frame_laterality = std::move(frame_laterality);
 						}
+						const mdcm::DataElement & deFrameLaterality = nestedds1.GetDataElement(tFrameLaterality);
 					}
 					{
 						const mdcm::DataElement & deAnatomicRegionSequence =
@@ -4311,40 +4138,24 @@ bool DicomUtils::read_group_sq(
 					const mdcm::Item & item1 = sqFrameVOILUTSequence->GetItem(1);
 					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
 					{
-						const mdcm::DataElement & deWindowCenter = nestedds1.GetDataElement(tWindowCenter);
-						if (!deWindowCenter.IsEmpty() &&
-							!deWindowCenter.IsUndefinedLength() &&
-							deWindowCenter.GetByteValue())
+						QString window_center;
+						if (get_string_value(nestedds1, tWindowCenter, window_center))
 						{
-							fg.window_center =
-								QString::fromLatin1(
-									deWindowCenter.GetByteValue()->GetPointer(),
-									deWindowCenter.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+							fg.window_center = std::move(window_center);
 						}
 					}
 					{
-						const mdcm::DataElement & deWindowWidth = nestedds1.GetDataElement(tWindowWidth);
-						if (!deWindowWidth.IsEmpty() &&
-							!deWindowWidth.IsUndefinedLength() &&
-							deWindowWidth.GetByteValue())
+						QString window_width;
+						if (get_string_value(nestedds1, tWindowWidth, window_width))
 						{
-							fg.window_width =
-								QString::fromLatin1(
-									deWindowWidth.GetByteValue()->GetPointer(),
-									deWindowWidth.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+							fg.window_width = std::move(window_width);
 						}
 					}
 					{
-						const mdcm::DataElement & deLUTFunction = nestedds1.GetDataElement(tLUTFunction);
-						if (!deLUTFunction.IsEmpty() &&
-							!deLUTFunction.IsUndefinedLength() &&
-							deLUTFunction.GetByteValue())
+						QString lut_function;
+						if (get_string_value(nestedds1, tLUTFunction, lut_function))
 						{
-							fg.lut_function =
-								QString::fromLatin1(
-									deLUTFunction.GetByteValue()->GetPointer(),
-									deLUTFunction.GetByteValue()->GetLength()).
-										trimmed().remove(QChar('\0'));
+							fg.lut_function = std::move(lut_function);
 						}
 					}
 				}
@@ -4361,11 +4172,7 @@ bool DicomUtils::read_group_sq(
 				{
 					const mdcm::Item & item1 = sqTemporalPositionSequence->GetItem(1);
 					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
-					fg.temp_pos_off_ok =
-						get_fd_value(
-							nestedds1,
-							tTemporalPositionTimeOffset,
-							&fg.temp_pos_off);
+					fg.temp_pos_off_ok = get_fd_value(nestedds1, tTemporalPositionTimeOffset, &fg.temp_pos_off);
 				}
 			}
 		}
@@ -4381,10 +4188,7 @@ bool DicomUtils::read_group_sq(
 					const mdcm::Item & item1 = sqPlanePositionVolumeSequence->GetItem(1);
 					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
 					std::vector<double> tmp1;
-					if (get_fd_values(
-							nestedds1,
-							tImagePositionVolume,
-							tmp1))
+					if (get_fd_values(nestedds1, tImagePositionVolume, tmp1))
 					{
 						if (tmp1.size() == 3)
 						{
@@ -4404,8 +4208,7 @@ bool DicomUtils::read_group_sq(
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sqPlaneOrientationVolumeSequence =
 					dePlaneOrientationVolumeSequence.GetValueAsSQ();
-				if (sqPlaneOrientationVolumeSequence &&
-					sqPlaneOrientationVolumeSequence->GetNumberOfItems() == 1)
+				if (sqPlaneOrientationVolumeSequence && sqPlaneOrientationVolumeSequence->GetNumberOfItems() == 1)
 				{
 					const mdcm::Item & item1 = sqPlaneOrientationVolumeSequence->GetItem(1);
 					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -4433,8 +4236,7 @@ bool DicomUtils::read_group_sq(
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sqPixelValueTransformationSequence =
 					dePixelValueTransformationSequence.GetValueAsSQ();
-				if (sqPixelValueTransformationSequence &&
-					sqPixelValueTransformationSequence->GetNumberOfItems() == 1)
+				if (sqPixelValueTransformationSequence && sqPixelValueTransformationSequence->GetNumberOfItems() == 1)
 				{
 					const mdcm::Item & item1 = sqPixelValueTransformationSequence->GetItem(1);
 					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -4481,7 +4283,7 @@ bool DicomUtils::read_group_sq(
 							QString tmp3;
 							if (get_string_value(nestedds1, tRWVLUTLabel, tmp3))
 							{
-								rwv_l.push_back(tmp3.remove(QChar('\0')));
+								rwv_l.push_back(tmp3);
 							}
 						}
 						const int rwv_l_size = rwv_l.size();
@@ -4613,31 +4415,27 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 					memcpy(&element, element_, 2);
 					if (group == 0x0018 && element == 0x1063)
 					{
-						const mdcm::DataElement & e = ds.GetDataElement(tframetime);
-						if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 						{
-							const QString s =
-								QString::fromLatin1(
-									e.GetByteValue()->GetPointer(), e.GetByteValue()->GetLength());
-							bool ok = false;
-							double tmp0 = QVariant(s.trimmed().remove(QChar('\0'))).toDouble(&ok);
-							if (ok) frametime = tmp0;
+							QString s;
+							if (get_string_value(ds, tframetime, s))
+							{
+								bool ok{};
+								const double tmp0 = QVariant(s).toDouble(&ok);
+								if (ok) frametime = tmp0;
+							}
 						}
 						for (int x = 0; x < dimz; ++x) ivariant->frame_times.push_back(frametime);
 					}
 					else if (group == 0x0018 && element == 0x1065)
 					{
-						const mdcm::DataElement & e = ds.GetDataElement(tframetimes);
-						if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
+						QString s;
+						if (get_string_value(ds, tframetimes, s))
 						{
-							const QString s =
-								QString::fromLatin1(
-									e.GetByteValue()->GetPointer(), e.GetByteValue()->GetLength());
-							bool ok;
-							QStringList l = s.trimmed().remove(QChar('\0')).split(QString("\\"));
+							const QStringList l = s.split(QString("\\"));
 							for (int x = 0; x < l.size(); ++x)
 							{
-								double tmp0 = QVariant(l.at(x).trimmed().remove(QChar('\0'))).toDouble(&ok);
+								bool ok{};
+								double tmp0 = QVariant(l.at(x).trimmed()).toDouble(&ok);
 								if (ok) ivariant->frame_times.push_back(tmp0);
 							}
 						}
@@ -4649,13 +4447,11 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 	}
 	else
 	{
-		const mdcm::DataElement & e = ds.GetDataElement(tframetime);
-		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
+		QString s;
+		if (get_string_value(ds, tframetime, s))
 		{
-			const QString s = QString::fromLatin1(
-				e.GetByteValue()->GetPointer(), e.GetByteValue()->GetLength());
-			bool ok;
-			double tmp0 = QVariant(s.trimmed().remove(QChar('\0'))).toDouble(&ok);
+			bool ok{};
+			const double tmp0 = QVariant(s).toDouble(&ok);
 			if (ok) frametime = tmp0;
 		}
 		for (int x = 0; x < dimz; ++x) ivariant->frame_times.push_back(frametime);
@@ -4671,16 +4467,7 @@ QString DicomUtils::read_anatomic_sq(const mdcm::DataSet & ds)
 	{
 		const mdcm::Tag tSpecificCharacterSet(0x0008,0x0005);
 		QString charset;
-		{
-			const mdcm::DataElement & eSpecificCharacterSet = ds.GetDataElement(tSpecificCharacterSet);
-			if (!eSpecificCharacterSet.IsEmpty() && !eSpecificCharacterSet.IsUndefinedLength() &&
-				eSpecificCharacterSet.GetByteValue())
-			{
-				charset = QString::fromLatin1(
-					eSpecificCharacterSet.GetByteValue()->GetPointer(),
-					eSpecificCharacterSet.GetByteValue()->GetLength()).trimmed();
-			}
-		}
+		(void)get_string_value(ds, tSpecificCharacterSet, charset);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
 		if (sq && sq->GetNumberOfItems() == 1)
 		{
@@ -4689,57 +4476,14 @@ QString DicomUtils::read_anatomic_sq(const mdcm::DataSet & ds)
 			const mdcm::DataElement & e2 = nds.GetDataElement(tCodeMeaning);
 			if (!e2.IsEmpty() && !e2.IsUndefinedLength() && e2.GetByteValue())
 			{
-				QByteArray ba(
-					e2.GetByteValue()->GetPointer(),
-					e2.GetByteValue()->GetLength());
-				const QString frame_body_part =
-					CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+				QByteArray ba(e2.GetByteValue()->GetPointer(), e2.GetByteValue()->GetLength());
+				const QString frame_body_part = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 				if (!frame_body_part.isEmpty())
+				{
 					return frame_body_part.trimmed().remove(QChar('\0'));
+				}
 			}
 		}
-	}
-	return QString("");
-}
-
-QString DicomUtils::read_series_laterality(const mdcm::DataSet & ds)
-{
-	const mdcm::Tag tlaterality(0x0020,0x0060);
-	const mdcm::DataElement & e = ds.GetDataElement(tlaterality);
-	if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
-	{
-		const QString s = QString::fromLatin1(
-			e.GetByteValue()->GetPointer(),
-			e.GetByteValue()->GetLength());
-		if (!s.isEmpty()) return s.trimmed().remove(QChar('\0'));
-	}
-	return QString("");
-}
-
-QString DicomUtils::read_image_laterality(const mdcm::DataSet & ds)
-{
-	const mdcm::Tag tilaterality(0x0020,0x0062);
-	const mdcm::DataElement & e = ds.GetDataElement(tilaterality);
-	if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
-	{
-		const QString s = QString::fromLatin1(
-			e.GetByteValue()->GetPointer(),
-			e.GetByteValue()->GetLength());
-		if (!s.isEmpty()) return s.trimmed().remove(QChar('\0'));
-	}
-	return QString("");
-}
-
-QString DicomUtils::read_body_part(const mdcm::DataSet & ds)
-{
-	const mdcm::Tag tbodypart(0x0018,0x0015);
-	const mdcm::DataElement & e = ds.GetDataElement(tbodypart);
-	if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
-	{
-		const QString s = QString::fromLatin1(
-			e.GetByteValue()->GetPointer(),
-			e.GetByteValue()->GetLength());
-		if (!s.isEmpty()) return s.trimmed().toLower().remove(QChar('\0'));
 	}
 	return QString("");
 }
@@ -4755,7 +4499,6 @@ void DicomUtils::read_acquisition_time(
 		QString acquisitiondatetime;
 		if (get_string_value(ds, tacquisitiondatetime, acquisitiondatetime))
 		{
-			acquisitiondatetime = acquisitiondatetime.trimmed().remove(QChar('\0'));
 			if (acquisitiondatetime.size() >= 14)
 			{
 				acquisitiondate = acquisitiondatetime.left(8);
@@ -4773,8 +4516,8 @@ void DicomUtils::read_acquisition_time(
 		if (get_string_value(ds, tacquisitiondate, acquisitiondate_tmp) &&
 			get_string_value(ds, tacquisitiontime, acquisitiontime_tmp))
 		{
-			acquisitiondate = acquisitiondate_tmp.trimmed().remove(QChar('\0'));
-			acquisitiontime = acquisitiontime_tmp.trimmed().remove(QChar('\0'));
+			acquisitiondate = std::move(acquisitiondate_tmp);
+			acquisitiontime = std::move(acquisitiontime_tmp);
 		}
 		else
 		{
@@ -4819,24 +4562,21 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	{
 		QString charset_tmp;
 		if (get_string_value(ds, tcharset, charset_tmp))
+		{
 			charset = std::move(charset_tmp);
+		}
 	}
 	{
 		QString imagetype;
 		if (get_string_value(ds, timagetype, imagetype))
 		{
-			imagetype = imagetype.trimmed();
 			if (!imagetype.isEmpty())
 			{
 				QString imagetype_;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				const QStringList l = imagetype.toLower().split(
-					QString("\\"),
-					Qt::SkipEmptyParts);
+				const QStringList l = imagetype.toLower().split(QString("\\"), Qt::SkipEmptyParts);
 #else
-				const QStringList l = imagetype.toLower().split(
-					QString("\\"),
-					QString::SkipEmptyParts);
+				const QStringList l = imagetype.toLower().split(QString("\\"), QString::SkipEmptyParts);
 #endif
 				imagetype_.append(QString(
 					"<br /><span class='y7'>DICOM image type</span>"
@@ -4853,7 +4593,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 		QString sop;
 		if (get_string_value(ds, tsop, sop))
 		{
-			ivariant->sop = sop.remove(QChar('\0'));
+			ivariant->sop = std::move(sop);
 			mdcm::UIDs uid;
 			uid.SetFromUID(ivariant->sop.toLatin1().constData());
 			ivariant->iod = QString::fromLatin1(uid.GetName());
@@ -4883,7 +4623,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	{
 		QString modality;
 		if (get_string_value(ds, tmodality, modality))
-			ivariant->modality = modality.remove(QChar('\0'));
+			ivariant->modality = std::move(modality);
 	}
 	{
 		QString manufacturer_s;
@@ -4971,7 +4711,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	{
 		QString birthdate;
 		if (get_string_value(ds, tbirthdate, birthdate))
-			ivariant->pat_birthdate = birthdate.remove(QChar('\0'));
+			ivariant->pat_birthdate = std::move(birthdate);
 	}
 	{
 		QString patweight;
@@ -4981,16 +4721,14 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	{
 		QString sex;
 		if (get_string_value(ds, tsex, sex))
-			ivariant->pat_sex = sex.remove(QChar('\0'));
+			ivariant->pat_sex = std::move(sex);
 	}
 	{
 		QString fieldstrength;
 		if (get_string_value(ds, tfieldstrength, fieldstrength))
 		{
-			fieldstrength = fieldstrength.trimmed();
 			bool conv_ok{};
-			const double fieldstrength_ =
-				QVariant(fieldstrength).toDouble(&conv_ok);
+			const double fieldstrength_ = QVariant(fieldstrength).toDouble(&conv_ok);
 			if (conv_ok)
 			{
 				fieldstrength.prepend(
@@ -5004,32 +4742,29 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	{
 		QString studyuid;
 		if (get_string_value(ds, tstudyuid, studyuid))
-			ivariant->study_uid = studyuid.remove(QChar('\0'));
+			ivariant->study_uid = std::move(studyuid);
 	}
 	{
 		QString seriesuid;
 		if (get_string_value(ds, tseriesuid, seriesuid))
-			ivariant->series_uid = seriesuid.remove(QChar('\0'));
+			ivariant->series_uid = std::move(seriesuid);
 	}
 	{
 		QString studyid;
 		if (get_string_value(ds, tstudyid, studyid))
-			ivariant->study_id = studyid.remove(QChar('\0'));
+			ivariant->study_id = std::move(studyid);
 	}
 	{
 		QString frame_of_refuid;
 		if (get_string_value(ds, tframe_of_refuid, frame_of_refuid))
-			ivariant->frame_of_ref_uid = frame_of_refuid.remove(QChar('\0'));
+			ivariant->frame_of_ref_uid = std::move(frame_of_refuid);
 	}
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tcomment);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 		{
-			QByteArray ba(
-				e.GetByteValue()->GetPointer(),
-				e.GetByteValue()->GetLength());
-			const QString tmp0 =
-				CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+			QByteArray ba(e.GetByteValue()->GetPointer(), e.GetByteValue()->GetLength());
+			const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 			if (!tmp0.isEmpty())
 			{
 				ivariant->comment = tmp0.trimmed().remove(QChar('\0'));
@@ -5039,7 +4774,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	{
 		QString interpretation;
 		if (get_string_value(ds, tinterpretation, interpretation))
-			ivariant->interpretation = interpretation.remove(QChar('\0'));
+			ivariant->interpretation = std::move(interpretation);
 	}
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tprivcomment);
@@ -5076,7 +4811,7 @@ void DicomUtils::read_pet_attributes(const mdcm::DataSet & ds, ImageVariant * iv
 		{
 			if (!pet_units.isEmpty())
 			{
-				ivariant->pet_info = pet_units.remove(QChar('\0'));
+				ivariant->pet_info = std::move(pet_units);
 			}
 		}
 	}
@@ -5115,7 +4850,7 @@ void DicomUtils::read_pet_attributes_legacy(const mdcm::DataSet & ds, ImageVaria
 					QString s;
 					if (get_string_value(nds1, mdcm::Tag(0x0054,0x1001), s)) // unit
 					{
-						ivariant->pet_info = s.remove(QChar('\0'));
+						ivariant->pet_info = std::move(s);
 					}
 				}
 				if (ivariant->pet_info == QString("GML") || ivariant->pet_info == QString("CM2ML"))
@@ -5496,13 +5231,11 @@ bool DicomUtils::build_gems_dictionary(QMap<QString, int> & m, const mdcm::DataS
 	const mdcm::PrivateTag t2(0x7fe1,0x71,"GEMS_Ultrasound_MovieGroup_001");
 	const mdcm::PrivateTag t3(0x7fe1,0x72,"GEMS_Ultrasound_MovieGroup_001");
 	const mdcm::DataElement & s0 = ds.GetDataElement(t0);
-	if (s0.IsEmpty()) return false;
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq0 = s0.GetValueAsSQ();
 	if (!(sq0 && sq0->GetNumberOfItems() == 1)) return false; // 1 item ?
 	mdcm::Item & i0 = sq0->GetItem(1);
 	mdcm::DataSet & subds0 = i0.GetNestedDataSet();
 	const mdcm::DataElement& s1 = subds0.GetDataElement(t1);
-	if (s1.IsEmpty()) return false;
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = s1.GetValueAsSQ();
 	if (!(sq1 && sq1->GetNumberOfItems() > 0)) return false;
 	const size_t n = sq1->GetNumberOfItems();
@@ -5545,8 +5278,9 @@ bool DicomUtils::build_gems_dictionary(QMap<QString, int> & m, const mdcm::DataS
 		//
 		const mdcm::ByteValue * bv1 = name.GetByteValue();
 		if (!bv1) continue;
-		QString tmp0 = QString::fromLatin1(bv1->GetPointer(), bv1->GetLength());
-		if (!result0.empty()) m[tmp0.trimmed()] = result0[0];
+		const QString tmp0 =
+			QString::fromLatin1(bv1->GetPointer(), bv1->GetLength()).trimmed().remove(QChar('\0'));
+		if (!result0.empty()) m[tmp0] = result0[0];
 	}
 	return true;
 }
@@ -6917,7 +6651,7 @@ bool DicomUtils::read_shutter(const mdcm::DataSet & ds, PRDisplayShutter & a)
 		const mdcm::Tag tVerticesofthePolygonalShutter(0x0018,0x1620);
 		const mdcm::Tag tShutterPresentationValue(0x0018,0x1622);
 		const mdcm::Tag tShutterPresentationColorCIELabValue(0x0018,0x1624);
-		a.ShutterShape = ShutterShape.trimmed().remove(QChar('\0'));
+		a.ShutterShape = ShutterShape;
 		int ShutterLeftVerticalEdge;
 		int ShutterRightVerticalEdge;
 		int ShutterUpperHorizontalEdge;
@@ -7046,13 +6780,15 @@ QString DicomUtils::read_enhanced(
 		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
 		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
 		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
-		QString sop_tmp;
-		if (get_string_value(ds, tSOPClassUID, sop_tmp))
 		{
-			sop = sop_tmp.remove(QChar('\0'));
-			mdcm::UIDs uid;
-			uid.SetFromUID(sop.toLatin1().constData());
-			iod = QString::fromLatin1(uid.GetName());
+			QString sop_tmp;
+			if (get_string_value(ds, tSOPClassUID, sop_tmp))
+			{
+				sop = std::move(sop_tmp);
+				mdcm::UIDs uid;
+				uid.SetFromUID(sop.toLatin1().constData());
+				iod = QString::fromLatin1(uid.GetName());
+			}
 		}
 		read_dimension_index_sq(ds, sq);
 		//
@@ -7339,13 +7075,15 @@ QString DicomUtils::read_enhanced_supp_palette(
 		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
 		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
 		QString iod;
-		QString sop_tmp;
-		if (get_string_value(ds, tSOPClassUID, sop_tmp))
 		{
-			sop = sop_tmp.remove(QChar('\0'));
-			mdcm::UIDs uid;
-			uid.SetFromUID(sop.toLatin1().constData());
-			iod = QString::fromLatin1(uid.GetName());
+			QString sop_tmp;
+			if (get_string_value(ds, tSOPClassUID, sop_tmp))
+			{
+				sop = std::move(sop_tmp);
+				mdcm::UIDs uid;
+				uid.SetFromUID(sop.toLatin1().constData());
+				iod = QString::fromLatin1(uid.GetName());
+			}
 		}
 		read_dimension_index_sq(ds, sq);
 		//
@@ -7602,7 +7340,6 @@ QString DicomUtils::read_ultrasound(
 	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PhotometricInterpretation pi;
-	const mdcm::Tag tnumframes(0x0028,0x0008);
 	const mdcm::Tag tPixelAspectRatio(0x0028,0x0034);
 	const mdcm::PrivateTag tPhilipsVoxelSpacing(0x200d,0x03,"Philips US Imaging DD 036");
 	const bool overlays_enabled = settings.overlays;
@@ -7634,17 +7371,10 @@ QString DicomUtils::read_ultrasound(
 		QApplication::processEvents();
 #endif
 		{
-			const mdcm::DataElement & e = ds.GetDataElement(tnumframes);
-			if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
+			int k;
+			if (get_is_value(ds, mdcm::Tag(0x0028,0x0008), &k))
 			{
-				QString numframes;
-				numframes = QString::fromLatin1(
-					e.GetByteValue()->GetPointer(),
-					e.GetByteValue()->GetLength());
-				const QVariant v(numframes.trimmed().remove(QChar('\0')));
-				bool c_ok{};
-				const int k = v.toInt(&c_ok);
-				if (c_ok) number_of_frames = k;
+				number_of_frames = k;
 			}
 		}
 		//
@@ -7866,7 +7596,6 @@ QString DicomUtils::read_nuclear(
 	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PhotometricInterpretation pi;
-	const mdcm::Tag tnumframes(0x0028,0x0008);
 	const bool overlays_enabled = settings.overlays;
 	const int overlays_idx = overlays_enabled ? 0 : -2;
 #if 0
@@ -7899,17 +7628,10 @@ QString DicomUtils::read_nuclear(
 		const mdcm::DataSet & ds   = file.GetDataSet();
 #if 0
 		{
-			const mdcm::DataElement & e = ds.GetDataElement(tnumframes);
-			if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
+			int k;
+			if (get_is_value(ds, mdcm::Tag(0x0028,0x0008), &k))
 			{
-				QString numframes;
-				numframes = QString::fromLatin1(
-					e.GetByteValue()->GetPointer(),
-					e.GetByteValue()->GetLength());
-				const QVariant v(numframes.trimmed().remove(QChar('\0')));
-				bool c_ok{};
-				const int k = v.toInt(&c_ok);
-				if (c_ok) number_of_frames = k;
+				number_of_frames = k;
 			}
 		}
 #endif
@@ -7987,21 +7709,18 @@ are stacked in front of the first slice. See Image Orientation
 	const float col_dircos_x = dircos_[3];
 	const float col_dircos_y = dircos_[4];
 	const float col_dircos_z = dircos_[5];
-	const float nrm_dircos_x =
-		row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
-	const float nrm_dircos_y =
-		row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
-	const float nrm_dircos_z =
-		row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	direction[0][0] = row_dircos_x;
 	direction[1][0] = row_dircos_y;
 	direction[2][0] = row_dircos_z;
 	direction[0][1] = col_dircos_x;
 	direction[1][1] = col_dircos_y;
 	direction[2][1] = col_dircos_z;
-	direction[0][2] = (spacing_z_ > 0) ? nrm_dircos_x : -nrm_dircos_x;
-	direction[1][2] = (spacing_z_ > 0) ? nrm_dircos_y : -nrm_dircos_y;
-	direction[2][2] = (spacing_z_ > 0) ? nrm_dircos_z : -nrm_dircos_z;
+	direction[0][2] = (spacing_z_ > 0.0) ? nrm_dircos_x : -nrm_dircos_x;
+	direction[1][2] = (spacing_z_ > 0.0) ? nrm_dircos_y : -nrm_dircos_y;
+	direction[2][2] = (spacing_z_ > 0.0) ? nrm_dircos_z : -nrm_dircos_z;
 #if 0
 	std::cout << "Direction: " << direction[0][0] << " " << direction[1][0] << " " << direction[2][0] << std::endl;
 	std::cout << "           " << direction[0][1] << " " << direction[1][1] << " " << direction[2][1] << std::endl;
@@ -8082,7 +7801,6 @@ QString DicomUtils::read_series(
 	mdcm::PhotometricInterpretation pi;
 	bool geometry_from_image = min_load;
 	bool slices_ok{};
-	const mdcm::Tag tnumframes(0x0028,0x0008);
 	const bool overlays_enabled = settings.overlays;
 	std::vector<double> levels_;
 	std::vector<double> windows_;
@@ -8125,16 +7843,10 @@ QString DicomUtils::read_series(
 			if (j == 0)
 			{
 				{
-					const mdcm::DataElement & e = ds.GetDataElement(tnumframes);
-					if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
+					int k;
+					if (get_is_value(ds, mdcm::Tag(0x0028,0x0008), &k))
 					{
-						QString numframes = QString::fromLatin1(
-							e.GetByteValue()->GetPointer(),
-							e.GetByteValue()->GetLength());
-						const QVariant v(numframes.trimmed().remove(QChar('\0')));
-						bool c_ok{};
-						const int k = v.toInt(&c_ok);
-						if (c_ok) number_of_frames = k;
+						number_of_frames = k;
 					}
 				}
 				if (!min_load)
@@ -9516,13 +9228,30 @@ QString DicomUtils::read_buffer(
 			const mdcm::File & ifile = image_reader.GetFile();
 			const mdcm::DataSet & ds = ifile.GetDataSet();
 			AnatomyDesc a;
-			a.laterality = read_image_laterality(ds);
+			{
+				QString laterality;
+				if (get_string_value(ds, mdcm::Tag(0x0020,0x0062), laterality))
+				{
+					a.laterality = std::move(laterality);
+				}
+			}
 			if (a.laterality.isEmpty())
 			{
-				a.laterality = read_series_laterality(ds);
+				QString laterality;
+				if (get_string_value(ds, mdcm::Tag(0x0020,0x0060), laterality))
+				{
+					a.laterality = std::move(laterality);
+				}
 			}
 			a.body_part = read_anatomic_sq(ds);
-			if (a.body_part.isEmpty()) a.body_part = read_body_part(ds);
+			if (a.body_part.isEmpty())
+			{
+				QString body_part;
+				if (get_string_value(ds, mdcm::Tag(0x0018,0x0015), body_part))
+				{
+					a.body_part = body_part.toLower();
+				}
+			}
 			anatomy[anatomy_idx] = a;
 			if (anatomy_idx == 0 && dimz > 1)
 			{
@@ -10620,7 +10349,7 @@ QString DicomUtils::read_enhanced_common(
 			double window_width_tmp{-999999.0};
 			short lut_function{1};
 			short lut_function_tmp{1};
-			QString instance_uid;
+			QString instance_uid("");
 			int instance_number{-1};
 			int ref_segment_num{-1};
 			//
@@ -10669,10 +10398,7 @@ QString DicomUtils::read_enhanced_common(
 					const mdcm::File & rfile = reader.GetFile();
 					const mdcm::DataSet & ds = rfile.GetDataSet();
 					QString charset;
-					if (get_string_value(ds, mdcm::Tag(0x0008,0x0005), charset))
-					{
-						charset = charset.trimmed().remove(QChar('\0'));
-					}
+					(void)get_string_value(ds, mdcm::Tag(0x0008,0x0005), charset);
 					if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2")) // probably should not be present
 					{
 						read_us_regions(ds, ivariant);
@@ -10710,7 +10436,13 @@ QString DicomUtils::read_enhanced_common(
 					// Check top level window, this is invalid, but some datasets
 					// may exist, will only be used as fallback later.
 					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
-					instance_uid = read_instance_uid(ds);
+					{
+						QString instance_uid_tmp;
+						if (get_string_value(ds, mdcm::Tag(0x0008,0x0018), instance_uid_tmp))
+						{
+							instance_uid = std::move(instance_uid_tmp);
+						}
+					}
 					{
 						int instance_number_tmp;
 						if (get_is_value(ds, mdcm::Tag(0x0020, 0x0013), &instance_number_tmp))
@@ -11680,14 +11412,10 @@ QString DicomUtils::read_enhanced_3d_8d(
 
 bool DicomUtils::is_mosaic(const mdcm::DataSet & ds)
 {
-	if (ds.IsEmpty()) return false;
-	const mdcm::Tag tImageType(0x0008,0x0008);
-	const mdcm::DataElement & de = ds.GetDataElement(tImageType);
-	if (!de.IsEmpty() && !de.IsUndefinedLength() && de.GetByteValue())
+	QString s;
+	if (get_string_value(ds, mdcm::Tag(0x0008,0x0008), s))
 	{
-		const QString s = QString::fromLatin1(
-			de.GetByteValue()->GetPointer(),
-			de.GetByteValue()->GetLength()).trimmed().toUpper();
+		s = s.toUpper();
 		if (s.contains(QString("MOSAIC"))) return true;
 	}
 	return false;
@@ -11695,22 +11423,18 @@ bool DicomUtils::is_mosaic(const mdcm::DataSet & ds)
 
 bool DicomUtils::is_uih_grid(const mdcm::DataSet & ds)
 {
-	if (ds.IsEmpty()) return false;
 	const mdcm::PrivateTag tMRVFrameSequence(0x0065,0x51,"Image Private Header");
 	const mdcm::DataElement & e	= ds.GetDataElement(tMRVFrameSequence);
-	if (!e.IsEmpty())
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+	if (sq && sq->GetNumberOfItems() > 0)
 	{
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
-		if (sq && sq->GetNumberOfItems() > 0) return true;
+		return true;
 	}
 	else
 	{
 		const mdcm::DataElement & e1 = ds.GetDataElement(mdcm::Tag(0x0065,0x1051));
-		if (!e1.IsEmpty())
-		{
-			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e1.GetValueAsSQ();
-			if (sq && sq->GetNumberOfItems() > 0) return true;
-		}
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
+		if (sq1 && sq1->GetNumberOfItems() > 0) return true;
 	}
 	return false;
 }
@@ -12084,12 +11808,10 @@ bool DicomUtils::process_contrours_ref(
 #endif
 			const mdcm::DataSet & ds1 = reader1.GetFile().GetDataSet();
 			{
-				const mdcm::DataElement & e1 = ds1.GetDataElement(tsopinstance);
-				if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
+				QString sop_instance_uid_tmp;
+				if (get_string_value(ds1, tsopinstance, sop_instance_uid_tmp))
 				{
-					sop_instance_uid = QString::fromLatin1(
-						e1.GetByteValue()->GetPointer(),
-						e1.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+					sop_instance_uid = std::move(sop_instance_uid_tmp);
 				}
 			}
 			if (!sop_instance_uid.isEmpty())
@@ -12226,7 +11948,7 @@ bool DicomUtils::scan_files_for_instance_uid(
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 		QString uid_;
 		const bool ok = get_string_value(ds, tSOPInstanceUID, uid_);
-		if (ok && uid.trimmed().remove(QChar('\0')) == uid_.trimmed().remove(QChar('\0')))
+		if (ok && uid == uid_)
 		{
 			file = tmp0;
 			return true;
@@ -12274,8 +11996,7 @@ void DicomUtils::read_pr_ref(
 		QString s;
 		const bool ok = get_string_value(nds0, tSeriesInstanceUID, s);
 		if (!ok) continue;
-		const mdcm::DataElement & eReferencedImageSequence =
-			nds0.GetDataElement(tReferencedImageSequence);
+		const mdcm::DataElement & eReferencedImageSequence = nds0.GetDataElement(tReferencedImageSequence);
 		if (eReferencedImageSequence.IsEmpty()) continue;
 		mdcm::SmartPointer<mdcm::SequenceOfItems>
 			sqReferencedImageSequence = eReferencedImageSequence.GetValueAsSQ();
@@ -12290,8 +12011,7 @@ void DicomUtils::read_pr_ref(
 			const mdcm::Item & item1 = sqReferencedImageSequence->GetItem(y + 1);
 			const mdcm::DataSet & nds1 = item1.GetNestedDataSet();
 			QString s0;
-			const bool ok0 = get_string_value(nds1, tReferencedSOPInstanceUID, s0);
-			if (ok0)
+			if (get_string_value(nds1, tReferencedSOPInstanceUID, s0))
 			{
 				PrRefImage ref;
 				ref.uid = std::move(s0);
@@ -12448,7 +12168,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 									tGradientOutputType,
 									GradientOutputType);
 							(void)tGradientOutputType_ok;
-							GradientOutputType = GradientOutputType.simplified().remove(QChar('\0'));
+							GradientOutputType = GradientOutputType.simplified();
 							QString sGradientOutputType = GradientOutputType;
 							if (GradientOutputType.toUpper() == QString("DB_DT"))
 							{
@@ -13118,7 +12838,7 @@ QString DicomUtils::read_dicom(
 			QString sop_tmp;
 			if (get_string_value(ds, mdcm::Tag(0x0008,0x0016), sop_tmp))
 			{
-				sop = sop_tmp.remove(QChar('\0'));
+				sop = std::move(sop_tmp);
 			}
 		}
 #if 1
@@ -14433,12 +14153,12 @@ QString DicomUtils::read_dicom(
 			{
 				QString s1;
 				get_string_value(ds, ph, s1);
-				si.photometric = s1.trimmed().remove(QChar('\0'));
+				si.photometric = std::move(s1);
 			}
 			{
 				QString s2;
 				get_string_value(ds, sc, s2);
-				si.sop = s2.trimmed().remove(QChar('\0'));
+				si.sop = std::move(s2);
 			}
 			{
 				QString s3;

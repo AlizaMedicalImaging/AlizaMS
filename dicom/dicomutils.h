@@ -231,7 +231,6 @@ public:
 		std::vector<double> &);
 	static void load_contour(
 		const mdcm::DataSet&, ImageVariant*);
-	static QString read_instance_uid(const mdcm::DataSet&);
 	static void read_window(
 		const mdcm::DataSet&, double*, double*, short*);
 	static void read_us_regions(
@@ -262,11 +261,6 @@ public:
 		const mdcm::DataSet&, ImageVariant*, int);
 	static QString read_anatomic_sq(
 		const mdcm::DataSet&);
-	static QString read_series_laterality(
-		const mdcm::DataSet&);
-	static QString read_image_laterality(
-		const mdcm::DataSet&);
-	static QString read_body_part(const mdcm::DataSet&);
 	static void read_acquisition_time(
 		const mdcm::DataSet&, QString&, QString&);
 	static void read_ivariant_info_tags(

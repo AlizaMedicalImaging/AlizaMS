@@ -236,7 +236,7 @@ template<typename T> SRImage lrgb3(
 	{
 		const double tmp_max =
 			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
+				? pow(2.0, static_cast<double>(bits_stored)) - 1.0
 				: static_cast<double>(USHRT_MAX);
 		try
 		{
@@ -328,7 +328,7 @@ bool scan_files_for_instance_uid2(
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 		QString uid_;
 		const bool ok = DicomUtils::get_string_value(ds, tSOPInstanceUID, uid_);
-		if (ok && uid.trimmed().remove(QChar('\0')) == uid_.trimmed().remove(QChar('\0')))
+		if (ok && uid == uid_)
 		{
 			file = tmp0;
 			return true;
@@ -394,10 +394,9 @@ void SRUtils::read_IMAGE(
 		{
 			mdcm::UIDs uid;
 			uid.SetFromUID(ReferencedSOPClassUID.toLatin1().constData());
-			QString uidname = QString::fromLatin1(uid.GetName());
+			const QString uidname = QString::fromLatin1(uid.GetName()).trimmed().remove(QChar('\0'));
 			if (!uidname.isEmpty())
 			{
-				uidname = uidname.trimmed();
 				if (info)
 				{
 					s += QString("<span class='y3'>IMAGE: ") + uidname + QString("</span><br />\n");
@@ -408,7 +407,7 @@ void SRUtils::read_IMAGE(
 				if (info)
 				{
 					s += QString("<span class='y3'>IMAGE: ") +
-						ReferencedSOPClassUID.trimmed().remove(QChar('\0')) +
+						ReferencedSOPClassUID +
 						QString("</span><br />\n");
 				}
 			}
@@ -419,13 +418,13 @@ void SRUtils::read_IMAGE(
 			if (info)
 			{
 				s += QString("<span class='y3'>IMAGE: ") +
-					ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
+					ReferencedSOPInstanceUID +
 					QString("</span><br />\n");
 			}
 			else if (skip_images)
 			{
 				s += QString("<span class='yy'>IMAGE: ") +
-					ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
+					ReferencedSOPInstanceUID +
 					QString("</span><br />\n");
 			}
 			if (skip_images) continue;
@@ -851,7 +850,7 @@ endpoints of the minor axis of an ellipse
 					{
 						s += QString("<span class='yy'>") +
 							QString("IMAGE: ") +
-							ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
+							ReferencedSOPInstanceUID +
 							QString("</span><br />\n<span class='red2'>IMAGE: error (1) ") +
 							e_.trimmed() +
 							QString("</span><br />\n");
@@ -863,7 +862,7 @@ endpoints of the minor axis of an ellipse
 			{
 				s += QString("<span class='yy'>") +
 					QString("IMAGE: ") +
-					ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
+					ReferencedSOPInstanceUID +
 					QString("</span><br />\n<span class='red2'>IMAGE: error (2) ") +
 					e_.trimmed() +
 					QString("</span><br />\n");
@@ -893,7 +892,6 @@ bool SRUtils::read_SCOORD(
 	QString GraphicType;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0070,0x0023), GraphicType))
 	{
-		GraphicType = GraphicType.trimmed();
 		s += QString("<span class='yy'>") + GraphicType + QString("</span><br />\n");
 		if (info)
 		{
@@ -905,7 +903,6 @@ bool SRUtils::read_SCOORD(
 	QString PixelOriginInterpretation;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0048,0x0301), PixelOriginInterpretation))
 	{
-		PixelOriginInterpretation = PixelOriginInterpretation.trimmed();
 		if (info)
 		{
 			s += QString("<span class='y3'>") + PixelOriginInterpretation + QString("</span><br />\n");
@@ -916,7 +913,7 @@ bool SRUtils::read_SCOORD(
 	{
 		if (info)
 		{
-			s += QString("<span class='y3'>") + FiducialUID.trimmed().remove(QChar('\0'))  + QString("</span><br />\n");
+			s += QString("<span class='y3'>") + FiducialUID + QString("</span><br />\n");
 		}
 	}
 	size_t other_{};
@@ -934,11 +931,11 @@ bool SRUtils::read_SCOORD(
 				const mdcm::DataSet & nds1 = item.GetNestedDataSet();
 				if (DicomUtils::get_string_value(nds1, mdcm::Tag(0x0040,0xa040), ValueType))
 				{
-					ValueType = ValueType.trimmed().toUpper();
+					ValueType = ValueType.toUpper();
 				}
 				if (DicomUtils::get_string_value(nds1, mdcm::Tag(0x0040,0xa010), RelationshipType))
 				{
-					RelationshipType = RelationshipType.trimmed().toUpper();
+					RelationshipType = RelationshipType.toUpper();
 				}
 				if (!skip_images && ValueType == QString("IMAGE")
 #if 1
@@ -993,8 +990,7 @@ void SRUtils::read_PNAME(
 	if (!e2.IsEmpty() && !e2.IsUndefinedLength() && e2.GetByteValue())
 	{
 		QByteArray ba(e2.GetByteValue()->GetPointer(), e2.GetByteValue()->GetLength());
-		QString TextValue = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
-		TextValue = TextValue.trimmed();
+		const QString TextValue = CodecUtils::toUTF8(&ba, charset.toLatin1().constData()).trimmed().remove(QChar('\0'));
 		s += QString("<span class='y'>") + DicomUtils::convert_pn_value(TextValue) + QString("</span><br />\n");
 	}
 }
@@ -1008,8 +1004,8 @@ void SRUtils::read_TEXT(
 	if (!e2.IsEmpty() && !e2.IsUndefinedLength() && e2.GetByteValue())
 	{
 		QByteArray ba(e2.GetByteValue()->GetPointer(), e2.GetByteValue()->GetLength());
-		const QString TextValue = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
-		s += QString("<span class='y'>") + TextValue.trimmed() + QString("</span><br />\n");
+		const QString TextValue = CodecUtils::toUTF8(&ba, charset.toLatin1().constData()).trimmed().remove(QChar('\0'));
+		s += QString("<span class='y'>") + TextValue + QString("</span><br />\n");
 	}
 }
 
@@ -1040,8 +1036,9 @@ void SRUtils::read_NUM(
 					if (!e7.IsEmpty() && !e7.IsUndefinedLength() && e7.GetByteValue())
 					{
 						QByteArray ba7(e7.GetByteValue()->GetPointer(), e7.GetByteValue()->GetLength());
-						const QString tmp5 = CodecUtils::toUTF8(&ba7, charset.toLatin1().constData());
-						unit = tmp5.trimmed();
+						const QString tmp5 =
+							CodecUtils::toUTF8(&ba7, charset.toLatin1().constData()).trimmed().remove(QChar('\0'));
+						unit = tmp5;
 					}
 				}
 				{
@@ -1050,8 +1047,8 @@ void SRUtils::read_NUM(
 					{
 						QByteArray ba7(e7.GetByteValue()->GetPointer(), e7.GetByteValue()->GetLength());
 						const QString tmp5 =
-							(CodecUtils::toUTF8(&ba7, charset.toLatin1().constData())).trimmed();
-						if ((unit.trimmed().toUpper() != QString("NO UNITS")) &&
+							CodecUtils::toUTF8(&ba7, charset.toLatin1().constData()).trimmed().remove(QChar('\0'));
+						if ((unit.toUpper() != QString("NO UNITS")) &&
 							(!tmp5.isEmpty()) && (tmp5 != QString("1")))
 						{
 							unit += QString(" (") + tmp5 + QString(")");
@@ -1059,8 +1056,8 @@ void SRUtils::read_NUM(
 					}
 				}
 			}
-			const QString u = (unit.trimmed().toUpper() != QString("NO UNITS")) ? std::move(unit) : QString("");
-			s += QString("<span class='y'>") + NumericValue.trimmed() + QString(" ") + u + QString("</span><br />\n");
+			const QString u = (unit.toUpper() != QString("NO UNITS")) ? std::move(unit) : QString("");
+			s += QString("<span class='y'>") + NumericValue + QString(" ") + u + QString("</span><br />\n");
 		}
 	}
 }
@@ -1084,12 +1081,13 @@ void SRUtils::read_CODE(
 			if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
 			{
 				QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
-				QString tmp5 = CodecUtils::toUTF8(&ba5, charset.toLatin1().constData());
+				const QString tmp5 =
+					CodecUtils::toUTF8(&ba5, charset.toLatin1().constData()).trimmed().remove(QChar('\0'));
 				if (!CodeMeaning2.isEmpty())
 				{
 					CodeMeaning2 += QString(" ");
 				}
-				CodeMeaning2 += tmp5.trimmed();
+				CodeMeaning2 += tmp5;
 			}
 		}
 	}
@@ -1104,7 +1102,6 @@ void SRUtils::read_DATE(const mdcm::DataSet & ds, QString & s)
 	QString Date;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa121), Date))
 	{
-		Date = Date.trimmed();
 		const QDate date_ = QDate::fromString(Date, QString("yyyyMMdd"));
 		s += QString("<span class='y'>") + date_.toString(QString("d MMM yyyy")) + QString("</span><br />\n");
 	}
@@ -1114,7 +1111,6 @@ void SRUtils::read_DATETIME(const mdcm::DataSet & ds, QString & s)
 {
 	QString DateTime;
 	if (!DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa120), DateTime)) return;
-	DateTime = DateTime.trimmed();
 	QString tmp0;
 	if (!DateTime.isEmpty())
 	{
@@ -1141,7 +1137,6 @@ void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 {
 	QString Time;
 	if (!DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa122), Time)) return;
-	Time = Time.trimmed();
 	QString tmp0;
 	if (!Time.isEmpty())
 	{
@@ -1170,7 +1165,6 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 	QString GraphicType;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0070,0x0023), GraphicType))
 	{
-		GraphicType = GraphicType.trimmed();
 		s += QString("<span class='y'>") + GraphicType + QString("</span><br />\n");
 	}
 	std::vector<float> graphic_data;
@@ -1179,12 +1173,12 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x3006,0x0024), ReferencedFrameofReferenceUID))
 	{
 		s += QString("<span class='y'>") +
-		ReferencedFrameofReferenceUID.trimmed().remove(QChar('\0')) + QString("</span><br />\n");
+		ReferencedFrameofReferenceUID + QString("</span><br />\n");
 	}
 	QString FiducialUID;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0070,0x031A), FiducialUID))
 	{
-		s += QString("<span class='y'>") + FiducialUID.trimmed().remove(QChar('\0')) + QString("</span><br />\n");
+		s += QString("<span class='y'>") + FiducialUID + QString("</span><br />\n");
 	}
 }
 
@@ -1195,8 +1189,8 @@ QString SRUtils::read_UIDREF(const mdcm::DataSet & ds, QString & s)
 	{
 		return QString("");
 	}
-	s += QString("<span class='y'>") + UID.trimmed().remove(QChar('\0')) + QString("</span><br />\n");
-	return UID.trimmed();
+	s += QString("<span class='y'>") + UID + QString("</span><br />\n");
+	return UID;
 }
 
 void SRUtils::read_TCOORD(
@@ -1208,7 +1202,6 @@ void SRUtils::read_TCOORD(
 	QString TemporalRangeType;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa130), TemporalRangeType))
 	{
-		TemporalRangeType = TemporalRangeType.trimmed();
 		s += QString("<span class='yy'>") + TemporalRangeType + QString("</span><br />\n");
 		if (info)
 		{
@@ -1279,7 +1272,7 @@ QString SRUtils::read_sr_title2(
 	QString d;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0010,0x0030), d))
 	{
-		const QDate qd = QDate::fromString(d.trimmed(), QString("yyyyMMdd"));
+		const QDate qd = QDate::fromString(d, QString("yyyyMMdd"));
 		s += QString("<p id=\"1a\" align=\"center\"><span class='t2'>") +
 			qd.toString(QString("d MMM yyyy")) +
 			QString("</span></p>\n");
@@ -1288,12 +1281,12 @@ QString SRUtils::read_sr_title2(
 	QString id;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0010,0x0020), id))
 	{
-		s += QString("<li>Patient ID: ") + id.trimmed() + QString("</li>");
+		s += QString("<li>Patient ID: ") + id + QString("</li>");
 	}
 	QString StudyDate;
 	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0020), StudyDate))
 	{
-		const QDate qd = QDate::fromString(StudyDate.trimmed(), QString("yyyyMMdd"));
+		const QDate qd = QDate::fromString(StudyDate, QString("yyyyMMdd"));
 		s += QString("<li>Study date: ") + qd.toString(QString("d MMM yyyy")) + QString("</li>");
 	}
 	{
@@ -1335,7 +1328,7 @@ QStringList SRUtils::read_referenced(
 		{
 			mdcm::UIDs uid;
 			uid.SetFromUID(ReferencedSOPClassUID.toLatin1().constData());
-			QString uidname = QString::fromLatin1(uid.GetName());
+			const QString uidname = QString::fromLatin1(uid.GetName()).trimmed().remove(QChar('\0'));
 			if (!uidname.isEmpty())
 			{
 				s += QString("<span class='y'>") + uidname + QString("</span><br />\n");
@@ -1343,7 +1336,7 @@ QStringList SRUtils::read_referenced(
 			else
 			{
 				s += QString("<span class='y'>") +
-					ReferencedSOPClassUID.trimmed().remove(QChar('\0')) +
+					ReferencedSOPClassUID +
 					QString("</span><br />\n");
 			}
 		}
@@ -1352,7 +1345,7 @@ QStringList SRUtils::read_referenced(
 		{
 			l.push_back(ReferencedSOPInstanceUID);
 			s += QString("<span class='y'>") +
-				ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
+				ReferencedSOPInstanceUID +
 				QString("</span><br />\n");
 		}
 		std::vector<int> refframes;
@@ -1387,12 +1380,13 @@ QString SRUtils::get_concept_code_meaning(
 			if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
 			{
 				QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
-				QString tmp5 = CodecUtils::toUTF8(&ba5, charset.toLatin1().constData());
+				const QString tmp5 =
+					CodecUtils::toUTF8(&ba5, charset.toLatin1().constData()).trimmed().remove(QChar('\0'));
 				if (!CodeMeaning.isEmpty())
 				{
 					CodeMeaning += QString(" ");
 				}
-				CodeMeaning += tmp5.trimmed();
+				CodeMeaning += tmp5;
 			}
 		}
 	}
@@ -1460,7 +1454,7 @@ QString SRUtils::read_sr_content_sq(
 				const mdcm::DataSet & nds = item.GetNestedDataSet();
 				if (DicomUtils::get_string_value(nds, mdcm::Tag(0x0040,0xa040), ValueType))
 				{
-					ValueType = ValueType.trimmed().toUpper();
+					ValueType = ValueType.toUpper();
 					if (info)
 					{
 						s += QString("<span class='y3'>Value Type: ") + ValueType + QString("</span><br />\n");
@@ -1468,7 +1462,7 @@ QString SRUtils::read_sr_content_sq(
 				}
 				if (DicomUtils::get_string_value(nds, mdcm::Tag(0x0040,0xa010), RelationshipType))
 				{
-					RelationshipType = RelationshipType.trimmed().toUpper();
+					RelationshipType = RelationshipType.toUpper();
 					if (info)
 					{
 						s += QString("<span class='y3'>Relationship Type: ") + RelationshipType + QString("</span><br />\n");
@@ -1477,7 +1471,7 @@ QString SRUtils::read_sr_content_sq(
 				if (DicomUtils::get_string_value(nds, mdcm::Tag(0x0040,0xa050), ContinuityOfContent))
 				{
 					// TODO
-					ContinuityOfContent = ContinuityOfContent.trimmed().toUpper();
+					ContinuityOfContent = ContinuityOfContent.toUpper();
 					if (info)
 					{
 						s += QString("<span class='y3'>Continuity Of Content: ") +
@@ -1682,7 +1676,7 @@ QString SRUtils::read_sr_content_sq(
 			const bool sop_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0016), sop);
 			if (sop_ok)
 			{
-				if (sop.trimmed().remove(QChar('\0')) == QString("1.2.840.10008.5.1.4.1.1.88.59"))
+				if (sop == QString("1.2.840.10008.5.1.4.1.1.88.59"))
 				{
 					is_key_object_selection = true;
 				}
