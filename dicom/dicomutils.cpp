@@ -9777,22 +9777,31 @@ QString DicomUtils::read_buffer(
 		for (unsigned long long x = 0; x < image_buffer_length; ++x)
 		{
 			const unsigned char c = not_rescaled_buffer[x];
-			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x1) ? 255 : 0;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x1) ? 1 : 0;
 			++j;
-			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x2) ? 255 : 0;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x2) ? 1 : 0;
 			++j;
-			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x4) ? 255 : 0;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x4) ? 1 : 0;
 			++j;
-			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x8) ? 255 : 0;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x8) ? 1 : 0;
 			++j;
-			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x10) ? 255 : 0;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x10) ? 1 : 0;
 			++j;
-			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x20) ? 255 : 0;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x20) ? 1 : 0;
 			++j;
-			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x40) ? 255 : 0;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x40) ? 1 : 0;
 			++j;
-			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x80) ? 255 : 0;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x80) ? 1 : 0;
 			++j;
+		}
+		const size_t remainder = len % 8;
+		if (remainder > 0)
+		{
+			const unsigned char c = not_rescaled_buffer[len / 8];
+			for (size_t bit = 0; bit < remainder; ++bit)
+			{
+				singlebit_buffer[j + bit] = (c & (1 << bit)) ? 1 : 0;
+			}
 		}
 		buffer      = reinterpret_cast<char *>(singlebit_buffer);
 		buffer_size = singlebit_buffer_size;
@@ -9854,7 +9863,7 @@ QString DicomUtils::read_buffer(
 						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 						return QString("Memory allocation error");
 					}
-					for (size_t j = 0; j < image_buffer_length; j+=3)
+					for (size_t j = 0; j < image_buffer_length; j += 3)
 					{
 						// TODO the code is partially duplicated with commonutils.cpp
 						int R{};
