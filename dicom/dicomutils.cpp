@@ -9774,7 +9774,7 @@ QString DicomUtils::read_buffer(
 			return QString("Buffer allocation error");
 		}
 		unsigned long long j{};
-		for (unsigned long long x = 0; x < image_buffer_length; ++x)
+		for (unsigned long long x = 0; x < singlebit_buffer_size / 8; ++x)
 		{
 			const unsigned char c = not_rescaled_buffer[x];
 			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x1) ? 1 : 0;
@@ -9794,10 +9794,10 @@ QString DicomUtils::read_buffer(
 			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x80) ? 1 : 0;
 			++j;
 		}
-		const size_t remainder = len % 8;
+		const size_t remainder = singlebit_buffer_size % 8;
 		if (remainder > 0)
 		{
-			const unsigned char c = not_rescaled_buffer[len / 8];
+			const unsigned char c = not_rescaled_buffer[singlebit_buffer_size / 8];
 			for (size_t bit = 0; bit < remainder; ++bit)
 			{
 				singlebit_buffer[j + bit] = (c & (1 << bit)) ? 1 : 0;
