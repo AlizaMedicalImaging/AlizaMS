@@ -10338,9 +10338,11 @@ QString DicomUtils::read_enhanced_common(
 			float  center_x, center_y, center_z;
 			std::vector<ImageSlice*> slices;
 			const bool enable_gl = min_load ? false : ok3d;
-			// Disable texture for Breast Tomosynthesis
+			// Disable texture for Breast Tomosynthesis and SEG
+			const bool is_seg = sop == QString("1.2.840.10008.5.1.4.1.1.66.4");
+			const bool is_breast_tomo = sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3");
 			bool skip_texture =
-				(min_load || !enable_gl || (sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
+				(min_load || !enable_gl || is_breast_tomo || is_seg)
 				? true : !settings.use3d;
 			const int new_id = min_load ? -1 : CommonUtils::get_next_id();
 			double window_center{-999999.0};
@@ -10379,7 +10381,7 @@ QString DicomUtils::read_enhanced_common(
 				enable_gl,
 				skip_texture,
 				nullptr,
-				sop == QString("1.2.840.10008.5.1.4.1.1.66.4") ? 8 : 0);
+				is_seg ? 8 : 0);
 			ivariant->di->filtering = settings.filtering;
 			//
 			{
