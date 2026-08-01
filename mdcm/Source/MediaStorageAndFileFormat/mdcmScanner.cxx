@@ -175,7 +175,7 @@ Scanner::Scan(const std::vector<std::string> & filenames, const Dict & dict)
       }
       catch (...)
       {
-        mdcmAlwaysWarnMacro("Failed to read:" << filename);
+        mdcmAlwaysWarnMacro("Failed to read: " << filename);
       }
       if (read)
       {
