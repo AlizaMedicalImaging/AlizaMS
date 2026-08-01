@@ -82,79 +82,6 @@ void get_bin_values(
 	}
 }
 
-void get_series_files(
-	const QString & f,
-	const QString & uid,
-	QStringList & result)
-{
-	QFileInfo fi(f);
-	const QString p = fi.absolutePath();
-	std::vector<std::string> files;
-	{
-		QDir dir(p);
-		const QStringList l = dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
-		for (int x = 0; x < l.size(); ++x)
-		{
-			const QString tmp2 = dir.absolutePath() + QString("/") + l.at(x);
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-			files.push_back(std::string(QDir::toNativeSeparators(tmp2).toUtf8().constData()));
-#else
-			files.push_back(std::string(QDir::toNativeSeparators(tmp2).toLocal8Bit().constData()));
-#endif
-#else
-			files.push_back(std::string(tmp2.toLocal8Bit().constData()));
-#endif
-		}
-	}
-	const mdcm::Global & g  = mdcm::GlobalInstance;
-	const mdcm::Dicts  & dicts = g.GetDicts();
-	const mdcm::Dict & dict = dicts.GetPublicDict();
-	const mdcm::Tag t(0x0020,0x000e);
-	mdcm::Scanner s;
-	s.AddTag(t);
-	s.Scan(files, dict);
-	mdcm::Scanner::ValuesType v = s.GetValues();
-	mdcm::Scanner::ValuesType::iterator it = v.begin();
-	while (it != v.end())
-	{
-		const QString tmp0 = QString::fromLatin1((*it).c_str());
-		if (tmp0.trimmed().remove(QChar('\0')) == uid.trimmed().remove(QChar('\0')))
-		{
-			std::vector<std::string> f__ = s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
-			for (unsigned int j = 0; j < f__.size(); ++j)
-			{
-				const QString tmp1 =
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-					QDir::toNativeSeparators(QString::fromUtf8(f__.at(j).c_str()));
-#else
-					QDir::toNativeSeparators(QString::fromLocal8Bit(f__.at(j).c_str()));
-#endif
-#else
-					QString::fromLocal8Bit(f__.at(j).c_str());
-#endif
-				mdcm::Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-				reader.SetFileName(QDir::toNativeSeparators(tmp1).toUtf8().constData());
-#else
-				reader.SetFileName(QDir::toNativeSeparators(tmp1).toLocal8Bit().constData());
-#endif
-#else
-				reader.SetFileName(tmp1.toLocal8Bit().constData());
-#endif
-				if (reader.ReadUpToTag(t))
-				{
-					result.push_back(tmp1);
-				}
-			}
-			break;
-		}
-		++it;
-	}
-}
-
 QString print_length(size_t l)
 {
 	QString r;
@@ -1130,7 +1057,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 		}
 		if (series_uid_ok)
 		{
-			get_series_files(f, series_uid, files);
+			DicomUtils::get_all_files_in_series(f, series_uid, files);
 		}
 	}
 	catch (const mdcm::ParseException & pe)

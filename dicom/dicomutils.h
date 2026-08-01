@@ -511,6 +511,10 @@ public:
 		const CurrentSettings&,
 		short, // type of object processing
 		short);
+	static void get_all_files_in_series(
+		const QString &, // filename (to get path from)
+		const QString &, // Series UID
+		QStringList &);
 };
 
 #endif
