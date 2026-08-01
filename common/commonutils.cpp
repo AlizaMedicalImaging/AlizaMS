@@ -86,7 +86,7 @@ double abs_max(double x, double y, double z)
 	return r;
 }
 
-bool check_bad_direction(const itk::Matrix<itk::SpacePrecisionType, 3, 3> & d)
+bool check_bad_direction(const itk::Matrix<double, 3, 3> & d)
 {
 	const bool r =
 		MMath::AlmostEqual(d[0][0], 0.0, 0.000001) &&
@@ -517,7 +517,7 @@ template<typename T> void get_dimensions(
 	const typename T::Pointer & image,
 	int * dimx, int * dimy, int * dimz,
 	double * spacingx, double * spacingy, double * spacingz,
-	float * originx, float * originy, float * originz)
+	double * originx, double * originy, double * originz)
 {
 	if (image.IsNull()) return;
 	typename T::SizeType size;
@@ -544,9 +544,9 @@ template<typename T> void get_dimensions(
 	*spacingx = spacing[0];
 	*spacingy = spacing[1];
 	*spacingz = spacing[2];
-	*originx  = static_cast<float>(origin[0]);
-	*originy  = static_cast<float>(origin[1]);
-	*originz  = static_cast<float>(origin[2]);
+	*originx  = origin[0];
+	*originy  = origin[1];
+	*originz  = origin[2];
 }
 
 template<typename T> QString get_orientation(
@@ -1123,9 +1123,6 @@ template<typename T> void read_geometry_from_image(
 	ivariant->di->slices_direction_x = direction.getX();
 	ivariant->di->slices_direction_y = direction.getY();
 	ivariant->di->slices_direction_z = direction.getZ();
-	ivariant->di->up_direction_x = up.getX();
-	ivariant->di->up_direction_y = up.getY();
-	ivariant->di->up_direction_z = up.getZ();
 	calc_center_from_image<T>(ivariant, image);
 	ivariant->equi = true;
 	ivariant->di->slices_generated = true;
@@ -1395,7 +1392,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
 	const std::vector<char *> & data,
-	const itk::Matrix<itk::SpacePrecisionType, 3, 3> & direction,
+	const itk::Matrix<double, 3, 3> & direction,
 	const size_t dimx, const size_t dimy, const size_t dimz,
 	const double origin_x, const double origin_y, const double origin_z,
 	const double spacing_x, const double spacing_y, const double spacing_z,
@@ -1533,7 +1530,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
 	const std::vector<char *> & data,
-	const itk::Matrix<itk::SpacePrecisionType, 3, 3> & direction,
+	const itk::Matrix<double, 3, 3> & direction,
 	const size_t dimx, const size_t dimy, const size_t dimz,
 	const double origin_x, const double origin_y, const double origin_z,
 	const double spacing_x, const double spacing_y, const double spacing_z,
@@ -1728,7 +1725,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
 	const std::vector<char *> & data,
-	const itk::Matrix<itk::SpacePrecisionType, 3, 3> & direction,
+	const itk::Matrix<double, 3, 3> & direction,
 	const size_t dimx, const size_t dimy, const size_t dimz,
 	const double origin_x, const double origin_y, const double origin_z,
 	const double spacing_x, const double spacing_y, const double spacing_z,
@@ -2905,9 +2902,6 @@ void CommonUtils::copy_slices(
 	dest->di->slices_direction_x = source->di->slices_direction_x;
 	dest->di->slices_direction_y = source->di->slices_direction_y;
 	dest->di->slices_direction_z = source->di->slices_direction_z;
-	dest->di->up_direction_x     = source->di->up_direction_x;
-	dest->di->up_direction_y     = source->di->up_direction_y;
-	dest->di->up_direction_z     = source->di->up_direction_z;
 	dest->di->default_center_x   = source->di->default_center_x;
 	dest->di->default_center_y   = source->di->default_center_y;
 	dest->di->default_center_z   = source->di->default_center_z;
@@ -3602,7 +3596,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	const mdcm::PixelFormat & pixelformat,
 	const mdcm::PhotometricInterpretation & pi,
 	ImageVariant * ivariant,
-	itk::Matrix<itk::SpacePrecisionType, 3, 3> & direction,
+	itk::Matrix<double, 3, 3> & direction,
 	unsigned int dimx_, unsigned int dimy_, unsigned int dimz_,
 	double origin_x, double origin_y, double origin_z,
 	double spacing_x, double spacing_y, double spacing_z,

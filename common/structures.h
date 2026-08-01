@@ -525,16 +525,16 @@ public:
 	bool lock_single{};
 	bool lock_level2D{};
 	quint32 image_3dtex{};
-	float origin[3]{};
+	float origin[3]{}; // for GLWidget 
 	bool origin_ok{};
 	short tex_info{-1};
 	int idimx{};
 	int idimy{};
 	int idimz{};
-	float ix_origin{};
-	float iy_origin{};
-	float iz_origin{};
-	float dircos[6]{};
+	double ix_origin{};
+	double iy_origin{};
+	double iz_origin{};
+	double dircos[6]{};
 	double ix_spacing{};
 	double iy_spacing{};
 	double iz_spacing{};
@@ -546,18 +546,15 @@ public:
 	double vmax{};
 	double rmin{};
 	double rmax{};
-	float center_x{};
+	float center_x{}; // for GLWidget
 	float center_y{};
 	float center_z{};
-	float default_center_x{};
+	float default_center_x{}; // for GLWidget
 	float default_center_y{};
 	float default_center_z{};
-	float slices_direction_x{};
+	float slices_direction_x{}; // for GLWidget
 	float slices_direction_y{};
 	float slices_direction_z{1.0f};
-	float up_direction_x{};
-	float up_direction_y{};
-	float up_direction_z{1.0f};
 	// 0 - linear_exact
 	// 1 - linear
 	// 2 - sigmoid

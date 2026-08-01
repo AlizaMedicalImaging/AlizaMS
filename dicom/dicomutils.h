@@ -284,7 +284,6 @@ public:
 			double*,
 			float*,float*,float*,
 			float*,float*,float*,
-			float*,float*,float*,
 			float);
 	static bool build_gems_dictionary(
 		QMap<QString,int> &,

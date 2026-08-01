@@ -3119,9 +3119,9 @@ void GraphicsWidget::update_pixel_value(double x, double  y)
 			(v->di->idimy == image_container.image3D->di->idimy) &&
 			(v->di->idimz == image_container.image3D->di->idimz) &&
 			(v->orientation == image_container.image3D->orientation) &&
-			MMath::AlmostEqual(v->di->ix_origin, image_container.image3D->di->ix_origin, 0.001f) &&
-			MMath::AlmostEqual(v->di->iy_origin, image_container.image3D->di->iy_origin, 0.001f) &&
-			MMath::AlmostEqual(v->di->iz_origin, image_container.image3D->di->iz_origin, 0.001f))
+			MMath::AlmostEqual(v->di->ix_origin, image_container.image3D->di->ix_origin, 0.001) &&
+			MMath::AlmostEqual(v->di->iy_origin, image_container.image3D->di->iy_origin, 0.001) &&
+			MMath::AlmostEqual(v->di->iz_origin, image_container.image3D->di->iz_origin, 0.001))
 		{
 			const QString d = GraphicsUtils::get_scalar_pixel_value(v, a, x, y, sx, sy, sz, false);
 			info_line->setText(d);

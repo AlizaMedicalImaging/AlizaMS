@@ -188,10 +188,9 @@ void DisplayInterface::close(bool clear_geometry)
 	trimeshes.clear();
 	center_x = center_y = center_z = 0.0f;
 	slices_direction_x = slices_direction_y = 0.0f;
-	slices_direction_z = 1.0;
-	up_direction_x = up_direction_z = 0.0f;
-	up_direction_y = 1.0f;
-	from_slice = 0; to_slice = (idimz > 0) ? idimz-1 : 0;
+	slices_direction_z = 1.0f;
+	from_slice = 0;
+	to_slice = (idimz > 0) ? idimz - 1 : 0;
 quit__:
 #if 0
 	if (opengl_ok && gl)

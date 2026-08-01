@@ -3248,13 +3248,7 @@ bool DicomUtils::read_slices(
 	double origin_x{};
 	double origin_y{};
 	double origin_z{};
-	float
-		slices_dir_x,
-		slices_dir_y,
-		slices_dir_z,
-		up_dir_x,
-		up_dir_y,
-		up_dir_z;
+	float slices_dir_x, slices_dir_y, slices_dir_z;
 	float center_x, center_y, center_z;
 	double dircos[9]{};
 	for (unsigned int i = 0; i < size_z; ++i)
@@ -3340,7 +3334,6 @@ bool DicomUtils::read_slices(
 			&origin_x, &origin_y, &origin_z,
 			dircos,
 			&slices_dir_x, &slices_dir_y, &slices_dir_z,
-			&up_dir_x, &up_dir_y, &up_dir_z,
 			&center_x, &center_y, &center_z,
 			tolerance);
 	if (ok)
@@ -3348,9 +3341,6 @@ bool DicomUtils::read_slices(
 		ivariant->di->slices_direction_x = slices_dir_x;
 		ivariant->di->slices_direction_y = slices_dir_y;
 		ivariant->di->slices_direction_z = slices_dir_z;
-		ivariant->di->up_direction_x = up_dir_x;
-		ivariant->di->up_direction_y = up_dir_y;
-		ivariant->di->up_direction_z = up_dir_z;
 		// for validation, will be taken from final itk image later
 		ivariant->di->ix_origin = origin_x;
 		ivariant->di->iy_origin = origin_y;
@@ -3360,7 +3350,7 @@ bool DicomUtils::read_slices(
 		ivariant->di->iz_spacing = size_z == 1 ? 1 : spacing_z;
 		for (int x = 0; x < 6; ++x)
 		{
-			ivariant->di->dircos[x] = static_cast<float>(dircos[x]); ///////
+			ivariant->di->dircos[x] = dircos[x]; ///////
 		}
 		//
 		if (ivariant->equi == false)
@@ -3559,9 +3549,6 @@ bool DicomUtils::read_slices_uihgrid(
 	float slices_dir_x;
 	float slices_dir_y;
 	float slices_dir_z;
-	float up_dir_x;
-	float up_dir_y;
-	float up_dir_z;
 	float center_x;
 	float center_y;
 	float center_z;
@@ -3575,7 +3562,6 @@ bool DicomUtils::read_slices_uihgrid(
 			&origin_x, &origin_y, &origin_z,
 			dircos,
 			&slices_dir_x, &slices_dir_y, &slices_dir_z,
-			&up_dir_x, &up_dir_y, &up_dir_z,
 			&center_x, &center_y, &center_z,
 			tolerance);
 	if (ok)
@@ -3583,9 +3569,6 @@ bool DicomUtils::read_slices_uihgrid(
 		ivariant->di->slices_direction_x = slices_dir_x;
 		ivariant->di->slices_direction_y = slices_dir_y;
 		ivariant->di->slices_direction_z = slices_dir_z;
-		ivariant->di->up_direction_x = up_dir_x;
-		ivariant->di->up_direction_y = up_dir_y;
-		ivariant->di->up_direction_z = up_dir_z;
 		// for validation, will be taken from final itk image later
 		ivariant->di->ix_origin = origin_x;
 		ivariant->di->iy_origin = origin_y;
@@ -3595,7 +3578,7 @@ bool DicomUtils::read_slices_uihgrid(
 		ivariant->di->iz_spacing = spacing_z;
 		for (int x = 0; x < 6; ++x)
 		{
-			ivariant->di->dircos[x] = static_cast<float>(dircos[x]); ///////
+			ivariant->di->dircos[x] = dircos[x]; ///////
 		}
 		//
 		if (ivariant->equi == false)
@@ -3641,7 +3624,7 @@ bool DicomUtils::read_slices_rtdose(
 	double pat_orient[6];
 	double pix_spacing[2];
 	double spacing_x, spacing_y, spacing_z, origin_x, origin_y, origin_z;
-	float slices_dir_x, slices_dir_y, slices_dir_z, up_dir_x, up_dir_y, up_dir_z;
+	float slices_dir_x, slices_dir_y, slices_dir_z;
 	float center_x, center_y, center_z;
 	double dircos[9]{};
 	QString pat_pos_s, pat_orient_s, pix_spacing_s;
@@ -3681,7 +3664,6 @@ bool DicomUtils::read_slices_rtdose(
 			&origin_x, &origin_y, &origin_z,
 			dircos,
 			&slices_dir_x, &slices_dir_y, &slices_dir_z,
-			&up_dir_x, &up_dir_y, &up_dir_z,
 			&center_x, &center_y, &center_z,
 			tolerance);
 	if (ok)
@@ -3689,9 +3671,6 @@ bool DicomUtils::read_slices_rtdose(
 		ivariant->di->slices_direction_x = slices_dir_x;
 		ivariant->di->slices_direction_y = slices_dir_y;
 		ivariant->di->slices_direction_z = slices_dir_z;
-		ivariant->di->up_direction_x = up_dir_x;
-		ivariant->di->up_direction_y = up_dir_y;
-		ivariant->di->up_direction_z = up_dir_z;
 		// for validation, will be taken from final itk image later
 		ivariant->di->ix_origin = origin_x;
 		ivariant->di->iy_origin = origin_y;
@@ -3701,7 +3680,7 @@ bool DicomUtils::read_slices_rtdose(
 		ivariant->di->iz_spacing = spacing_z;
 		for (int x = 0; x < 6; ++x)
 		{
-			ivariant->di->dircos[x] = static_cast<float>(dircos[x]); ///////
+			ivariant->di->dircos[x] = dircos[x]; ///////
 		}
 		//
 		if (ivariant->equi == false)
@@ -4088,7 +4067,6 @@ bool DicomUtils::read_group_sq(
 						{
 							fg.frame_laterality = std::move(frame_laterality);
 						}
-						const mdcm::DataElement & deFrameLaterality = nestedds1.GetDataElement(tFrameLaterality);
 					}
 					{
 						const mdcm::DataElement & deAnatomicRegionSequence =
@@ -4972,7 +4950,6 @@ bool DicomUtils::generate_geometry(
 		double * origin_x,  double * origin_y,  double * origin_z,
 		double * dircos,
 		float * slices_dir_x, float * slices_dir_y, float * slices_dir_z,
-		float * up_dir_x, float * up_dir_y, float * up_dir_z,
 		float * center_x, float * center_y, float * center_z,
 		float tolerance)
 {
@@ -5130,23 +5107,22 @@ bool DicomUtils::generate_geometry(
 		tmp_length2 = length2;
 		tmp_length3 = length3;
 	}
-	const float row_dircos_x = static_cast<float>(dircos[0]);
-	const float row_dircos_y = static_cast<float>(dircos[1]);
-	const float row_dircos_z = static_cast<float>(dircos[2]);
-	const float col_dircos_x = static_cast<float>(dircos[3]);
-	const float col_dircos_y = static_cast<float>(dircos[4]);
-	const float col_dircos_z = static_cast<float>(dircos[5]);
-	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
-	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
-	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+	const double row_dircos_x = dircos[0];
+	const double row_dircos_y = dircos[1];
+	const double row_dircos_z = dircos[2];
+	const double col_dircos_x = dircos[3];
+	const double col_dircos_y = dircos[4];
+	const double col_dircos_z = dircos[5];
+	const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+	const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+	const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	const sVector3 direction1 = normalize(sVector3(nrm_dircos_x, nrm_dircos_y, nrm_dircos_z));
 	if (size_ > 1)
 	{
 		const sVector3 direction0_tmp = last - first;
-		if (!(
-				MMath::AlmostEqual(direction0_tmp.getX(), 0.0f, 0.00001f) &&
-				MMath::AlmostEqual(direction0_tmp.getY(), 0.0f, 0.00001f) &&
-				MMath::AlmostEqual(direction0_tmp.getZ(), 0.0f, 0.00001f)))
+		if (!(MMath::AlmostEqual(direction0_tmp.getX(), 0.0f, 0.00001f) &&
+			  MMath::AlmostEqual(direction0_tmp.getY(), 0.0f, 0.00001f) &&
+			  MMath::AlmostEqual(direction0_tmp.getZ(), 0.0f, 0.00001f)))
 		{
 			const sVector3 direction0 = normalize(direction0_tmp);
 			*slices_dir_x = direction0.getX();
@@ -5154,10 +5130,9 @@ bool DicomUtils::generate_geometry(
 			*slices_dir_z = direction0.getZ();
 			if (tmp1 &&
 				((tmp2 && (size_ > 2)) || size_ == 2) &&
-				!(
-					MMath::AlmostEqual(direction0.getX(), direction1.getX(), 0.0001f) &&
-					MMath::AlmostEqual(direction0.getY(), direction1.getY(), 0.0001f) &&
-					MMath::AlmostEqual(direction0.getZ(), direction1.getZ(), 0.0001f)))
+				!(MMath::AlmostEqual(direction0.getX(), direction1.getX(), 0.0001f) &&
+				  MMath::AlmostEqual(direction0.getY(), direction1.getY(), 0.0001f) &&
+				  MMath::AlmostEqual(direction0.getZ(), direction1.getZ(), 0.0001f)))
 			{
 				invalidate_volume = true;
 #ifdef ALIZA_VERBOSE
@@ -5201,9 +5176,6 @@ bool DicomUtils::generate_geometry(
 		else if (size_ == 2) *equi_ = tmp1;
 	}
 	//
-	*up_dir_x = up.getX();
-	*up_dir_y = up.getY();
-	*up_dir_z = up.getZ();
 	if (*equi_ == true)
 	{
 		const sVector3 image_center = 0.5f * (v0 + v1);
@@ -7334,7 +7306,7 @@ QString DicomUtils::read_ultrasound(
 	const bool skip_too_large = settings.skip_too_large;
 	bool icc_ok{};
 	std::vector<char*> data;
-	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
+	itk::Matrix<double, 3, 3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PhotometricInterpretation pi;
 	const mdcm::Tag tPixelAspectRatio(0x0028,0x0034);
@@ -7501,15 +7473,15 @@ QString DicomUtils::read_ultrasound(
 	origin_x = origin_x_;
 	origin_y = origin_y_;
 	origin_z = origin_z_;
-	const float row_dircos_x = dircos_[0];
-	const float row_dircos_y = dircos_[1];
-	const float row_dircos_z = dircos_[2];
-	const float col_dircos_x = dircos_[3];
-	const float col_dircos_y = dircos_[4];
-	const float col_dircos_z = dircos_[5];
-	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
-	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
-	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+	const double row_dircos_x = dircos_[0];
+	const double row_dircos_y = dircos_[1];
+	const double row_dircos_z = dircos_[2];
+	const double col_dircos_x = dircos_[3];
+	const double col_dircos_y = dircos_[4];
+	const double col_dircos_z = dircos_[5];
+	const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+	const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+	const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	direction[0][0] = row_dircos_x;
 	direction[1][0] = row_dircos_y;
 	direction[2][0] = row_dircos_z;
@@ -7590,7 +7562,7 @@ QString DicomUtils::read_nuclear(
 	const bool skip_too_large = settings.skip_too_large;
 	bool icc_ok{};
 	std::vector<char*> data;
-	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
+	itk::Matrix<double, 3, 3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PhotometricInterpretation pi;
 	const bool overlays_enabled = settings.overlays;
@@ -7700,15 +7672,15 @@ are stacked in front of the first slice. See Image Orientation
 */
 	spacing_z = spacing_z_ > 0.0 ? spacing_z_ : -spacing_z_;
 	//
-	const float row_dircos_x = dircos_[0];
-	const float row_dircos_y = dircos_[1];
-	const float row_dircos_z = dircos_[2];
-	const float col_dircos_x = dircos_[3];
-	const float col_dircos_y = dircos_[4];
-	const float col_dircos_z = dircos_[5];
-	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
-	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
-	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+	const double row_dircos_x = dircos_[0];
+	const double row_dircos_y = dircos_[1];
+	const double row_dircos_z = dircos_[2];
+	const double col_dircos_x = dircos_[3];
+	const double col_dircos_y = dircos_[4];
+	const double col_dircos_z = dircos_[5];
+	const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+	const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+	const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	direction[0][0] = row_dircos_x;
 	direction[1][0] = row_dircos_y;
 	direction[2][0] = row_dircos_z;
@@ -7792,7 +7764,7 @@ QString DicomUtils::read_series(
 	const bool skip_too_large = settings.skip_too_large;
 	bool icc_ok{};
 	std::vector<char*> data;
-	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
+	itk::Matrix<double, 3, 3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PixelFormat previous_pixelformat;
 	mdcm::PhotometricInterpretation pi;
@@ -8181,12 +8153,12 @@ QString DicomUtils::read_series(
 				bool invalidate{};
 				if (ivariant->equi)
 				{
-					const float tmp0_spacing_x = static_cast<float>(spacing_x_);
-					const float tmp0_spacing_y = static_cast<float>(spacing_y_);
-					const float tmp1_spacing_x = static_cast<float>(ivariant->di->ix_spacing);
-					const float tmp1_spacing_y = static_cast<float>(ivariant->di->iy_spacing);
-					const float tmp1_spacing_z = static_cast<float>(ivariant->di->iz_spacing);
-					if (tmp1_spacing_x <= 0)
+					const double tmp0_spacing_x = spacing_x_;
+					const double tmp0_spacing_y = spacing_y_;
+					const double tmp1_spacing_x = ivariant->di->ix_spacing;
+					const double tmp1_spacing_y = ivariant->di->iy_spacing;
+					const double tmp1_spacing_z = ivariant->di->iz_spacing;
+					if (tmp1_spacing_x <= 0.0)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "ivariant->di->ix_spacing <= 0" << std::endl;
@@ -8194,7 +8166,7 @@ QString DicomUtils::read_series(
 						invalidate = true;
 						ivariant->di->ix_spacing = 1.0;
 					}
-					if (tmp1_spacing_y <= 0)
+					if (tmp1_spacing_y <= 0.0)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "ivariant->di->iy_spacing <= 0" << std::endl;
@@ -8202,7 +8174,7 @@ QString DicomUtils::read_series(
 						invalidate = true;
 						ivariant->di->iy_spacing = 1.0;
 					}
-					if (tmp1_spacing_z <= 0)
+					if (tmp1_spacing_z <= 0.0)
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "ivariant->di->iz_spacing <= 0" << std::endl;
@@ -8210,7 +8182,7 @@ QString DicomUtils::read_series(
 						invalidate = true;
 						ivariant->di->iz_spacing = 0.00001;
 					}
-					if (!MMath::AlmostEqual(tmp0_spacing_x, tmp1_spacing_x, 0.0001f))
+					if (!MMath::AlmostEqual(tmp0_spacing_x, tmp1_spacing_x, 0.0001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_spacing_x != tmp1_spacing_x "
@@ -8218,7 +8190,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if (!MMath::AlmostEqual(tmp0_spacing_y, tmp1_spacing_y, 0.0001f))
+					if (!MMath::AlmostEqual(tmp0_spacing_y, tmp1_spacing_y, 0.0001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_spacing_y != tmp1_spacing_y "
@@ -8226,13 +8198,13 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					const float tmp0_origin_x = static_cast<float>(origin_x_);
-					const float tmp0_origin_y = static_cast<float>(origin_y_);
-					const float tmp0_origin_z = static_cast<float>(origin_z_);
-					const float tmp1_origin_x = ivariant->di->ix_origin;
-					const float tmp1_origin_y = ivariant->di->iy_origin;
-					const float tmp1_origin_z = ivariant->di->iz_origin;
-					if (!MMath::AlmostEqual(tmp0_origin_x, tmp1_origin_x, 0.001f))
+					const double tmp0_origin_x = origin_x_;
+					const double tmp0_origin_y = origin_y_;
+					const double tmp0_origin_z = origin_z_;
+					const double tmp1_origin_x = ivariant->di->ix_origin;
+					const double tmp1_origin_y = ivariant->di->iy_origin;
+					const double tmp1_origin_z = ivariant->di->iz_origin;
+					if (!MMath::AlmostEqual(tmp0_origin_x, tmp1_origin_x, 0.001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_x != tmp1_origin_x "
@@ -8240,7 +8212,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if (!MMath::AlmostEqual(tmp0_origin_y, tmp1_origin_y, 0.001f))
+					if (!MMath::AlmostEqual(tmp0_origin_y, tmp1_origin_y, 0.001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_y != tmp1_origin_y "
@@ -8248,7 +8220,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if (!MMath::AlmostEqual(tmp0_origin_z, tmp1_origin_z, 0.001f))
+					if (!MMath::AlmostEqual(tmp0_origin_z, tmp1_origin_z, 0.001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_z != tmp1_origin_z "
@@ -8256,19 +8228,19 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					const float tmp0_dircos_0 = static_cast<float>(dircos_[0]);
-					const float tmp0_dircos_1 = static_cast<float>(dircos_[1]);
-					const float tmp0_dircos_2 = static_cast<float>(dircos_[2]);
-					const float tmp0_dircos_3 = static_cast<float>(dircos_[3]);
-					const float tmp0_dircos_4 = static_cast<float>(dircos_[4]);
-					const float tmp0_dircos_5 = static_cast<float>(dircos_[5]);
-					const float tmp1_dircos_0 = ivariant->di->dircos[0];
-					const float tmp1_dircos_1 = ivariant->di->dircos[1];
-					const float tmp1_dircos_2 = ivariant->di->dircos[2];
-					const float tmp1_dircos_3 = ivariant->di->dircos[3];
-					const float tmp1_dircos_4 = ivariant->di->dircos[4];
-					const float tmp1_dircos_5 = ivariant->di->dircos[5];
-					if (!MMath::AlmostEqual(tmp0_dircos_0, tmp1_dircos_0, 0.0001f))
+					const double tmp0_dircos_0 = dircos_[0];
+					const double tmp0_dircos_1 = dircos_[1];
+					const double tmp0_dircos_2 = dircos_[2];
+					const double tmp0_dircos_3 = dircos_[3];
+					const double tmp0_dircos_4 = dircos_[4];
+					const double tmp0_dircos_5 = dircos_[5];
+					const double tmp1_dircos_0 = ivariant->di->dircos[0];
+					const double tmp1_dircos_1 = ivariant->di->dircos[1];
+					const double tmp1_dircos_2 = ivariant->di->dircos[2];
+					const double tmp1_dircos_3 = ivariant->di->dircos[3];
+					const double tmp1_dircos_4 = ivariant->di->dircos[4];
+					const double tmp1_dircos_5 = ivariant->di->dircos[5];
+					if (!MMath::AlmostEqual(tmp0_dircos_0, tmp1_dircos_0, 0.0001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_0 != tmp1_dircos_0 "
@@ -8276,7 +8248,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if (!MMath::AlmostEqual(tmp0_dircos_1, tmp1_dircos_1, 0.0001f))
+					if (!MMath::AlmostEqual(tmp0_dircos_1, tmp1_dircos_1, 0.0001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_1 != tmp1_dircos_1 "
@@ -8284,7 +8256,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if (!MMath::AlmostEqual(tmp0_dircos_2, tmp1_dircos_2, 0.0001f))
+					if (!MMath::AlmostEqual(tmp0_dircos_2, tmp1_dircos_2, 0.0001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_2 != tmp1_dircos_2 "
@@ -8292,7 +8264,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if (!MMath::AlmostEqual(tmp0_dircos_3, tmp1_dircos_3, 0.0001f))
+					if (!MMath::AlmostEqual(tmp0_dircos_3, tmp1_dircos_3, 0.0001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_3 != tmp1_dircos_3 "
@@ -8300,7 +8272,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if (!MMath::AlmostEqual(tmp0_dircos_4, tmp1_dircos_4, 0.0001f))
+					if (!MMath::AlmostEqual(tmp0_dircos_4, tmp1_dircos_4, 0.0001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_4 != tmp1_dircos_4 "
@@ -8308,7 +8280,7 @@ QString DicomUtils::read_series(
 #endif
 						invalidate = true;
 					}
-					if (!MMath::AlmostEqual(tmp0_dircos_5, tmp1_dircos_5, 0.0001f))
+					if (!MMath::AlmostEqual(tmp0_dircos_5, tmp1_dircos_5, 0.0001))
 					{
 #ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_5 != tmp1_dircos_5 "
@@ -8332,18 +8304,15 @@ QString DicomUtils::read_series(
 				origin_x = ivariant->di->ix_origin;
 				origin_y = ivariant->di->iy_origin;
 				origin_z = ivariant->di->iz_origin;
-				const float row_dircos_x = ivariant->di->dircos[0];
-				const float row_dircos_y = ivariant->di->dircos[1];
-				const float row_dircos_z = ivariant->di->dircos[2];
-				const float col_dircos_x = ivariant->di->dircos[3];
-				const float col_dircos_y = ivariant->di->dircos[4];
-				const float col_dircos_z = ivariant->di->dircos[5];
-				const float nrm_dircos_x =
-					row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
-				const float nrm_dircos_y =
-					row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
-				const float nrm_dircos_z =
-					row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+				const double row_dircos_x = ivariant->di->dircos[0];
+				const double row_dircos_y = ivariant->di->dircos[1];
+				const double row_dircos_z = ivariant->di->dircos[2];
+				const double col_dircos_x = ivariant->di->dircos[3];
+				const double col_dircos_y = ivariant->di->dircos[4];
+				const double col_dircos_z = ivariant->di->dircos[5];
+				const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+				const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+				const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 				direction[0][0] = row_dircos_x;
 				direction[1][0] = row_dircos_y;
 				direction[2][0] = row_dircos_z;
@@ -8362,15 +8331,15 @@ QString DicomUtils::read_series(
 				origin_x = origin_x_;
 				origin_y = origin_y_;
 				origin_z = origin_z_;
-				const float row_dircos_x = dircos_[0];
-				const float row_dircos_y = dircos_[1];
-				const float row_dircos_z = dircos_[2];
-				const float col_dircos_x = dircos_[3];
-				const float col_dircos_y = dircos_[4];
-				const float col_dircos_z = dircos_[5];
-				const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
-				const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
-				const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+				const double row_dircos_x = dircos_[0];
+				const double row_dircos_y = dircos_[1];
+				const double row_dircos_z = dircos_[2];
+				const double col_dircos_x = dircos_[3];
+				const double col_dircos_y = dircos_[4];
+				const double col_dircos_z = dircos_[5];
+				const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+				const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+				const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 				direction[0][0] = row_dircos_x;
 				direction[1][0] = row_dircos_y;
 				direction[2][0] = row_dircos_z;
@@ -8439,17 +8408,15 @@ QString DicomUtils::read_series(
 				{
 					const bool b3 = (luts_.at(x) == luts_.at(x - 1));
 					if (!b3) one_lut = false;
-					const bool b1 = MMath::AlmostEqual(levels_.at(x), levels_.at(x - 1));
-					const bool b2 = MMath::AlmostEqual(windows_.at(x), windows_.at(x - 1));
+					const bool b1 = MMath::AlmostEqual(levels_.at(x), levels_.at(x - 1),   0.0001);
+					const bool b2 = MMath::AlmostEqual(windows_.at(x), windows_.at(x - 1), 0.0001);
 					if (!b1 || !b2) one_level = false;
 				}
 			}
 			if (one_level)
 			{
-				ivariant->di->default_us_window_center =
-					ivariant->di->us_window_center = levels_.at(0);
-				ivariant->di->default_us_window_width  =
-					ivariant->di->us_window_width = windows_.at(0);
+				ivariant->di->default_us_window_center = ivariant->di->us_window_center = levels_.at(0);
+				ivariant->di->default_us_window_width  = ivariant->di->us_window_width  = windows_.at(0);
 			}
 			else
 			{
@@ -8460,8 +8427,7 @@ QString DicomUtils::read_series(
 			}
 			if (one_lut)
 			{
-				ivariant->di->default_lut_function =
-					ivariant->di->lut_function = luts_.at(0);
+				ivariant->di->default_lut_function = ivariant->di->lut_function = luts_.at(0);
 			}
 		}
 	}
@@ -8547,7 +8513,7 @@ QString DicomUtils::read_series(
 			//
 			// Note: there are also attributes 'Series Date' / 'Series Time'.
 			//
-			constexpr short use_acq_time = 0;
+			const short use_acq_time = 0;
 			//
 			if (use_acq_time == 0)
 			{
@@ -10325,13 +10291,12 @@ QString DicomUtils::read_enhanced_common(
 			bool   equi_{};
 			bool   one_direction_{};
 			double origin_x_gen, origin_y_gen, origin_z_gen;
-			itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
+			itk::Matrix<double, 3, 3> direction;
 			double spacing_x, spacing_y, spacing_z;
 			double origin_x, origin_y, origin_z;
 			double spacing_z_tmp;
 			double dircos_gen[6]{};
 			float  slices_dir_x, slices_dir_y, slices_dir_z;
-			float  up_dir_x, up_dir_y, up_dir_z;
 			float  center_x, center_y, center_z;
 			std::vector<ImageSlice*> slices;
 			const bool enable_gl = min_load ? false : ok3d;
@@ -10622,7 +10587,6 @@ QString DicomUtils::read_enhanced_common(
 					&origin_x_gen, &origin_y_gen, &origin_z_gen,
 					dircos_gen,
 					&slices_dir_x, &slices_dir_y, &slices_dir_z,
-					&up_dir_x, &up_dir_y, &up_dir_z,
 					&center_x, &center_y, &center_z,
 					tolerance);
 			}
@@ -10656,15 +10620,15 @@ QString DicomUtils::read_enhanced_common(
 				origin_x = origin_x_gen;
 				origin_y = origin_y_gen;
 				origin_z = origin_z_gen;
-				const float row_dircos_x = static_cast<float>(dircos_gen[0]);
-				const float row_dircos_y = static_cast<float>(dircos_gen[1]);
-				const float row_dircos_z = static_cast<float>(dircos_gen[2]);
-				const float col_dircos_x = static_cast<float>(dircos_gen[3]);
-				const float col_dircos_y = static_cast<float>(dircos_gen[4]);
-				const float col_dircos_z = static_cast<float>(dircos_gen[5]);
-				const float nrm_dircos_x = row_dircos_y*col_dircos_z - row_dircos_z*col_dircos_y;
-				const float nrm_dircos_y = row_dircos_z*col_dircos_x - row_dircos_x*col_dircos_z;
-				const float nrm_dircos_z = row_dircos_x*col_dircos_y - row_dircos_y*col_dircos_x;
+				const double row_dircos_x = dircos_gen[0];
+				const double row_dircos_y = dircos_gen[1];
+				const double row_dircos_z = dircos_gen[2];
+				const double col_dircos_x = dircos_gen[3];
+				const double col_dircos_y = dircos_gen[4];
+				const double col_dircos_z = dircos_gen[5];
+				const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+				const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+				const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 				direction[0][0] = row_dircos_x;
 				direction[1][0] = row_dircos_y;
 				direction[2][0] = row_dircos_z;
@@ -10690,15 +10654,15 @@ QString DicomUtils::read_enhanced_common(
 				origin_x  = origin_x_read;
 				origin_y  = origin_y_read;
 				origin_z  = origin_z_read;
-				const float row_dircos_x = static_cast<float>(dircos_read[0]);
-				const float row_dircos_y = static_cast<float>(dircos_read[1]);
-				const float row_dircos_z = static_cast<float>(dircos_read[2]);
-				const float col_dircos_x = static_cast<float>(dircos_read[3]);
-				const float col_dircos_y = static_cast<float>(dircos_read[4]);
-				const float col_dircos_z = static_cast<float>(dircos_read[5]);
-				const float nrm_dircos_x = row_dircos_y*col_dircos_z - row_dircos_z*col_dircos_y;
-				const float nrm_dircos_y = row_dircos_z*col_dircos_x - row_dircos_x*col_dircos_z;
-				const float nrm_dircos_z = row_dircos_x*col_dircos_y - row_dircos_y*col_dircos_x;
+				const double row_dircos_x = dircos_read[0];
+				const double row_dircos_y = dircos_read[1];
+				const double row_dircos_z = dircos_read[2];
+				const double col_dircos_x = dircos_read[3];
+				const double col_dircos_y = dircos_read[4];
+				const double col_dircos_z = dircos_read[5];
+				const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+				const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+				const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 				direction[0][0] = row_dircos_x;
 				direction[1][0] = row_dircos_y;
 				direction[2][0] = row_dircos_z;
@@ -10941,9 +10905,6 @@ QString DicomUtils::read_enhanced_common(
 					ivariant->di->slices_direction_x = slices_dir_x;
 					ivariant->di->slices_direction_y = slices_dir_y;
 					ivariant->di->slices_direction_z = slices_dir_z;
-					ivariant->di->up_direction_x = up_dir_x;
-					ivariant->di->up_direction_y = up_dir_y;
-					ivariant->di->up_direction_z = up_dir_z;
 					if (!ivariant->equi)
 					{
 						float cx{};
