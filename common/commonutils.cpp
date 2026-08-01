@@ -4531,10 +4531,3 @@ bool CommonUtils::check_multiple_levels(const ImageVariant * v)
 	return false;
 }
 
-#ifdef USE_GET_TOTAL_MEM
-#undef USE_GET_TOTAL_MEM
-#endif
-
-#ifdef TRY_SUPPORT_YBR_PARTIAL_422
-#undef TRY_SUPPORT_YBR_PARTIAL_422
-#endif

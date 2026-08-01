@@ -3188,9 +3188,6 @@ void DicomUtils::load_contour(const mdcm::DataSet & ds, ImageVariant * ivariant)
 	QApplication::processEvents();
 #endif
 }
-#ifdef TMP_PRINT_LOAD_CONTOUR
-#undef TMP_PRINT_LOAD_CONTOUR
-#endif
 
 void DicomUtils::read_window(
 	const mdcm::DataSet & ds,
@@ -12734,6 +12731,84 @@ bool DicomUtils::read_gray_lut(
 	return true;
 }
 
+void DicomUtils::get_all_files_in_series(
+		const QString & f,
+		const QString & uid,
+		QStringList & result)
+{
+	const QFileInfo fi(f);
+	const QString p = fi.absolutePath();
+	std::vector<std::string> files;
+	{
+		QDir dir(p);
+		const QStringList l = dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
+		for (int x = 0; x < l.size(); ++x)
+		{
+			const QString tmp2 = dir.absolutePath() + QString("/") + l.at(x);
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(ALIZA_WIN32_UNC))
+			files.push_back(std::string(QDir::toNativeSeparators(tmp2).toUtf8().constData()));
+#else
+			files.push_back(std::string(QDir::toNativeSeparators(tmp2).toLocal8Bit().constData()));
+#endif
+#else
+			files.push_back(std::string(tmp2.toLocal8Bit().constData()));
+#endif
+		}
+	}
+	const mdcm::Global & g  = mdcm::GlobalInstance;
+	const mdcm::Dicts  & dicts = g.GetDicts();
+	const mdcm::Dict & dict = dicts.GetPublicDict();
+	const mdcm::Tag t(0x0020,0x000e);
+	mdcm::Scanner s;
+	s.AddTag(t);
+	s.Scan(files, dict);
+	mdcm::Scanner::ValuesType v = s.GetValues();
+	mdcm::Scanner::ValuesType::iterator it = v.begin();
+	while (it != v.end())
+	{
+		const QString tmp0 = QString::fromLatin1((*it).c_str());
+		if (tmp0.trimmed().remove(QChar('\0')) == uid.trimmed().remove(QChar('\0')))
+		{
+			std::vector<std::string> f__ = s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
+			for (unsigned int j = 0; j < f__.size(); ++j)
+			{
+				const QString tmp1 =
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+					QDir::toNativeSeparators(QString::fromUtf8(f__.at(j).c_str()));
+#else
+					QDir::toNativeSeparators(QString::fromLocal8Bit(f__.at(j).c_str()));
+#endif
+#else
+					QString::fromLocal8Bit(f__.at(j).c_str());
+#endif
+#if 0
+				// This check is most likely not required.
+				mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+				reader.SetFileName(QDir::toNativeSeparators(tmp1).toUtf8().constData());
+#else
+				reader.SetFileName(QDir::toNativeSeparators(tmp1).toLocal8Bit().constData());
+#endif
+#else
+				reader.SetFileName(tmp1.toLocal8Bit().constData());
+#endif
+				if (reader.ReadUpToTag(t))
+				{
+					result.push_back(tmp1);
+				}
+#else
+				result.push_back(tmp1);
+#endif
+			}
+			break;
+		}
+		++it;
+	}
+}
+
 // load_type
 // 0 - default
 // 1 - PR reference
@@ -14656,90 +14731,4 @@ QString DicomUtils::read_dicom(
 #endif
 	return message_;
 }
-
-void DicomUtils::get_all_files_in_series(
-		const QString & f,
-		const QString & uid,
-		QStringList & result)
-{
-	const QFileInfo fi(f);
-	const QString p = fi.absolutePath();
-	std::vector<std::string> files;
-	{
-		QDir dir(p);
-		const QStringList l = dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
-		for (int x = 0; x < l.size(); ++x)
-		{
-			const QString tmp2 = dir.absolutePath() + QString("/") + l.at(x);
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(ALIZA_WIN32_UNC))
-			files.push_back(std::string(QDir::toNativeSeparators(tmp2).toUtf8().constData()));
-#else
-			files.push_back(std::string(QDir::toNativeSeparators(tmp2).toLocal8Bit().constData()));
-#endif
-#else
-			files.push_back(std::string(tmp2.toLocal8Bit().constData()));
-#endif
-		}
-	}
-	const mdcm::Global & g  = mdcm::GlobalInstance;
-	const mdcm::Dicts  & dicts = g.GetDicts();
-	const mdcm::Dict & dict = dicts.GetPublicDict();
-	const mdcm::Tag t(0x0020,0x000e);
-	mdcm::Scanner s;
-	s.AddTag(t);
-	s.Scan(files, dict);
-	mdcm::Scanner::ValuesType v = s.GetValues();
-	mdcm::Scanner::ValuesType::iterator it = v.begin();
-	while (it != v.end())
-	{
-		const QString tmp0 = QString::fromLatin1((*it).c_str());
-		if (tmp0.trimmed().remove(QChar('\0')) == uid.trimmed().remove(QChar('\0')))
-		{
-			std::vector<std::string> f__ = s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
-			for (unsigned int j = 0; j < f__.size(); ++j)
-			{
-				const QString tmp1 =
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-					QDir::toNativeSeparators(QString::fromUtf8(f__.at(j).c_str()));
-#else
-					QDir::toNativeSeparators(QString::fromLocal8Bit(f__.at(j).c_str()));
-#endif
-#else
-					QString::fromLocal8Bit(f__.at(j).c_str());
-#endif
-#if 0
-				// This check is most likely not required.
-				mdcm::Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-				reader.SetFileName(QDir::toNativeSeparators(tmp1).toUtf8().constData());
-#else
-				reader.SetFileName(QDir::toNativeSeparators(tmp1).toLocal8Bit().constData());
-#endif
-#else
-				reader.SetFileName(tmp1.toLocal8Bit().constData());
-#endif
-				if (reader.ReadUpToTag(t))
-				{
-					result.push_back(tmp1);
-				}
-#else
-				result.push_back(tmp1);
-#endif
-			}
-			break;
-		}
-		++it;
-	}
-}
-
-#ifdef ENHANCED_PRINT_INFO
-#undef ENHANCED_PRINT_INFO
-#endif
-
-#ifdef WARN_RAM_SIZE
-#undef WARN_RAM_SIZE
-#endif
 

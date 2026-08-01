@@ -629,12 +629,3 @@ int main(int argc, char * argv[])
 	}
 }
 
-#undef USE_SPLASH_SCREEN
-#undef LOG_STDOUT_TO_FILE
-#undef PRINT_HOST_INFO
-#ifdef TMP_USE_GL_TEST
-#undef TMP_USE_GL_TEST
-#endif
-#ifdef SILENCE_QT_LOGGING
-#undef SILENCE_QT_LOGGING
-#endif

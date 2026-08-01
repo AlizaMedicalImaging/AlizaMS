@@ -4166,9 +4166,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 	return v;
 }
-#ifdef PRINT_MAKE_PR_MONOCHROME
-#undef PRINT_MAKE_PR_MONOCHROME
-#endif
 
 ImageVariant * PrConfigUtils::make_pr_rgb(
 	const ImageVariant *,

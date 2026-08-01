@@ -811,6 +811,3 @@ QString SpectroscopyUtils::ProcessData(
 	return QString("");
 }
 
-#ifdef LOAD_SPECT_DATA
-#undef LOAD_SPECT_DATA
-#endif

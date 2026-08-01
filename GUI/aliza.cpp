@@ -5152,6 +5152,3 @@ void Aliza::exit_null()
 	exit(0);
 }
 
-#ifdef ALIZA_PRINT_COUNT_GL_OBJ
-#undef ALIZA_PRINT_COUNT_GL_OBJ
-#endif
