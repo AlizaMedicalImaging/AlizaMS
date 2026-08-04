@@ -1052,7 +1052,6 @@ template<typename T> void read_geometry_from_image(
 	sVector3 first     = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 last      = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 direction = sVector3(0.0f, 0.0f, 0.0f);
-	sVector3 up        = sVector3(0.0f, 0.0f, 0.0f);
 	const typename T::DirectionType dircos = image->GetDirection();
 	const double d1 = dircos[0][0];
 	const double d2 = dircos[1][0];
@@ -1063,7 +1062,7 @@ template<typename T> void read_geometry_from_image(
 	for (size_t z = 0; z < size[2]; ++z)
 	{
 		typename T::IndexType idx0, idx1, idx2, idx3;
-		itk::Point<float, 3> p0, p1, p2, p3;
+		itk::Point<double, 3> p0, p1, p2, p3;
 		idx0[0] = 0;
 		idx1[0] = 0;
 		idx2[0] = size[0] - 1;
@@ -1092,31 +1091,35 @@ template<typename T> void read_geometry_from_image(
 #endif
 			continue;
 		}
-		float x0 = p0[0], y0 = p0[1], z0 = p0[2];
-		float x1 = p1[0], y1 = p1[1], z1 = p1[2];
-		float x2 = p2[0], y2 = p2[1], z2 = p2[2];
-		float x3 = p3[0], y3 = p3[1], z3 = p3[2];
+		double x0 = p0[0], y0 = p0[1], z0 = p0[2];
+		double x1 = p1[0], y1 = p1[1], z1 = p1[2];
+		double x2 = p2[0], y2 = p2[1], z2 = p2[2];
+		double x3 = p3[0], y3 = p3[1], z3 = p3[2];
 		if (z == 0)
 		{
-			first = sVector3(x0, y0, z0);
-			sVector3 tmp_up0 = sVector3(x1, y1, z1);
-			sVector3 tmp_up1 = sVector3(x0, y0, z0);
-			up = sVector3(normalize(tmp_up1-tmp_up0));
+			first = sVector3(static_cast<float>(x0), static_cast<float>(y0), static_cast<float>(z0));
 		}
 		else if (z == size[2] - 1)
 		{
-			last = sVector3(x0, y0, z0);
+			last = sVector3(static_cast<float>(x0), static_cast<float>(y0), static_cast<float>(z0));
 		}
-		const double ipp_iop[9] = {
-			static_cast<double>(x1),
-			static_cast<double>(y1),
-			static_cast<double>(z1),
-			d1, d2, d3, d4, d5, d6 };
+		const double ipp_iop[9] = { x1, y1, z1, d1, d2, d3, d4, d5, d6 };
 		CommonUtils::generate_imageslice(
 			ivariant->di->image_slices,
 			QString(""),
 			size[2], z,
-			x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
+			static_cast<float>(x0),
+			static_cast<float>(y0),
+			static_cast<float>(z0),
+			static_cast<float>(x1),
+			static_cast<float>(y1),
+			static_cast<float>(z1),
+			static_cast<float>(x2),
+			static_cast<float>(y2),
+			static_cast<float>(z2),
+			static_cast<float>(x3),
+			static_cast<float>(y3),
+			static_cast<float>(z3),
 			ipp_iop);
 	}
 	direction = sVector3(normalize(last - first));
