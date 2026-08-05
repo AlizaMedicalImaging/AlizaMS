@@ -47,7 +47,6 @@ bool generate_spectorscopy_geometry(
 		double * origin_x,  double * origin_y,  double * origin_z,
 		double * dircos,
 		float * slices_dir_x, float * slices_dir_y, float * slices_dir_z,
-		float * up_dir_x, float * up_dir_y, float * up_dir_z,
 		float * center_x, float * center_y, float * center_z,
 		float tolerance)
 {
@@ -57,7 +56,6 @@ bool generate_spectorscopy_geometry(
 	sVector3 last  = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 v0 = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 v1 = sVector3(0.0f, 0.0f, 0.0f);
-	sVector3 up = sVector3(0.0f, 0.0f, 0.0f);
 	QString tmp0;
 	bool tmp1 = true, tmp2 = true;
 	sVector3 tmp_p0 = sVector3(0.0f, 0.0f, 0.0f);
@@ -122,9 +120,6 @@ bool generate_spectorscopy_geometry(
 		{
 			first = sVector3(x0, y0, z0);
 			v0 = (p0.getXYZ() + p3.getXYZ()) * 0.5f;
-			sVector3 tmp_up0 = sVector3(x1, y1, z1);
-			sVector3 tmp_up1 = sVector3(x0, y0, z0);
-			up = normalize(tmp_up1 - tmp_up0);
 			*origin_x = ipp_iop[0];
 			*origin_y = ipp_iop[1];
 			*origin_z = ipp_iop[2];
@@ -299,9 +294,6 @@ bool generate_spectorscopy_geometry(
 		else if (size_ == 2) *equi_ = tmp1;
 	}
 	//
-	*up_dir_x = up.getX();
-	*up_dir_y = up.getY();
-	*up_dir_z = up.getZ();
 	if (*equi_ == true)
 	{
 		const sVector3 cube_center = 0.5f * (v0 + v1);
@@ -658,8 +650,9 @@ QString SpectroscopyUtils::ProcessData(
 			double spacing_z;
 			double dircos_gen[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			float  slices_dir_x, slices_dir_y, slices_dir_z;
-			float  up_dir_x, up_dir_y, up_dir_z;
-			float  center_x, center_y, center_z;
+			float  center_x{};
+			float  center_y{};
+			float  center_z{};
 			std::vector<SpectroscopySlice*> slices;
 			QString orientation;
 			double spacing_x, spacing_y;
@@ -708,7 +701,6 @@ QString SpectroscopyUtils::ProcessData(
 				&origin_x_gen, &origin_y_gen, &origin_z_gen,
 				dircos_gen,
 				&slices_dir_x, &slices_dir_y, &slices_dir_z,
-				&up_dir_x, &up_dir_y, &up_dir_z,
 				&center_x, &center_y, &center_z,
 				0.01f);
 			if (!geom_ok)
