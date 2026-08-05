@@ -3960,8 +3960,11 @@ bool DicomUtils::read_group_sq(
 						deInStackPositionNumber.GetByteValue())
 					{
 						unsigned int tmp678;
-						fg.in_stack_pos_num_ok = get_ul_value(nestedds1, tInStackPositionNumber, &tmp678);
-						fg.in_stack_pos_num = static_cast<int>(tmp678);
+						if (get_ul_value(nestedds1, tInStackPositionNumber, &tmp678))
+						{
+							fg.in_stack_pos_num_ok = true;
+							fg.in_stack_pos_num = static_cast<int>(tmp678);
+						}
 					}
 				}
 				{
