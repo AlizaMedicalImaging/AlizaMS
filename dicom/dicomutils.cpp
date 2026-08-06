@@ -14560,7 +14560,8 @@ QString DicomUtils::read_dicom(
 				if (!message_.isEmpty()) message_.append(QChar('\n'));
 				message_.append(QString(
 					"The series referenced in the RTSTRUCT "
-					"could not be found. Try using the DICOM scanner, "
+					"could not be found. Try using the DICOM scanner "
+					"(do not drag-and-drop or use \"Open file\"), "
 					"specifying the folder that contains both the RTSTRUCT itself "
 					" and the series it references. They can be located in subfolders."));
 				mdcm::Reader reader;
@@ -14653,7 +14654,8 @@ QString DicomUtils::read_dicom(
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
 			message_.append(QString(
 				"The series referenced in the Grayscale Soft Copy presentation "
-				"could not be found. Try using the DICOM scanner, "
+				"could not be found. Try using the DICOM scanner "
+				"(do not drag-and-drop or use \"Open file\"), "
 				"specifying the folder that contains both the GSPS series"
 				" and the series it references. They can be located in subfolders."));
 		}
