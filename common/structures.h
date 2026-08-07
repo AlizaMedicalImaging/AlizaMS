@@ -334,8 +334,6 @@ typedef QList<UltrasoundRegionData> USRegions;
 
 typedef std::vector<double> FrameTimes;
 
-typedef QMap<int, QString> LabelsMap;
-
 class PresentationStateObj
 {
 public:
