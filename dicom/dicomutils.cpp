@@ -12803,7 +12803,6 @@ QString DicomUtils::read_dicom(
 	const mdcm::Tag tPixelSpacing(0x0028,0x0030);
 	QStringList images;
 	QStringList rtstruct_ref_search;
-	QString     rtstruct_ref_search_path;
 	QStringList grey_softcopy_pr_files;
 	QStringList color_softcopy_pr_files;
 	QStringList pseudo_color_softcopy_pr_files;
@@ -12901,8 +12900,6 @@ QString DicomUtils::read_dicom(
 			// RTSTRUCT
 			if (load_type == 0)
 			{
-				QFileInfo reffi(filenames.at(x));
-				rtstruct_ref_search_path = reffi.absolutePath();
 				rtstruct_ref_search.push_back(filenames.at(x));
 			}
 			continue;
@@ -14500,15 +14497,17 @@ QString DicomUtils::read_dicom(
 		for (long x = 0; x < rtstruct_ref_search.size(); ++x)
 		{
 			std::vector<ImageVariant*> tmp_ivariants_rtstruct;
-			const bool ref_ok =
-				process_contrours_ref(
+			bool ref_ok{};
+			if (!root.isEmpty())
+			{
+				ref_ok = process_contrours_ref(
 					rtstruct_ref_search.at(x),
-					rtstruct_ref_search_path,
+					root,
 					tmp_ivariants_rtstruct,
 					ok3d,
 					1, // force sorted uniform
 					settings);
-			bool ref2_ok{};
+			}
 			if (ref_ok)
 			{
 				for (unsigned int y = 0; y < tmp_ivariants_rtstruct.size(); ++y)
@@ -14519,51 +14518,12 @@ QString DicomUtils::read_dicom(
 			}
 			else
 			{
-				if (!root.isEmpty())
-				{
-					ref2_ok = process_contrours_ref(
-						rtstruct_ref_search.at(x),
-						root,
-						tmp_ivariants_rtstruct,
-						ok3d,
-						1, // force sorted uniform
-						settings);
-				}
-				else
-				{
-#if 0
-					// Try to go one directory up
-					QFileInfo fi5(rtstruct_ref_search_path + QString("/.."));
-					if (fi5.exists())
-					{
-						ref2_ok = process_contrours_ref(
-							rtstruct_ref_search.at(x),
-							QDir::toNativeSeparators(fi5.absoluteFilePath()),
-							tmp_ivariants_rtstruct,
-							ok3d,
-							1, // force sorted uniform
-							settings);
-					}
-#endif
-				}
-				if (ref2_ok)
-				{
-					for (unsigned int y = 0; y < tmp_ivariants_rtstruct.size(); ++y)
-					{
-						tmp_ivariants_rtstruct[y]->filenames = QStringList(rtstruct_ref_search.at(x));
-						ivariants.push_back(tmp_ivariants_rtstruct[y]);
-					}
-				}
-			}
-			if (!(ref_ok || ref2_ok))
-			{
 				if (!message_.isEmpty()) message_.append(QChar('\n'));
 				message_.append(QString(
-					"The series referenced in the RTSTRUCT "
-					"could not be found. Try using the DICOM scanner "
-					"(do not drag-and-drop or use \"Open file\"), "
-					"specifying the folder that contains both the RTSTRUCT itself "
-					" and the series it references. They can be located in subfolders."));
+					"The series referenced by this RTSTRUCT file could not be found. "
+					"Use the DICOM Scanner and select the folder that contains both the "
+					"RTSTRUCT file and the referenced series (they may be in subfolders). "
+					"Do not open individual files by drag‑and‑drop or with \"Open file\"."));
 				mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -14600,7 +14560,6 @@ QString DicomUtils::read_dicom(
 		QFileInfo p0(file0);
 		QString message_pr;
 		unsigned int count{};
-#if 1
 		if (!root.isEmpty())
 		{
 			count = process_gsps(
@@ -14611,39 +14570,6 @@ QString DicomUtils::read_dicom(
 				ivariants,
 				message_pr);
 		}
-#else
-		QString root_tmp;
-		if (root.isEmpty())
-		{
-			root_tmp = p0.absolutePath();
-		}
-		else
-		{
-			root_tmp = root;
-		}
-		count = process_gsps(
-			grey_softcopy_pr_files,
-			root_tmp,
-			settings,
-			ok3d,
-			ivariants,
-			message_pr);
-		if (root.isEmpty() && count < 1 && message_pr.isEmpty())
-		{
-			// Try to go one directory up
-			QFileInfo fi5(root_tmp + QString("/.."));
-			if (fi5.exists())
-			{
-				count = process_gsps(
-					grey_softcopy_pr_files,
-					QDir::toNativeSeparators(fi5.absoluteFilePath()),
-					settings,
-					ok3d,
-					ivariants,
-					message_pr);
-			}
-		}
-#endif
 		if (!message_pr.isEmpty())
 		{
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
@@ -14653,11 +14579,10 @@ QString DicomUtils::read_dicom(
 		{
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
 			message_.append(QString(
-				"The series referenced in the Grayscale Soft Copy presentation "
-				"could not be found. Try using the DICOM scanner "
-				"(do not drag-and-drop or use \"Open file\"), "
-				"specifying the folder that contains both the GSPS series"
-				" and the series it references. They can be located in subfolders."));
+				"The series referenced by this Grayscale Soft Copy Presentation file could not be found. "
+				"Use the DICOM Scanner and select the folder that contains both the "
+				"Grayscale Soft Copy Presentation file and the referenced series (they may be in subfolders). "
+				"Do not open individual files by drag‑and‑drop or with \"Open file\"."));
 		}
 	}
 	//
