@@ -1002,7 +1002,7 @@ else()
 endif()
 
 if(MDCM_USE_SYSTEM_OPENJPEG)
-  target_include_directories(${ALIZAMS_TARGET} SYSTEM PRIVATE ${OPENJPEG_INCLUDE_DIRS})
+  target_include_directories(${ALIZAMS_TARGET} SYSTEM BEFORE PRIVATE ${OPENJPEG_INCLUDE_DIRS})
 else()
   target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmopenjpeg")
   target_include_directories(${ALIZAMS_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmopenjpeg/src/lib/openjp2")
