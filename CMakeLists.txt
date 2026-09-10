@@ -1085,11 +1085,6 @@ if(MDCM_NO_MESSAGES)
   target_compile_definitions(${ALIZAMS_TARGET} PRIVATE MDCM_NO_MESSAGES)
 endif()
 
-if(MDCM_USE_SYSTEM_CHARLS)
-  if(CHARLS_LOW)
-    target_compile_definitions(${ALIZAMS_TARGET} PRIVATE MDCM_CHARLS_LOW)
-  endif()
-endif()
 target_compile_definitions(${ALIZAMS_TARGET} PUBLIC CHARLS_NO_DEPRECATED_WARNING)
 
 # The ability to load dcm in the main thread has not be removed from the
