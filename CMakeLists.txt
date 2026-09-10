@@ -499,8 +499,6 @@ endif()
 
 if(NOT MDCM_USE_SYSTEM_CHARLS)
   set_source_files_properties("mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx" PROPERTIES COMPILE_DEFINITIONS CHARLS_STATIC)
-else()
-  set_source_files_properties("mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx" PROPERTIES COMPILE_DEFINITIONS CHARLS_DLL)
 endif()
 
 #
