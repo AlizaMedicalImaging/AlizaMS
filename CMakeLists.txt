@@ -284,7 +284,7 @@ else()
 endif()
 
 if(MDCM_USE_SYSTEM_OPENJPEG)
-  find_package(OpenJPEG 2.0.0 REQUIRED)
+  find_package(OpenJPEG REQUIRED)
   set(MDCM_OPENJPEG_LIBRARIES ${OPENJPEG_LIBRARIES})
 else()
   set(MDCM_OPENJPEG_LIBRARIES mdcmopenjp2)
@@ -343,16 +343,15 @@ set(MDCM_BUILD_VERSION 7)
 set(MDCM_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}.${MDCM_BUILD_VERSION}")
 set(MDCM_API_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}")
 
+include(CheckCXXSourceCompiles)
+
 check_include_file_concat("byteswap.h" MDCM_HAVE_BYTESWAP_FILE_H)
-# s. GDCM bug #324
 if(MDCM_HAVE_BYTESWAP_FILE_H)
-  include(CheckCXXSourceCompiles)
   check_cxx_source_compiles("#include <byteswap.h>\nint main(){return bswap_32(42);}" MDCM_HAVE_BYTESWAP_H)
 endif()
 
 check_include_file("rpc.h" MDCM_HAVE_RPC_H)
 
-include(CheckCXXSourceCompiles)
 check_cxx_source_compiles("int main(){const char *f =__FUNCTION__;return 0;}" MDCM_CXX_HAS_FUNCTION)
 
 if(MDCM_USE_SYSTEM_OPENSSL)
@@ -523,7 +522,7 @@ find_package(OpenGL REQUIRED)
 #
 #
 
-find_package(ITK COMPONENTS
+find_package(ITK REQUIRED COMPONENTS
   ITKCommon
   ITKImageFilterBase
   ITKImageFunction
@@ -536,16 +535,16 @@ include(${ITK_USE_FILE})
 message(STATUS "ITK: ${ITK_LIBRARIES}")
 
 if(USE_QT_V_6)
-  find_package(Qt6 COMPONENTS
+  find_package(Qt6 REQUIRED COMPONENTS
     Core
     Gui
     Widgets
     OpenGLWidgets
     PrintSupport
     Svg
-    Core5Compat REQUIRED)
+    Core5Compat)
   if(NOT ALIZA_MEDIASTORAGE_MODE)
-    find_package(Qt6 COMPONENTS Sql REQUIRED)
+    find_package(Qt6 REQUIRED COMPONENTS Sql)
   endif()
 elseif(USE_QT_V_5)
   find_package(Qt5Core REQUIRED)
