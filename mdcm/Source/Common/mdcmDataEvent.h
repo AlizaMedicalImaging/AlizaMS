@@ -68,8 +68,9 @@ public:
     return Bytes;
   }
 
+  void operator=(const DataEvent &) = delete;
+
 private:
-  void operator=(const DataEvent &);
   const char * Bytes{};
   size_t       Length{};
 };

@@ -38,36 +38,36 @@ class DataSetEvent : public AnyEvent
 public:
   typedef DataSetEvent Self;
   typedef AnyEvent     Superclass;
+  DataSetEvent(const Self & s)
+    : AnyEvent(s) {}
   DataSetEvent(DataSet const * ds = nullptr)
     : m_DataSet(ds)
   {}
-  virtual ~DataSetEvent() {}
-  virtual const char *
+  ~DataSetEvent() override = default;
+  const char *
   GetEventName() const override
   {
     return "DataSetEvent";
   }
-  virtual bool
+  bool
   CheckEvent(const ::mdcm::Event * e) const override
   {
     return (dynamic_cast<const Self *>(e) == nullptr ? false : true);
   }
-  virtual ::mdcm::Event *
+  ::mdcm::Event *
   MakeObject() const override
   {
     return new Self;
   }
-  DataSetEvent(const Self & s)
-    : AnyEvent(s) {}
   const DataSet &
   GetDataSet() const
   {
     return *m_DataSet;
   }
 
+  void operator=(const Self &) = delete;
+
 private:
-  void
-  operator=(const Self &);
   const DataSet * m_DataSet;
 };
 

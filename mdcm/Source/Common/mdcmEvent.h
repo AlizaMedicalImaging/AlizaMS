@@ -34,18 +34,11 @@ public:
   Event();
   Event(const Event &);
   virtual ~Event();
-  virtual Event *
-  MakeObject() const = 0;
-  virtual void
-  Print(std::ostream &) const;
-  virtual const char *
-  GetEventName() const = 0;
-  virtual bool
-  CheckEvent(const Event *) const = 0;
-
-private:
-  void
-  operator=(const Event &); // Not implemented.
+  virtual Event * MakeObject() const = 0;
+  virtual void Print(std::ostream &) const;
+  virtual const char * GetEventName() const = 0;
+  virtual bool CheckEvent(const Event *) const = 0;
+  void operator=(const Event &) = delete;
 };
 
 inline std::ostream &
@@ -63,21 +56,20 @@ operator<<(std::ostream & os, const Event & e)
     typedef super Superclass;                                       \
     classname() {}                                                  \
     virtual ~classname() {}                                         \
-    virtual const char * GetEventName() const override              \
+    const char * GetEventName() const override                      \
     {                                                               \
       return #classname;                                            \
     }                                                               \
-    virtual bool CheckEvent(const ::mdcm::Event * e) const override \
+    bool CheckEvent(const ::mdcm::Event * e) const override         \
     {                                                               \
       return dynamic_cast<const Self *>(e) ? true : false;          \
     }                                                               \
-    virtual ::mdcm::Event * MakeObject() const override             \
+    ::mdcm::Event * MakeObject() const override                     \
     {                                                               \
       return new Self;                                              \
     }                                                               \
     classname(const Self & s) : super(s) {}                         \
-  private:                                                          \
-    void operator=(const Self &);                                   \
+    void operator=(const Self &) = delete;                          \
   }
 
 mdcmEventMacro(NoEvent, Event);
