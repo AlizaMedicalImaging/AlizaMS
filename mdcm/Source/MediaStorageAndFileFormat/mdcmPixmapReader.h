@@ -65,7 +65,7 @@ public:
   GetPixmap() const;
   Pixmap &
   GetPixmap();
-  virtual bool
+  bool
   Read() override;
 
 protected:

@@ -38,7 +38,7 @@ class MDCM_EXPORT SurfaceWriter : public SegmentWriter
 {
 public:
   SurfaceWriter()= default;
-  virtual ~SurfaceWriter() override = default;
+  ~SurfaceWriter() override = default;
   bool
   Write() override;
   unsigned long

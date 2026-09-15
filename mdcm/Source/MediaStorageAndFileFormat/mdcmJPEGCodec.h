@@ -41,7 +41,7 @@ class MDCM_EXPORT JPEGCodec : public ImageCodec
 {
 public:
   JPEGCodec();
-  virtual ~JPEGCodec() override;
+  ~JPEGCodec() override;
   bool
   CanDecode(const TransferSyntax &) const override;
   bool
@@ -57,7 +57,7 @@ public:
   void
   ComputeOffsetTable(bool);
   virtual bool
-  GetHeaderInfo(std::istream &) override;
+  GetHeaderInfo(std::istream &);
   virtual bool
   GetHeaderInfoAndTS(std::istream &, TransferSyntax &);
   void
@@ -77,7 +77,7 @@ protected:
   bool
   StopEncode(std::ostream &) override;
   virtual bool
-  DecodeByStreams(std::istream &, std::ostream &) override;
+  DecodeByStreams(std::istream &, std::ostream &);
   virtual bool
   InternalCode(const char *, size_t, std::ostream &);
   bool
