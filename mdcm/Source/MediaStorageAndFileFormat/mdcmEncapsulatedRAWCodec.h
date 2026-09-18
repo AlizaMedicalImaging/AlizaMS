@@ -26,7 +26,7 @@ public:
   bool
   CanDecode(const TransferSyntax &) const override;
   bool
-  Code(const char *, unsigned long long, DataElement &);
+  Code2(const char *, unsigned long long, DataElement &);
   bool
   Decode2(const DataElement &, char *, unsigned long long);
   bool

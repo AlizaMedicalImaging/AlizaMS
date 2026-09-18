@@ -31,7 +31,7 @@ EncapsulatedRAWCodec::CanDecode(const TransferSyntax & ts) const
 }
 
 bool
-EncapsulatedRAWCodec::Code(const char * in, unsigned long long len, DataElement & out)
+EncapsulatedRAWCodec::Code2(const char * in, unsigned long long len, DataElement & out)
 {
   const unsigned int * dims = this->GetDimensions();
   if ((len % dims[2]) != 0)

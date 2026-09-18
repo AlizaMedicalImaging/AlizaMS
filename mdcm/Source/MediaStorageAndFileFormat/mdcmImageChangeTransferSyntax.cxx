@@ -301,7 +301,7 @@ ImageChangeTransferSyntax::TryEncapsulatedRAWCodec(const DataElement & pixelde, 
     codec.SetPixelFormat(input.GetPixelFormat());
     codec.SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     DataElement out;
-    if (!codec.Code(buffer, len, out))
+    if (!codec.Code2(buffer, len, out))
       return false;
     DataElement & de = output.GetDataElement();
     de.SetValue(out.GetValue());
